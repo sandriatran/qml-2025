@@ -1,0 +1,25 @@
+---
+title: "Language practices of Emilian and Esperanto communities: spaces of use, explicit language attitudes and self-reported competence"
+author:
+  - Jessica Hampton
+  - Stefano Coretta
+year: 2020
+populations: ["Emilian", "Esperanto"]
+languages: ["Emilian", "Esperanto"]
+url: "https://github.com/stefanocoretta/emilian-esperanto/blob/main/data/rds/emilianto_attitude.rds"
+doi: "10.31219/osf.io/jqgku"
+format: 
+  html:
+    template-partials: /assets/partials/title-metadata.html
+data-entry:
+  project:
+    title: ""
+  compendium:
+    url: "https://github.com/stefanocoretta/emilian-esperanto"
+  publication:
+    title: "Language practices of Emilian and Esperanto communities: spaces of use, explicit language attitudes and self-reported competence"
+    year: 2024
+    doi: "10.1080/01434632.2024.2413933"
+    abstract: |
+      This paper provides a comparative analysis of the language practices maintained by speakers of two minoritised languages: Emilian and Esperanto. Emilian is a Gallo-Italic language group historically spoken in the Emilia Romagna region of Italy for which very little is currently known. Esperanto is seemingly maintaining itself more successfully than Emilian and can therefore serve as an insightful member of comparison. We administered a sociolinguistic questionnaire designed to5quantify spaces of language use and attitudes towards each language to investigate the following: (i) spaces of language use and (ii) language attitudes in the two communities, and (iii) the relationship between spaces, language attitudes and competence. The results suggest that the relationship between language attitudes and competence is modulated by spaces of use: at lower proportions of9spaces of use, language attitudes are more positively correlated with language competence, while at higher proportions of spaces of use, the relationship between attitude and competence is reduced. Although Emilian is maintained in less spaces than Esperanto is, we observe that it is still used in local spaces. We propose that creating spaces for users of minoritised language like Emilian could engender higher levels of language competence and hence language maintenance.
+---

@@ -1,0 +1,58 @@
+---
+format: 
+  html:
+    template-partials: /assets/partials/title-metadata.html
+title: "Mixean Basque Voice Onset Time"
+author: 
+  - "Ander Egurtzegi"
+  - "Chris Carignan"
+year: 2020
+languages: ["Mixean Basque"]
+populations: ["Basque"]
+data-entry:
+  project:
+    title: "Mixean Basque"
+  compendium:
+    url: "https://osf.io/fp83h/"
+  publication:
+    title: "An acoustic description of Mixean Basque"
+    doi: "10.1121/10.0000996"
+---
+
+## Variables
+
+`speaker`
+
+:   Speaker's ID.
+
+`word`
+
+:   Word.
+
+`phone`
+
+:   Target phone (graphemic representation).
+
+`prev`
+
+:   Previous phone.
+
+`post`
+
+:   Following phone.
+
+`voicing`
+
+:   Consonant voicing.
+
+`start`
+
+:   Consonant release time (s).
+
+`end`
+
+:   Onset of voicing (s).
+
+`VOT`
+
+:   Voice Onset Time (s).

@@ -1,0 +1,103 @@
+---
+format: 
+  html:
+    template-partials: /assets/partials/title-metadata.html
+title: "Formant trajectories in Italian and Polish"
+author: "Stefano Coretta"
+year: 2018
+url: "https://osf.io/e3ykx"
+languages: ["Italian", "Polish"]
+populations: ["Italian", "Polish"]
+data-entry:
+  project:
+    title: "Vowel duration and consonant voicing: A production study"
+  compendium:
+    doi: "10.17605/OSF.IO/W92ME"
+    url: "https://osf.io/w92me/"
+---
+
+## Variables
+
+`speaker`
+
+:   speaker's ID
+
+`file`
+
+:   audio chunk file name
+
+`word`
+
+:   word stimulus
+
+`time`
+
+:   time point within vowel (9 points per vowel)
+
+`f1`
+
+:   F1 (Hz)
+
+`f2`
+
+:   F2 (Hz)
+
+`f3`
+
+:   F3 (Hz)
+
+`f4`
+
+:   fundamental frequency (F0) (Hz)
+
+`language`
+
+:   speaker's native language (`Italian`, `Polish`)
+
+`gender`
+
+:   speaker's gender (`f`, `m`)
+
+`glottocode`
+
+:   language Glottocode
+
+`item`
+
+:   word ID number
+
+`ipa`
+
+:   IPA transcription of the word
+
+`c1`
+
+:   first consonant (C1)
+
+`c1_phonation`
+
+:   voicing of C1 (`voiceless`, `voiced`)
+
+`vowel`
+
+:   V1 and V2 (`a`, `o`, `u`)
+
+`anteropost`
+
+:   backness of the vowel (`back`, `central`)
+
+`height`
+
+:   height of the vowel (`high`, `mid`, `low`)
+
+`c2`
+
+:   second consonant (C2)
+
+`c2_phonation`
+
+:   voicing of C2 (`voiceless` or `voiced`)
+
+`c2_place`
+
+:   place of C2 (`coronal`, \`velar\`\`)

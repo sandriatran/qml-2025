@@ -1,0 +1,51 @@
+---
+format: 
+  html:
+    template-partials: /assets/partials/title-metadata.html
+title: "Pupillometry reveals cognitive demands of lexical competition during spoken word recognition in young and older adults (subset)"
+description: 
+  "A subset of the data on pupil width for the project *Pupillometry reveals cognitive demands of lexical competition during spoken word recognition in young and older adults*."
+author: 
+  - Drew Jordan McLaughlin
+  - Maggie Zink
+  - Lauren Gaunt
+  - Brent Spehar
+  - Kristin Van Engen
+  - Mitchell S. Sommers
+  - Jonathan E. Peelle
+year: 2023
+languages: "American English"
+population: "American English"
+data-entry:
+  project:
+    title: "Pupillometry reveals cognitive demands of lexical competition during spoken word recognition in young and older adults"
+  compendium:
+    url: "https://osf.io/s5ut8/"
+  publication:
+    title: "Pupillometry reveals cognitive demands of lexical competition during spoken word recognition in young and older adults"
+    doi: "10.3758/s13423-021-01991-0"
+    abstract: |
+      In most contemporary activation-competition frameworks for spoken word recognition, candidate words compete against phonological "neighbors"" with similar acoustic properties (e.g., "cap"" vs. "cat""). Thus, recognizing words with more competitors should come at a greater cognitive cost relative to recognizing words with fewer competitors, due to increased demands for selecting the correct item and inhibiting incorrect candidates. Importantly, these processes should operate even in the absence of differences in accuracy. In the present study, we tested this proposal by examining differences in processing costs associated with neighborhood density for highly intelligible items presented in quiet. A second goal was to examine whether the cognitive demands associated with increased neighborhood density were greater for older adults compared with young adults. Using pupillometry as an index of cognitive processing load, we compared the cognitive demands associated with spoken word recognition for words with many or fewer neighbors, presented in quiet, for young (n = 67) and older (n = 69) adult listeners. Growth curve analysis of the pupil data indicated that older adults showed a greater evoked pupil response for spoken words than did young adults, consistent with increased cognitive load during spoken word recognition. Words from dense neighborhoods were marginally more demanding to process than words from sparse neighborhoods. There was also an interaction between age and neighborhood density, indicating larger effects of density in young adult listeners. These results highlight the importance of assessing both cognitive demands and accuracy when investigating the mechanisms underlying spoken word recognition.
+---
+
+## Variables
+
+`subject`
+
+:   Patricipant's ID.
+
+`trial`
+
+:   Trial number.
+
+`Condition`
+
+:   Neighbourhood density condition (`Dense` or `Sparse`).
+
+`Age`
+
+:   Participant's age bin (`OA` old adult, `YA` young adult).
+
+`pupil_max`
+
+:   Maximum pupil size within trial (scaled within trial and subject, originally in arbitrary units AU).

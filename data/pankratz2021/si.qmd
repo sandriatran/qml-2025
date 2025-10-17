@@ -1,0 +1,47 @@
+---
+title: "The role of relevance for scalar diversity"
+author:
+  - Elizabeth Pankratz
+  - Bob van Tiel
+year: 2021
+languages: "English"
+population: "English"
+doi: "10.1017/langcog.2021.13"
+url: "https://osf.io/t3b4u/"
+abstract: |
+  Scalar inferences occur when a weaker statement like *It’s warm* is used when a stronger one like *It’s hot* could have been used instead, resulting in the inference that whoever produced the weaker statement believes that the stronger statement does not hold. The rate at which this inference is drawn varies across scalar words, a result termed ‘scalar diversity’. Here, we study scalar diversity in adjectival scalar words from a usage-based perspective. We introduce novel operationalisations of several previously observed predictors of scalar diversity using computational tools based on usage data, allowing us to move away from existing judgment-based methods. In addition, we show in two experiments that, above and beyond these previously observed predictors, scalar diversity is predicted in part by the relevance of the scalar inference at hand. We introduce a corpus-based measure of relevance based on the idea that scalar inferences that are more relevant are more likely to occur in scalar constructions that draw an explicit contrast between scalar words (e.g., *It’s warm but not hot*). We conclude that usage has an important role to play in the establishment of common ground, a requirement for pragmatic inferencing.
+---
+
+## Variables
+
+`weak_adj`
+
+:   The weaker adjective on the tested scale (paired with the stronger adjective in `strong_adj`).
+
+`strong_adj`
+
+:   The stronger adjective on the tested scale (paired with the weaker adjective in `weak_adj`).
+
+`SI`
+
+:   Whether or not a participant made a scalar inference for the pair of adjectives in `weak_adj` and `strong_adj` (`no_scalar` if no, `scalar` if yes).
+
+`freq`
+
+:   How frequently the `weak_adj` co-occurred with a stronger adjective on the same scale in a large corpus.
+
+`semdist`
+
+:   A measure of the semantic distance between `weak_adj` and `strong_adj`. A negative score indicates that the words are semantically closer; a positive score indicates that the words are semantically more distant (the units are arbitrary).
+
+`weak_pol`
+
+: A continuous measure of a weak adjective's polarity; Principle Component 1 in a Principle Component Analysis which synthesised each adjective's emotional valence from [Mohammad (2018)](https://doi.org/10.18653/v1/P18-1017).
+
+`bounded`
+
+: Output of a random forest classifier that classified scales as bounded (`1`) or unbounded (`0`).
+
+`extreme`
+
+: Output of a random forest classifier that classified strong adjectives as extreme (`1`) or non-extreme (`0`).

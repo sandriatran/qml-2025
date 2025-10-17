@@ -1,0 +1,109 @@
+---
+format: 
+  html:
+    template-partials: /assets/partials/title-metadata.html
+title: "Albanian formant data"
+author: 
+  - "Stefano Coretta"
+  - "Josiane Riverin-Coutlée"
+  - "Enkeleida Kapia"
+  - "Stephen Nichols"
+year: 2021
+languages: "Northern Tosk Albanian"
+population: "Albanian"
+data-entry:
+  project:
+    title: "IPA Illustration of Northern Tosk Albanian"
+  compendium:
+    doi: "10.17605/OSF.IO/VRY3H"
+    url: "https://osf.io/vry3h/"
+  publication:
+    title: "Northern Tosk Albanian"
+    doi: "10.1017/S0025100322000044"
+---
+
+## Variables
+
+`speaker`
+
+:   Speaker's ID.
+
+`gender`
+
+:   Speaker's gender.
+
+`labels`
+
+:   SAMPA label.
+
+`word`
+
+:   Word with the target vowel.
+
+`bundle`
+
+:   Recording file ID.
+
+`F1`
+
+:   First formant value (Hz).
+
+`F2`
+
+:   Second formant value (Hz).
+
+`F3`
+
+:   Third formant value (Hz).
+
+`start`
+
+:   Onset of vowel (ms within recording).
+
+`end`
+
+:   Offset of vowel (ms within recording).
+
+`sample_start`
+
+:   Sample ID of onset of vowel (within recording).
+
+`sample_end`
+
+:   Sample ID of offset vowel (within recording).
+
+`times_orig`
+
+: [Unknown.]
+
+`vowel`
+
+: IPA vowel.
+
+`F1.z`
+
+:   First formant value (z-score).
+
+`F2.z`
+
+:   Second formant value (z-score).
+
+`F1.z.hz`
+
+:   First formant value (normalised Hz).
+
+`F2.z.hz`
+
+:   Second formant value (normalised Hz).
+
+`F1.z.bark`
+
+:   First formant value (normalised Bark).
+
+`F2.z.bark`
+
+:   Second formant value (normalised Bark).
+
+`F2_F1.z.hz`
+
+:   F2-F1 difference (normalised Hz).

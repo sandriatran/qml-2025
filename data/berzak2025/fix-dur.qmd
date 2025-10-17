@@ -1,0 +1,52 @@
+---
+format: 
+  html:
+    template-partials: /assets/partials/title-metadata.html
+title: "Fixation durations from eye-tracking data (subset)"
+author: 
+  - "Berzak, Yevgeni"
+  - "Malmaud, Jonathan"
+  - "Shubi, Omer"
+  - "Meiri, Yoav"
+  - "Lion, Ella"
+  - "Levy, Roger"
+year: 2025
+languages: "English"
+population: "British English"
+data-entry:
+  project:
+    title: "OneStop Eye Movements"
+  compendium:
+    url: "https://osf.io/2prdq/"
+  publication:
+    title: "OneStop: A 360-Participant English Eye Tracking Dataset with Different Reading Regimes"
+    doi: "https://doi.org/10.31234/osf.io/kgxv5_v1"
+---
+
+## Description
+
+[![© 2020 American Academy of Ophthalmology. Saccades and fixations. https://www.aao.org/image/saccades-fixations](https://eyewiki.org/w/images/6/66/AA0_61866.jpg){fig-align="center"}](https://eyewiki.org/File:AA0_61866.jpg)
+
+This data set contains a subset of the data from [OneStop Eye Movements](https://osf.io/2prdq/). The original data set contains eye-tracking data from 360 participants reading English articles from the Guardian. The subset includes data from 60 participants from the Ordinary Reading task, Batch 1. Data from only the first paragraph is included (the first "trial"). Only the fixation duration and word length are available in the subset.
+
+## Variables
+
+`participant_id`
+
+:   Participant's ID.
+
+`trial_index`
+
+:   Number of trial: in this subset, only trial = 1. In each trial, the participant reads a paragraph.
+
+`article_batch`
+
+:   Batch of articles: in this subset, only first batch.
+
+`CURRENT_FIX_DURATION`
+
+:   Duration of gaze fixation in milliseconds.
+
+`word_length`
+
+:   Length in number of characters of the word being fixated.
