@@ -1,0 +1,22 @@
+---
+title: "QML 2025 Final Reflection"
+author: "Sandria Tran"
+date: 10-17-2025
+format: pdf
+---
+
+|  |  |
+|----------------------|--------------------------------------------------|
+| Group Project title | THE PROJECT TITLE |
+| Group members | MEMBER 1, MEMBER 2, MEMBER 3 (use names, include yourself) |
+
+## Final Reflection
+
+-   There is no word limit, but we suggest to keep this to one page.
+-   You should propose and justify a mark for yourself based on your experience with the course and with working on you Group Project. Note that your mark suggestion is just a suggestion and the tutors and I will make the final decision. You must follow the marking rubric of the course available at <https://uoelel.github.io/qml/assessments.html#feedback-and-marking>.
+
+## Group Project
+
+-   Include your Group Project output or a link to it here.
+-   If the output requires an explanation, but the output itself resides somewhere else and you are including a link, you can add the explanation here (for example, this is helpful when you video/audio recorded your output and you need to describe what you have done).
+-   If unsure how to include your output, post a question on Piazza.

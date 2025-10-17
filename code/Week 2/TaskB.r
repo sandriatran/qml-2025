@@ -65,7 +65,17 @@
 #       Lecture: https://uoelel.github.io/qml/lectures/week-01.html
 #       Textbook (PDF): https://stefanocoretta.github.io/qdal/Quantitative-Data-Analysis-for-Linguists-in-R.pdf
 #       Textbook(Online):https://stefanocoretta.github.io/qdal/
-#
+#        Citation:  Dryer, Matthew S. & Haspelmath, Martin (eds.) 2013. The World Atlas of Language Structures Online. Leipzig: Max Planck Institute for Evolutionary Anthropology.
+#        (Available online at https://wals.info/, Accessed on 2025-10-17.)
+
+#         @book{wals,
+#          address   = {Leipzig},
+#          editor    = {Matthew S. Dryer and Martin Haspelmath},
+#          publisher = {Max Planck Institute for Evolutionary Anthropology},
+#          title     = {WALS Online},
+#          url       = {https://wals.info/},
+#          year      = {2013}
+
 # ==============================================================================
 
 library(tidyverse)

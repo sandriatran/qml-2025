@@ -31,6 +31,8 @@ The course emphasizes general principles of data analysis and fosters an egalita
 
 ```
 ├── code/
+|   ├── outputs # Week 2 - 11 Data Visualizations 
+|   ├── Week 1  # Notes 1
 │   ├── Week 2  # Summarise, count, and group data
 │   ├── Week 3  # Plot basics and data visualization
 │   ├── Week 4  # Gaussian models with brms
