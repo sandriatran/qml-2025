@@ -1,0 +1,90 @@
+---
+format: 
+  html:
+    template-partials: /assets/partials/title-metadata.html
+title: "Domestic and International Common Language (DICL) Database"
+author: 
+  - Gurevich, Tamara
+  - Herman, Peter
+  - Toubal, Farid
+  - Yotov, Yoto
+year: 2024
+description: |
+  The database contains 11 index measures of linguistic similarity between 242 countries, both domestically and internationally. The domestic measures capture linguistic similarities present among populations within a single country while the international indexes capture language similarities between two different countries. The indexes, which are based on 6,674 languages, reflect three different dimensions of language: common official languages, common native and acquired spoken languages, and linguistic proximity across different languages. This database has many uses, such as in the study of bilateral flows—including FDI, migration, and international trade—as well as in regional or country level analyses.
+languages: ""
+population: "World population"
+data-entry:
+  project:
+    title: "Domestic and International Common Language (DICL) Database"
+  compendium:
+    doi: "10.7910/DVN/8WGJTL"
+    url: "https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/8WGJTL&version=3.0"
+  publication:
+    title: "A Dataset on Linguistic Connectivity Across and Within Countries"
+    doi: "10.1038/s41597-025-04692-8"
+    year: 2025
+    abstract: |
+      We construct a new global dataset on common language. The data cover 242 countries and territories and are based on information about the speakers of 6,675 languages. Using data from Ethnologue, we provide 11 bilateral measures reflecting different dimensions of linguistic connections within and between countries, including common official languages, common native and acquired languages, and linguistic proximity across different languages. A key novelty of the dataset is that it includes consistently defined information on linguistic relationships not only between different countries but within the administrative borders of countries as well.
+---
+
+## Variables
+
+`iso3_i`
+
+:   ISO 3-letter code for country *i*.
+
+`country_i`
+
+:   Full name of country *i*.
+
+`iso3_j`
+
+:   ISO 3-letter code for country *j*.
+
+`country_j`
+
+:   Full name of country *j*.
+
+`col`
+
+:   Common official language indicator \[`1` if countries *i* and *j* share at least one official language (national or provincial, statutory or de facto), `0` otherwise\].
+
+`cor`
+
+:   Restricted official language indicator \[`1` if countries share at least one national statutory or de facto official language, `0` otherwise\].
+
+`cnl`
+
+:   Common native language index: it measures overlap in native language speakers.
+
+`cal`
+
+:   Common acquired language index: it measures overlap in non-native or learned languages.
+
+`csl`
+
+:   Common spoken language index: it measures overlap in all spoken languages (native + acquired).
+
+`lpn`
+
+:   Linguistic proximity for different native languages: it measures how closely related the native languages of the two countries are.
+
+`lpa`
+
+:   Linguistic proximity for different acquired languages: same as `lpn` but for acquired languages.
+
+`lps`
+
+:   Linguistic proximity for all spoken languages.
+
+`bpn`
+
+:   Branch proximity for native languages.
+
+`bpa`
+
+:   Branch proximity for acquired languages.
+
+`bps`
+
+:   Branch proximity for all spoken languages.

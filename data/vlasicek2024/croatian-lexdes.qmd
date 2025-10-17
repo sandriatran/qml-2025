@@ -1,0 +1,86 @@
+---
+format: 
+  html:
+    template-partials: /assets/partials/title-metadata.html
+title: "Lexical decision times for nouns from the Croatian Psycholinguistic Database"
+author: 
+  - Vlašiček, Denis
+  - Dumančić, Francesca
+  - Tonković, Mirjana
+year: 2024
+languages: "Croatian"
+population: "Croatian"
+doi: "10.23669/EV3NFJ/HCE636"
+data-entry:
+  project:
+    title: "MegaRT: Lexical Decision Times for Croatian Words"
+  compendium:
+    doi: "10.23669/EV3NFJ"
+    url: "https://data.crossda.hr/dataset.xhtml?persistentId=doi:10.23669/EV3NFJ&version=2.0"
+---
+
+## Variables
+
+`word_string`
+
+:   A Croatian noun.
+
+`word_type`
+
+:   Type of word.
+
+`word_gender`
+
+:   The word’s gender in the Croatian language.
+
+`word_represents_animate`
+
+:   Whether the word represents something animate or inanimate.
+
+`word_num_letters`
+
+:   The number of letters in the word.
+
+`word_frequency`
+
+:   Word frequency as listed in the Croatian Psycholinguistic Database (CPB).
+
+`concreteness_n`
+
+:   Number of estimates of word concreteness; as listed in the CPB.
+
+`concreteness_m`
+
+:   Mean of the participants’ concreteness ratings; as listed in the CPB.
+
+`concreteness_median`
+
+:   Median of the participants’ concreteness ratings; as listed in the CPB.
+
+`concreteness_stddev`
+
+:   Standard deviation of the participants’ concreteness ratings; as listed in the CPB.
+
+`concreteness_min`
+
+:   Minimum of the participants’ concreteness ratings; as listed in the CPB.
+
+`concreteness_max`
+
+:   Maximum of the participants’ concreteness ratings; as listed in the CPB.
+
+`subjective_frequency_x`
+
+:   Analogous to the concreteness_x variables but for subjective frequency ratings.
+
+`imageability_x`
+
+:   Analogous to the concreteness_x variables but for imageability ratings.
+
+`age_of_acquisition_x`
+
+:   Analogous to the concreteness_x variables but for age-of-acquisition ratings; with the exception that the maximum value is theoretically limited by the human lifespan.
+
+`rt_milliseconds_x`
+
+:   Summary statistics for lexical decision times to the word_string expressed in milliseconds. Analogous to the CPB ratings.

@@ -1,0 +1,236 @@
+---
+format: 
+  html:
+    template-partials: /assets/partials/title-metadata.html
+title: "Acoustics and articulatory durational measures of Italian and Polish"
+author: "Stefano Coretta"
+year: 2018
+url: "https://osf.io/294pj"
+populations: ["Italian", "Polish"]
+languages: ["Italian", "Polish"]
+data-entry:
+  project:
+    title: "Vowel duration and consonant voicing: A production study"
+  compendium:
+    doi: "10.17605/OSF.IO/W92ME"
+    url: "https://osf.io/w92me/"
+  publication:
+    title: "An exploratory study of voicing-related differences in vowel duration as compensatory temporal adjustment in Italian and Polish"
+    doi: "10.5334/gjgl.869"
+    abstract: |
+      Over a century of phonetic research has established the cross-linguistic existence of the so called “voicing effect”, by which vowels tend to be shorter when followed by voiceless stops and longer when the following stop is voiced. However, no agreement is found among scholars regarding the source of this effect, and several causal accounts have been advanced. A notable one is the compensatory temporal adjustment account, according to which the duration of the vowel is inversely correlated with the stop closure duration (voiceless stops having longer closure durations than voiced stops). The compensatory account has been criticised due to lack of empirical support and its vagueness regarding the temporal interval within which compensation is implemented. The results from an exploratory study of Italian and Polish suggest that the duration of the interval between two consecutive stop releases in CVCV words in these languages is not affected by the voicing of the second stop. The durational difference of the first vowel and the stop closure would then follow from differences in timing of the VC boundary within this interval. While other aspects, like production mechanisms related to laryngeal features effects and perceptual biases cannot be ruled out, the data discussed here are compatible with a production account based on compensatory mechanisms.
+---
+
+## Variables
+
+`index`
+
+:   observation number within speaker
+
+`speaker`
+
+:   speaker's ID
+
+`file`
+
+:   audio chunk file name
+
+`rec_date`
+
+:   date and time of recording
+
+`ipu`
+
+:   SPPAS IPU index
+
+`prompt`
+
+:   sentence stimulys
+
+`word`
+
+:   word stimulus
+
+`time`
+
+:   time of the sentence onset within the concatenated audio file (s)
+
+`sentence_ons`
+
+:   onset time of the sentence (s)
+
+`sentence_off`
+
+:   offset time of the sentence (s)
+
+`word_ons`
+
+:   onset time of the target word (s)
+
+`word_off`
+
+:   offset time of the target word (= C1 onset) (s)
+
+`v1_ons`
+
+:   onset time of V1 (= C1 offset) (s)
+
+`c2_ons`
+
+:   onset time of C2 (= V1 offset) (s)
+
+`v2_ons`
+
+:   onset time of V2 (= C2 offset) (s)
+
+`c1_rel`
+
+:   time of C1 release (s)
+
+`c2_rel`
+
+:   time of C2 release (s)
+
+`voicing_start`
+
+:   time of voicing onset (s)
+
+`voicing_end`
+
+:   time of voicing offset (s)
+
+`voicing_duration`
+
+:   duration of voiced interval (ms)
+
+`voiced_points`
+
+:   number of points out of 5 within the first half of C1 closure in which voicing is present
+
+`GONS`
+
+:   onset of C1 closing gesture (s)
+
+`max`
+
+:   time of maximum displacement of C1 closing gesture (s)
+
+`NOFF`
+
+:   offset of C1 gesture nucleus (s)
+
+`NONS`
+
+:   onset of C1 gesture nucleus (s)
+
+`peak1`
+
+:   first tongue velocity peak (s)
+
+`peak2`
+
+:   second tongue velocity peak (s)
+
+`c1_duration`
+
+:   duration of C1 (ms)
+
+`c1_clos_duration`
+
+:   duration of C1 closure (ms)
+
+`c1_vot`
+
+:   C1 Voice Onset Time (ms)
+
+`c1_rvofft`
+
+:   C1 release to V1 offset time (ms)
+
+`v1_duration`
+
+:   duration of V1 (ms)
+
+`c1_duration`
+
+:   duration of C1 (ms)
+
+`c2_clos_duration`
+
+:   duration of C2 closure (ms)
+
+`v2_duration`
+
+:   duration of V2 (ms)
+
+`v_v`
+
+:   V1 onset to V2 onset (Vowel-to-Vowel) duration (ms)
+
+`word_duration`
+
+:   duration of the word (ms)
+
+`sentence_duration`
+
+:   duration of sentence (s)
+
+`language`
+
+:   speaker's native language (`Italian`, `Polish`)
+
+`gender`
+
+:   speaker's sex (`f`, `m`)
+
+`glottocode`
+
+:   language Glottocode
+
+`item`
+
+:   word ID number
+
+`ipa`
+
+:   IPA transcription of the word
+
+`c1`
+
+:   first consonant (C1)
+
+`c1_phonation`
+
+:   voicing of C1 (`voiceless`, `voiced`)
+
+`vowel`
+
+:   V1 and V2 (`a`, `o`, `u`)
+
+`anteropost`
+
+:   backness of the vowel (`back`, `central`)
+
+`height`
+
+:   height of the vowel (`high`, `mid`, `low`)
+
+`c2`
+
+:   second consonant (C2)
+
+`c2_phonation`
+
+:   voicing of C2 (`voiceless` or `voiced`)
+
+`c2_place`
+
+:   place of C2 (`coronal`, `velar`)
+
+`speech_rate`
+
+:   speech rate as syllables per second
+
+`speech_rate_c`
+
+:   centred speech rate as syllables per second

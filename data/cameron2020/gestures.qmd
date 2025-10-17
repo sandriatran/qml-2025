@@ -1,0 +1,62 @@
+---
+title: "A Cross-Cultural Analysis of Early Prelinguistic Gesture Development and Its Relationship to Language Development"
+author:
+  - Thea Cameron-Faulkner
+  - Nivedita Malik
+  - Circle Steele
+  - Stefano Coretta
+  - Ludovica Serratrice
+  - Elena Lieven
+year: 2020
+population: ["Cantonese", "Bangladeshi", "British"]
+doi: "10.1111/cdev.13406"
+url: "https://github.com/stefanocoretta/infant-gestures"
+abstract: |
+  Many Western industrialized nations have high levels of ethnic diversity but to date there are very few studies which investigate prelinguistic and early language development in infants from ethnic minority backgrounds. This study tracked the development of infant communicative gestures from 10 to 12 months (n = 59) in three culturally distinct groups in the United Kingdom and measured their relationship, along with maternal utterance frequency and responsiveness, to vocabulary development at 12 and 18 months. No significant differences were found in infant gesture development and maternal responsiveness across the groups, but relationships were identified between gesture, maternal responsiveness, and vocabulary development.
+---
+
+## Variables
+
+`dyad`
+
+:   Mother/infant dyad ID.
+
+`background`
+
+:   Infant cultural background (`English`, `Bengali`, `Cantonese`).
+
+`months`
+
+:   Infant's age in months.
+
+`task`
+
+:   Laboratory task (`five`: five minute play, `tp1`: object gallery 1, `tp2`: object gallery 2).
+
+`gesture`
+
+:   Gesture type (`reach`: reach out with open hand, `point`: index-finger pointing, `ho_gv`: object hold-out and give object to parent).
+
+`count_raw`
+
+:   Raw gesture count.
+
+`count`
+
+:   Gesture count (if `pro_rata == "yes"`, pro-rata count when task ended before allotted time).
+
+`ct_raw`
+
+:   Raw mother's contingent talk count.
+
+`ct`
+
+:   Mother's contingent talk count (if `pro_rata == "yes"`, pro-rata count when task ended before allotted time).
+
+`pro_rata`
+
+:   Whether a pro-rata adjustment was applied in case the task ended before the alloted time.
+
+`id`
+
+:   Unique numeric ID.

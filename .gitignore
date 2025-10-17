@@ -1,0 +1,13 @@
+# macOS files
+.DS_Store
+*.DS_Store
+
+# R files
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj
+
+# Temporary files
+Rplots.pdf
