@@ -75,22 +75,45 @@ library(here)
 output_dir <- here("code", "outputs")
 if (!dir.exists(output_dir)) dir.create(output_dir, recursive = TRUE)
 
-# Step 1: Install and load ritwals package
-# NOTE: If ritwals is not installed, uncomment and run these lines once:
-# install.packages("devtools")
-# devtools::install_github("stefanocoretta/ritwals")
+# Step 1: Install and load linguistic typology package with WALS data
+# NOTE: ritwals package doesn't exist, but lingtypology has WALS data
+# To install: install.packages("lingtypology")
 
-# Step 2: Load ritwals package
-if (!require("ritwals", quietly = TRUE)) {
-  cat("ERROR: ritwals package not installed.\n")
-  cat("Please install it by running:\n")
-  cat("  install.packages('devtools')\n")
-  cat("  devtools::install_github('stefanocoretta/ritwals')\n")
-  stop("Missing required package: ritwals")
+# Step 2: Load lingtypology package (contains WALS database)
+if (!require("lingtypology", quietly = TRUE)) {
+  cat("Installing lingtypology package (contains WALS data)...\n")
+  install.packages("lingtypology", repos = "https://cloud.r-project.org")
 }
 
-library(ritwals)
-data("WALS")
+library(lingtypology)
+
+# Load WALS data from lingtypology
+# Fetch specific features of interest
+features_to_fetch <- c("1A", "13A", "81A", "87A")
+wals_data <- wals.feature(features_to_fetch)
+
+# Convert wide format to long format (tidy data)
+# Each row = one language-feature-value combination
+WALS <- wals_data %>%
+  select(language, `1A`, `13A`, `81A`, `87A`) %>%
+  pivot_longer(
+    cols = -language,
+    names_to = "feature_ID",
+    values_to = "value"
+  ) %>%
+  filter(!is.na(value)) %>%
+  mutate(
+    feature = case_when(
+      feature_ID == "1A" ~ "Consonant Inventories",
+      feature_ID == "13A" ~ "Tone",
+      feature_ID == "81A" ~ "Order of Subject, Object and Verb",
+      feature_ID == "87A" ~ "Order of Adjective and Noun"
+    )
+  )
+
+cat("WALS data loaded from lingtypology package\n")
+cat("Available features:", length(unique(WALS$feature_ID)), "\n")
+cat("Total observations:", nrow(WALS), "\n\n")
 
 # Explore the data structure
 glimpse(WALS)
@@ -129,18 +152,12 @@ adj_noun <- WALS %>%
   arrange(desc(n_languages))
 print(adj_noun)
 
-# Bonus: Get summary for ALL features
+# Summary for all fetched features
 all_features_summary <- WALS %>%
   group_by(feature_ID, feature, value) %>%
   summarise(n_languages = n(), .groups = "drop") %>%
   arrange(feature_ID, desc(n_languages))
 print(all_features_summary)
-
-# Optional: See what features are available
-features_list <- WALS %>%
-  distinct(feature_ID, feature) %>%
-  arrange(feature_ID)
-print(features_list)
 
 # Visualization 1: Consonant Inventories
 p1 <- ggplot(consonant_inv, aes(x = reorder(value, n_languages), y = n_languages)) +
