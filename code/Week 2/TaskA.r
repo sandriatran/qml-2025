@@ -94,9 +94,9 @@ vot_by_voicing <- ita_egg %>%
   )
 print(vot_by_voicing)
 
-# Summary of VOT by place of articulation
+# Summary of VOT by place of articulation (using c2_place for the second consonant)
 vot_by_place <- ita_egg %>%
-  group_by(place) %>%
+  group_by(c2_place) %>%
   summarise(
     mean_VOT = mean(vot, na.rm = TRUE),
     sd_VOT = sd(vot, na.rm = TRUE),
@@ -114,16 +114,7 @@ vot_by_vowel <- ita_egg %>%
   )
 print(vot_by_vowel)
 
-# Combined summary: VOT by voicing AND place
-vot_by_voicing_place <- ita_egg %>%
-  group_by(voicing, place) %>%
-  summarise(
-    mean_VOT = mean(vot, na.rm = TRUE),
-    sd_VOT = sd(vot, na.rm = TRUE),
-    n = n(),
-    .groups = "drop"
-  )
-print(vot_by_voicing_place)
+# (VOT by voicing and place combined summary moved to visualization section below)
 
 # Combined summary: VOT by voicing AND vowel
 vot_by_voicing_vowel <- ita_egg %>%
@@ -151,14 +142,24 @@ p1 <- ggplot(ita_egg, aes(x = vot, fill = voicing)) +
 ggsave(here("code", "Week 2", "TaskA_vot_by_voicing.png"), p1, width = 8, height = 5)
 ggsave(here("code", "outputs", "Week2_TaskA_vot_by_voicing.png"), p1, width = 8, height = 5)
 
+# Combined summary: VOT by voicing AND place (using c2_place)
+vot_by_voicing_place <- ita_egg %>%
+  group_by(voicing, c2_place) %>%
+  summarise(
+    mean_VOT = mean(vot, na.rm = TRUE),
+    sd_VOT = sd(vot, na.rm = TRUE),
+    n = n(),
+    .groups = "drop"
+  )
+
 # Visualization 2: VOT by place of articulation and voicing
-p2 <- ggplot(vot_by_voicing_place, aes(x = place, y = mean_VOT, fill = voicing)) +
+p2 <- ggplot(vot_by_voicing_place, aes(x = c2_place, y = mean_VOT, fill = voicing)) +
   geom_col(position = "dodge") +
   geom_errorbar(aes(ymin = mean_VOT - sd_VOT, ymax = mean_VOT + sd_VOT),
                 position = position_dodge(0.9), width = 0.25) +
   labs(
     title = "Mean VOT by Place of Articulation and Voicing",
-    x = "Place of Articulation",
+    x = "Place of Articulation (C2)",
     y = "Mean VOT (ms)",
     fill = "Voicing"
   ) +

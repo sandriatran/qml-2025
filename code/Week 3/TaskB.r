@@ -17,7 +17,7 @@
 #         (1) What does the research cycle entail?
 #            (a) Research Question / Hypothesis 
 #            (b) Study Design
-#            (c) Data Acquisiton 
+#            (c) Data Acquisition 
 #            (d) Data Analysis
 #            (e) interpretation
 #            (f) Publication / Next Study 

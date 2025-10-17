@@ -17,7 +17,7 @@
 #         (1) What does the research cycle entail?
 #            (a) Research Question / Hypothesis 
 #            (b) Study Design
-#            (c) Data Acquisiton 
+#            (c) Data Acquisition 
 #            (d) Data Analysis
 #            (e) interpretation
 #            (f) Publication / Next Study 
@@ -106,7 +106,7 @@ ggsave(here("code", "Week 3", "TaskA_vot_boxplot.png"), p2, width = 7, height = 
 ggsave(here("code", "outputs", "Week3_TaskA_vot_boxplot.png"), p2, width = 7, height = 5)
 
 # Answer: Can VOT differentiate between the two voicing categories?
-cat("\n=== ANSWER ===\n")
+cat("\n== ANSWER ==\n")
 cat("Yes, VOT clearly differentiates between voiced and voiceless consonants.\n")
 cat("Voiced consonants have a mean VOT of", round(vot_summary$mean_VOT[vot_summary$voicing == "voiced"], 1), "ms\n")
 cat("Voiceless consonants have a mean VOT of", round(vot_summary$mean_VOT[vot_summary$voicing == "voiceless"], 1), "ms\n")
