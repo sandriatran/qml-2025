@@ -126,11 +126,13 @@ rt_by_status_accuracy <- mald %>%
 print(rt_by_status_accuracy)
 
 # Accuracy by lexical status
+# ACC is a factor with levels "correct"/"incorrect", convert to numeric (1/0)
 accuracy_by_status <- mald %>%
+  mutate(ACC_numeric = as.numeric(ACC == "correct")) %>%
   group_by(IsWord) %>%
   summarise(
-    mean_accuracy = mean(ACC, na.rm = TRUE),
-    sd_accuracy = sd(ACC, na.rm = TRUE),
+    mean_accuracy = mean(ACC_numeric, na.rm = TRUE),
+    sd_accuracy = sd(ACC_numeric, na.rm = TRUE),
     n = n()
   )
 print(accuracy_by_status)
@@ -139,10 +141,11 @@ print(accuracy_by_status)
 
 # Individual variation: RT and accuracy by participant and lexical status
 individual_variation <- mald %>%
+  mutate(ACC_numeric = as.numeric(ACC == "correct")) %>%
   group_by(Subject, IsWord) %>%
   summarise(
     mean_RT = mean(RT, na.rm = TRUE),
-    mean_accuracy = mean(ACC, na.rm = TRUE),
+    mean_accuracy = mean(ACC_numeric, na.rm = TRUE),
     n = n(),
     .groups = "drop"
   )
