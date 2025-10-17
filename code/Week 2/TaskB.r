@@ -75,11 +75,20 @@ library(here)
 output_dir <- here("code", "outputs")
 if (!dir.exists(output_dir)) dir.create(output_dir, recursive = TRUE)
 
-# Step 1: Install packages (run once)
+# Step 1: Install and load ritwals package
+# NOTE: If ritwals is not installed, uncomment and run these lines once:
 # install.packages("devtools")
 # devtools::install_github("stefanocoretta/ritwals")
 
-# Step 2: Attach ritwals and load WALS data
+# Step 2: Load ritwals package
+if (!require("ritwals", quietly = TRUE)) {
+  cat("ERROR: ritwals package not installed.\n")
+  cat("Please install it by running:\n")
+  cat("  install.packages('devtools')\n")
+  cat("  devtools::install_github('stefanocoretta/ritwals')\n")
+  stop("Missing required package: ritwals")
+}
+
 library(ritwals)
 data("WALS")
 
