@@ -80,6 +80,10 @@ load(here("data", "coretta2018a", "ita_egg.rda"))
 # Basic summary of the dataset structure
 glimpse(ita_egg)
 
+# Create voicing category from consonant (c2)
+ita_egg <- ita_egg %>%
+  mutate(voicing = if_else(c2 %in% c("b", "d", "g"), "voiced", "voiceless"))
+
 # Summary of VOT by voicing
 vot_by_voicing <- ita_egg %>%
   group_by(voicing) %>%

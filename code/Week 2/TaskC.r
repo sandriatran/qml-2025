@@ -90,14 +90,14 @@ n_participants <- mald %>%
   summarise(n_participants = n_distinct(Subject))
 print(n_participants)
 
-# Number of words
+# Number of words/items
 n_words <- mald %>%
-  summarise(n_words = n_distinct(Word))
+  summarise(n_words = n_distinct(Item))
 print(n_words)
 
 # Number of words by lexical status (IsWord)
 words_by_status <- mald %>%
-  distinct(Word, IsWord) %>%
+  distinct(Item, IsWord) %>%
   group_by(IsWord) %>%
   summarise(n_words = n())
 print(words_by_status)
