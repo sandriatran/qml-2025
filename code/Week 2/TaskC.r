@@ -73,12 +73,23 @@
 library(tidyverse)
 library(here)
 
+# Set working directory to project root (where .here file or .git directory is)
+# This ensures here() works correctly regardless of how the script is run
+here::i_am("code/Week 2/TaskC.r")
+
 # Create outputs directory
 output_dir <- here("code", "outputs")
 if (!dir.exists(output_dir)) dir.create(output_dir, recursive = TRUE)
 
 # Step 1: Read the MALD data
-mald <- readRDS(here("data", "tucker2019", "mald_1_1.rds"))
+# Verify the file path
+data_path <- here("data", "tucker2019", "mald_1_1.rds")
+if (!file.exists(data_path)) {
+  stop("Data file not found at: ", data_path,
+       "\nCurrent working directory: ", getwd(),
+       "\nProject root (here): ", here())
+}
+mald <- readRDS(data_path)
 
 # Explore the data structure
 glimpse(mald)
