@@ -210,15 +210,38 @@ ggsave(here("code", "Week 2", "TaskC_mean_rt.png"), p2, width = 7, height = 5)
 ggsave(here("code", "outputs", "Week2_TaskC_mean_rt.png"), p2, width = 7, height = 5)
 
 # Visualization 3: Accuracy by lexical status
-p3 <- ggplot(accuracy_by_status, aes(x = IsWord, y = mean_accuracy, fill = IsWord)) +
-  geom_col() +
-  geom_errorbar(aes(ymin = mean_accuracy - sd_accuracy, ymax = mean_accuracy + sd_accuracy), width = 0.2) +
+# For binary accuracy data, use barplot with confidence intervals
+# First, calculate participant-level accuracy for individual variation visualization
+participant_accuracy <- mald %>%
+  mutate(ACC_numeric = as.numeric(ACC == "correct")) %>%
+  group_by(Subject, IsWord) %>%
+  summarise(mean_accuracy = mean(ACC_numeric, na.rm = TRUE), .groups = "drop")
+
+# Calculate group-level means and 95% confidence intervals
+accuracy_summary <- participant_accuracy %>%
+  group_by(IsWord) %>%
+  summarise(
+    mean_acc = mean(mean_accuracy),
+    se_acc = sd(mean_accuracy) / sqrt(n()),
+    ci_lower = mean_acc - 1.96 * se_acc,
+    ci_upper = mean_acc + 1.96 * se_acc,
+    .groups = "drop"
+  )
+
+# Create barplot with individual participant points and 95% CI
+p3 <- ggplot(accuracy_summary, aes(x = IsWord, y = mean_acc, fill = IsWord)) +
+  geom_col(alpha = 0.7) +
+  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2, linewidth = 0.8) +
+  geom_jitter(data = participant_accuracy,
+              aes(x = IsWord, y = mean_accuracy),
+              width = 0.15, alpha = 0.3, size = 1, color = "black") +
   scale_x_discrete(labels = c("FALSE" = "Nonce Words", "TRUE" = "Real Words")) +
-  scale_y_continuous(limits = c(0, 1), labels = scales::percent) +
+  scale_y_continuous(limits = c(0, 1), labels = scales::percent, expand = c(0, 0)) +
   labs(
-    title = "Mean Accuracy by Lexical Status",
+    title = "Accuracy by Lexical Status",
+    subtitle = "Bars show group means with 95% CI; points show individual participants",
     x = "Lexical Status",
-    y = "Mean Accuracy",
+    y = "Proportion Correct",
     fill = "Real Word"
   ) +
   theme_minimal() +
