@@ -245,7 +245,7 @@ p3 <- ggplot(accuracy_summary, aes(x = IsWord, y = mean_acc, fill = IsWord)) +
   geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2, linewidth = 0.8) +
   geom_jitter(data = participant_accuracy,
               aes(x = IsWord, y = mean_accuracy),
-              width = 0.15, alpha = 0.3, size = 1, color = "black") +
+              width = 0.15, height = 0, alpha = 0.3, size = 1, color = "black") +
   scale_x_discrete(labels = c("FALSE" = "Nonce Words", "TRUE" = "Real Words")) +
   scale_y_continuous(limits = c(0, 1), labels = scales::percent, expand = c(0, 0)) +
   labs(
