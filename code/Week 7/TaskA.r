@@ -244,9 +244,12 @@
 library(tidyverse)
 library(here)
 library(brms)
+library(tidybayes)
 
-# Set working directory reference
-here::i_am("code/Week 7/TaskA.r")
+# IMPORTANT: Set working directory to project root first
+# Option 1: Open qml-2025.Rproj in RStudio (recommended)
+# Option 2: Run this line before running the rest of the script:
+setwd("/Users/s/Desktop/qml-2025")
 
 # Create output directory
 output_dir <- here("code", "outputs")
