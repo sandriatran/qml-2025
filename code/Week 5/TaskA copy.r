@@ -111,7 +111,7 @@ mald <- readRDS(here("data", "tucker2019", "mald_1_1.rds"))
 # 2. Filter for real words ----
 # Exclude non-words to focus on actual lexical decision for real items
 mald_real <- mald %>%
-  filter(isWord == TRUE) %>%
+  filter(IsWord == TRUE) %>%
   drop_na(RT, PhonLev)
 
 # 3. Fit Bayesian regression model ----
