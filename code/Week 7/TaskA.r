@@ -242,17 +242,18 @@
 
 # Load required libraries
 library(tidyverse)
-library(here)
 library(brms)
-library(tidybayes)
 
-# IMPORTANT: Set working directory to project root first
+# IMPORTANT: Set working directory to project root
 # Option 1: Open qml-2025.Rproj in RStudio (recommended)
-# Option 2: Run this line before running the rest of the script:
+# Option 2: If running directly, ensure you're in the project directory
 setwd("/Users/s/Desktop/qml-2025")
 
+# Define paths relative to project root
+data_path <- "data/coretta2018/token-measures.csv"
+output_dir <- "code/outputs"
+
 # Create output directory
-output_dir <- here("code", "outputs")
 if (!dir.exists(output_dir)) dir.create(output_dir, recursive = TRUE)
 
 # ==============================================================================
@@ -260,7 +261,7 @@ if (!dir.exists(output_dir)) dir.create(output_dir, recursive = TRUE)
 # ==============================================================================
 
 # Read the token measures data
-token_data <- read_csv(here("data", "coretta2018", "token-measures.csv"))
+token_data <- read_csv(data_path)
 
 # Explore the data structure
 glimpse(token_data)
@@ -298,9 +299,9 @@ p1 <- ggplot(token_data, aes(x = vowel, y = v1_duration, fill = vowel)) +
   theme_minimal() +
   theme(legend.position = "none")
 
-ggsave(here("code", "Week 7", "TaskA_vowel_distributions.png"),
+ggsave("code/Week 7/TaskA_vowel_distributions.png",
        p1, width = 10, height = 6)
-ggsave(here("code", "outputs", "Week7_TaskA_vowel_distributions.png"),
+ggsave("code/outputs/Week7_TaskA_vowel_distributions.png",
        p1, width = 10, height = 6)
 
 # Density plot by vowel
@@ -315,9 +316,9 @@ p2 <- ggplot(token_data, aes(x = v1_duration, fill = vowel)) +
   ) +
   theme_minimal()
 
-ggsave(here("code", "Week 7", "TaskA_vowel_densities.png"),
+ggsave("code/Week 7/TaskA_vowel_densities.png",
        p2, width = 10, height = 8)
-ggsave(here("code", "outputs", "Week7_TaskA_vowel_densities.png"),
+ggsave("code/outputs/Week7_TaskA_vowel_densities.png",
        p2, width = 10, height = 8)
 
 # ==============================================================================
@@ -347,16 +348,16 @@ plot(vowel_model)
 
 # Save diagnostic plots
 pp_check_plot <- pp_check(vowel_model, ndraws = 100)
-ggsave(here("code", "Week 7", "TaskA_pp_check.png"),
+ggsave("code/Week 7/TaskA_pp_check.png",
        pp_check_plot, width = 8, height = 6)
-ggsave(here("code", "outputs", "Week7_TaskA_pp_check.png"),
+ggsave("code/outputs/Week7_TaskA_pp_check.png",
        pp_check_plot, width = 8, height = 6)
 
 # ==============================================================================
 # 4. POSTERIOR DISTRIBUTIONS
 # ==============================================================================
 
-# Extract posterior draws
+# Extract posterior draws using brms function
 posterior_draws <- as_draws_df(vowel_model)
 
 # Plot posterior distributions of model parameters
@@ -375,9 +376,9 @@ p3 <- posterior_draws %>%
   theme_minimal() +
   theme(legend.position = "none")
 
-ggsave(here("code", "Week 7", "TaskA_posterior_parameters.png"),
+ggsave("code/Week 7/TaskA_posterior_parameters.png",
        p3, width = 12, height = 10)
-ggsave(here("code", "outputs", "Week7_TaskA_posterior_parameters.png"),
+ggsave("code/outputs/Week7_TaskA_posterior_parameters.png",
        p3, width = 12, height = 10)
 
 # ==============================================================================
@@ -388,38 +389,62 @@ ggsave(here("code", "outputs", "Week7_TaskA_posterior_parameters.png"),
 vowel_levels <- unique(token_data$vowel)
 new_data <- tibble(vowel = vowel_levels)
 
-# Predict with posterior draws
-predictions <- add_epred_draws(new_data, vowel_model)
+# Get posterior predictions using brms
+posterior_epred <- posterior_epred(vowel_model, newdata = new_data)
+
+# Create a data frame with predictions and credible intervals
+prediction_summary <- data.frame(
+  vowel = vowel_levels,
+  mean_pred = colMeans(posterior_epred),
+  lower_95 = apply(posterior_epred, 2, quantile, 0.025),
+  upper_95 = apply(posterior_epred, 2, quantile, 0.975),
+  lower_66 = apply(posterior_epred, 2, quantile, 0.17),
+  upper_66 = apply(posterior_epred, 2, quantile, 0.83)
+)
+
+print(prediction_summary)
 
 # Plot expected predictions with credible intervals
-p4 <- predictions %>%
-  ggplot(aes(x = vowel, y = .epred, fill = vowel)) +
-  stat_pointinterval(.width = c(0.66, 0.95), point_size = 3) +
+p4 <- ggplot(
+  prediction_summary,
+  aes(x = reorder(vowel, mean_pred), y = mean_pred, fill = vowel)
+) +
+  geom_point(size = 3) +
+  geom_errorbar(
+    aes(ymin = lower_95, ymax = upper_95),
+    width = 0.2,
+    size = 1
+  ) +
+  geom_errorbar(
+    aes(ymin = lower_66, ymax = upper_66),
+    width = 0.05,
+    size = 2
+  ) +
   labs(
     title = "Expected Vowel Duration Predictions",
-    subtitle = "Points show posterior means with 66% and 95% credible intervals",
+    subtitle = paste(
+      "Thick bars: 66% credible interval |",
+      "Thin bars: 95% credible interval"),
     x = "Vowel",
     y = "Predicted Duration (ms)",
     fill = "Vowel"
   ) +
   theme_minimal() +
-  theme(legend.position = "none")
+  theme(legend.position = "none") +
+  coord_flip()
 
-ggsave(here("code", "Week 7", "TaskA_predictions.png"),
-       p4, width = 10, height = 6)
-ggsave(here("code", "outputs", "Week7_TaskA_predictions.png"),
-       p4, width = 10, height = 6)
-
-# Summary of predictions
-prediction_summary <- predictions %>%
-  group_by(vowel) %>%
-  summarise(
-    mean_pred = mean(.epred),
-    lower_95 = quantile(.epred, 0.025),
-    upper_95 = quantile(.epred, 0.975)
-  )
-
-print(prediction_summary)
+ggsave(
+  "code/Week 7/TaskA_predictions.png",
+  p4,
+  width = 10,
+  height = 6
+)
+ggsave(
+  "code/outputs/Week7_TaskA_predictions.png",
+  p4,
+  width = 10,
+  height = 6
+)
 
 # ==============================================================================
 # 6. MODEL RESULTS REPORT
