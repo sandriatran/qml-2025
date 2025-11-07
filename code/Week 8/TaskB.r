@@ -170,7 +170,7 @@
  Lecture: https://uoelel.github.io/qml/lectures/week-08.html
 
 # Resources:
-#    Lecture: https://uoelel.github.io/qml/lectures/week-07.html
+#    Lecture: https://uoelel.github.io/qml/lectures/week-08.html
 #    Textbook (PDF): https://stefanocoretta.github.io/qdal/Quantitative-Data-Analysis-for-Linguists-in-R.pdf
 #    Textbook (Online):https://stefanocoretta.github.io/qdal/ch-regression-bernoulli.html
 # ==============================================================================
