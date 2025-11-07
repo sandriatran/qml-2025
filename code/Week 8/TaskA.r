@@ -5,6 +5,7 @@
 # Date: 2025-11-6
 # Topic: Workshop:  Bernoulli regression
 #        Lecture:   Bernoulli regression
+#       NOTE: THIS USES A epred_draws() APPROACH
 #
 # (i) Instructions:
 #   (1) Read the pankratz2021/si.csv data. (Data documentation)
@@ -38,7 +39,7 @@
 #                     probability of "success"
 #                     for observation i, and β coefficients are
 #                     estimated by the model
-            ex. a model would estimate log-odds of the outcome and have 1 group as a reference
+#            ex. a model would estimate log-odds of the outcome and have 1 group as a reference
 #        (i) LOG-ODDS back into Probabilities
 #             - To understand results:
 #                (i) transform the predicted log odds back to probabilities
@@ -149,7 +150,7 @@
 #        (2) Reporting credible intervals & confidence intervals (CrIs/CIs)
 #        (3) Checking the mean & variability of proportions by group
 #        (4) Using bootstrapped confidence intervals (with functions like mean_cl_boot in R)
-        Focus on:
+#        Focus on:
 #        (5): Credible intervals/Confidence intervals for group probabilities or effects
 #        (6): Group summaries and differences (comparing predicted probabilities/log-odds between groups)
 #        (7) Visualizations such as:
@@ -169,7 +170,7 @@
  Lecture: https://uoelel.github.io/qml/lectures/week-08.html
 
 # Resources:
-#    Lecture: https://uoelel.github.io/qml/lectures/week-07.html
+#    Lecture: https://uoelel.github.io/qml/lectures/week-08.html
 #    Textbook (PDF): https://stefanocoretta.github.io/qdal/Quantitative-Data-Analysis-for-Linguists-in-R.pdf
 #    Textbook (Online):https://stefanocoretta.github.io/qdal/ch-regression-bernoulli.html
 # ==============================================================================
