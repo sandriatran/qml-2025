@@ -1,18 +1,18 @@
 ---
 title: "QML 2025 Final Reflection"
-author: "Sandria Tran"
-date: 10-17-2025
+author: "Sandria Tran", "Violet Manson"
+date: 11-5-2025
 format: pdf
 ---
 
 |  |  |
 |----------------------|--------------------------------------------------|
-| Group Project title | THE PROJECT TITLE |
-| Group members | MEMBER 1, MEMBER 2, MEMBER 3 (use names, include yourself) |
+| Group Project title | Re-Analyzing Ota, Hartsuiker and Haywood (2009) |
+| Group members | Violet Manson, Sandria Tran,
 
 ## Final Reflection
 
--   There is no word limit, but we suggest to keep this to one page.
+-   (300 Words) There is no word limit, but we suggest to keep this to one page.
 -   You should propose and justify a mark for yourself based on your experience with the course and with working on you Group Project. Note that your mark suggestion is just a suggestion and the tutors and I will make the final decision. You must follow the marking rubric of the course available at <https://uoelel.github.io/qml/assessments.html#feedback-and-marking>.
 
 ## Group Project

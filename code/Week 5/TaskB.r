@@ -77,7 +77,7 @@
 #                           (ii) simulate data using sampled parameters 
 #                           (iii) compare real observations AND simulated data 
 #   (ii) Skills:
-#        (1) Fit regression models of the form with brms in R.
+#        (1) (1) Fit regression models with the form y ~ x brms in R.
 #        (2) Interpret the regression coefficients table of the model summary.
 #        (3) Extract and plot MCMC draws.
 #        (4) Report results from regression models.

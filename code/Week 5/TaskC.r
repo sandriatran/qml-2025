@@ -61,7 +61,12 @@
 #                       (d) model checking  
 #                           (i) uses draws for posterior predictive checks
 #                           (ii) simulate data using sampled parameters 
-#                           (iii) compare real observations AND simulated data 
+#                           (iii) compare real observations AND simulated data
+#   (ii) Skills:
+#        (1) (1) Fit regression models with the form y ~ x brms in R.
+#        (2) Interpret the regression coefficients table of the model summary.
+#        (3) Extract and plot MCMC draws.
+#        (4) Report results from regression models.
 #    Important Terms & Information:
 #            RT ∼ Gaussian(μ, σ) with μ = β₀ + β₁ · PhonLev
 #            Lecture: https://uoelel.github.io/qml/lectures/week-05.html#/title-slide
