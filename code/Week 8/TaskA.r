@@ -185,20 +185,42 @@ library(here)
 
 # 1. Read the data ----
 # Scalar Inference (SI) data: binary outcome (SI or no SI) predicted by semantic distance
-si_data <- read_csv(here("data", "pankratz2021", "si.csv"), show_col_types = FALSE) %>%
-  mutate(SI = if_else(SI == "scalar", 1, 0))
+si <- read_csv(here("data", "pankratz2021", "si.csv"), show_col_types = FALSE) %>%
+  mutate(
+    SI = factor(SI, levels = c("no_scalar", "scalar"))
+  )
 
 # Check data structure
-head(si_data)
-glimpse(si_data)
+head(si)
+glimpse(si)
 
-# 2. Fit Bernoulli regression model ----
+# 2. Exploratory visualization ----
+# First, visualize the raw data relationship between semdist and SI
+# Convert SI to numeric (0/1) for visualization purposes
+si %>%
+  mutate(SI = as.numeric(SI) - 1) %>%
+  ggplot(aes(semdist, SI)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "glm", method.args = list(family = "binomial")) +
+  labs(
+    title = "Scalar Inference by Semantic Distance",
+    subtitle = "Frequentist logistic regression (glm with binomial family)",
+    x = "Semantic Distance",
+    y = "Probability of SI"
+  ) +
+  theme_minimal()
+
+# Note: geom_smooth() with method = "glm" and family = "binomial" fits a
+# Maximum Likelihood Estimation (MLE) Bernoulli model SI ~ semdist
+# This provides a quick frequentist baseline before our Bayesian analysis
+
+# 3. Fit Bernoulli regression model with brms ----
 # Research question: does semantic distance (semdist) affect probability of scalar inference (SI)?
 # Model: SI ~ Bernoulli(p) where logit(p) = β₀ + β₁ · semdist
 
 model_si <- brm(
   SI ~ semdist,
-  data = si_data,
+  data = si %>% mutate(SI = as.numeric(SI) - 1),
   family = bernoulli(link = "logit"),
   iter = 2000,
   warmup = 1000,
@@ -210,7 +232,7 @@ model_si <- brm(
 # Model summary
 summary(model_si)
 
-# 3. Extract and visualize posterior distributions ----
+# 4. Extract and visualize posterior distributions ----
 posterior_draws <- as_draws_df(model_si)
 
 # Plot 1: Posterior distribution of intercept (β₀)
@@ -257,16 +279,15 @@ print(p2)
 print(p3)
 print(p4)
 
-# 4. Expected predictions across semantic distance range ----
+# 5. Expected predictions across semantic distance range ----
 # Create new data for prediction across the semantic distance range
-semdist_range <- si_data %>%
-  summarise(
-    min = min(semdist, na.rm = TRUE),
-    max = max(semdist, na.rm = TRUE)
-  )
+si_numeric <- si %>%
+  mutate(SI = as.numeric(SI) - 1)
 
 newdata <- tibble(
-  semdist = seq(semdist_range$min, semdist_range$max, length.out = 100)
+  semdist = seq(min(si_numeric$semdist, na.rm = TRUE),
+                max(si_numeric$semdist, na.rm = TRUE),
+                length.out = 100)
 )
 
 # Get expected probability of SI at each semdist value using epred_draws
@@ -283,7 +304,7 @@ epreds_summary <- epreds %>%
     .groups = "drop"
   )
 
-# 5. Plot expected probability of SI across semantic distance ----
+# 6. Plot expected probability of SI across semantic distance ----
 p5 <- ggplot(epreds_summary, aes(x = semdist, y = mean)) +
   geom_line(color = "darkblue", size = 1) +
   geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.3, fill = "steelblue") +
@@ -299,7 +320,7 @@ p5 <- ggplot(epreds_summary, aes(x = semdist, y = mean)) +
 
 print(p5)
 
-# 6. Model report ----
+# 7. Model report ----
 cat("\n========== BERNOULLI REGRESSION MODEL REPORT ==========\n\n")
 
 cat("RESEARCH QUESTION:\n")
