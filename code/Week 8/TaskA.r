@@ -279,6 +279,17 @@ print(p2)
 print(p3)
 print(p4)
 
+# Save plots to both central outputs and Week 8 outputs folders
+list(p1 = p1, p2 = p2, p3 = p3, p4 = p4) %>%
+  walk2(names(.), function(plot, name) {
+    # Save to central outputs folder
+    ggsave(here("code", "outputs", paste0("Week8_TaskA_", name, ".png")),
+           plot, width = 8, height = 6, dpi = 300)
+    # Save to Week 8 outputs folder
+    ggsave(here("code", "Week 8", "outputs", paste0("Week8_TaskA_", name, ".png")),
+           plot, width = 8, height = 6, dpi = 300)
+  })
+
 # 5. Expected predictions across semantic distance range ----
 # Create new data for prediction across the semantic distance range
 si_numeric <- si %>%
@@ -319,6 +330,12 @@ p5 <- ggplot(epreds_summary, aes(x = semdist, y = mean)) +
   theme(plot.subtitle = element_text(size = 10, color = "gray40"))
 
 print(p5)
+
+# Save p5 to both central outputs and Week 8 outputs folders
+ggsave(here("code", "outputs", "Week8_TaskA_p5.png"), p5,
+       width = 8, height = 6, dpi = 300)
+ggsave(here("code", "Week 8", "outputs", "Week8_TaskA_p5.png"), p5,
+       width = 8, height = 6, dpi = 300)
 
 # 7. Model report ----
 cat("\n========== BERNOULLI REGRESSION MODEL REPORT ==========\n\n")
