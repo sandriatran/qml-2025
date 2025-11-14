@@ -144,11 +144,15 @@ p4 <- pp_check(model_interaction, ndraws = 100) +
   labs(title = "Posterior Predictive Check") +
   theme_minimal()
 
-# Print and save plots
+# Print and save plots to both central outputs and Week 9 outputs folders
 list(p1 = p1, p2 = p2, p3 = p3, p4 = p4) %>%
   walk2(names(.), function(plot, name) {
     print(plot)
+    # Save to central outputs folder
     ggsave(here("code", "outputs", paste0("Week9_TaskA_", name, ".png")),
+           plot, width = 8, height = 6, dpi = 300)
+    # Save to Week 9 outputs folder
+    ggsave(here("code", "Week 9", "outputs", paste0("Week9_TaskA_", name, ".png")),
            plot, width = 8, height = 6, dpi = 300)
   })
 
@@ -181,7 +185,10 @@ p5 <- ggplot(epreds_summary, aes(x = Relation_type, y = mean_acc, color = Group)
   theme_minimal() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 print(p5)
+# Save to both central outputs and Week 9 outputs folders
 ggsave(here("code", "outputs", "Week9_TaskA_p5_expected_accuracy.png"), p5,
+       width = 8, height = 6, dpi = 300)
+ggsave(here("code", "Week 9", "outputs", "Week9_TaskA_p5_expected_accuracy.png"), p5,
        width = 8, height = 6, dpi = 300)
 
 # 6. Model report ----

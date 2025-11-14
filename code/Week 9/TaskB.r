@@ -139,11 +139,15 @@ p5 <- posterior_draws %>%
   labs(title = "Posterior: Error SD (σ)", x = "Sigma", y = "Density") +
   theme_minimal()
 
-# Print and save plots
+# Print and save plots to both central outputs and Week 9 outputs folders
 list(p1 = p1, p2 = p2, p3 = p3, p4 = p4, p5 = p5) %>%
   walk2(names(.), function(plot, name) {
     print(plot)
+    # Save to central outputs folder
     ggsave(here("code", "outputs", paste0("Week9_TaskB_", name, ".png")),
+           plot, width = 8, height = 6, dpi = 300)
+    # Save to Week 9 outputs folder
+    ggsave(here("code", "Week 9", "outputs", paste0("Week9_TaskB_", name, ".png")),
            plot, width = 8, height = 6, dpi = 300)
   })
 
@@ -175,7 +179,10 @@ p6 <- ggplot(epreds_summary, aes(x = density, y = mean_width, color = age_group)
   theme_minimal()
 
 print(p6)
+# Save to both central outputs and Week 9 outputs folders
 ggsave(here("code", "outputs", "Week9_TaskB_p6_expected_pupil_width.png"), p6,
+       width = 8, height = 6, dpi = 300)
+ggsave(here("code", "Week 9", "outputs", "Week9_TaskB_p6_expected_pupil_width.png"), p6,
        width = 8, height = 6, dpi = 300)
 
 # 7. Model report ----
