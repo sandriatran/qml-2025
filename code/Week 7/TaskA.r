@@ -119,9 +119,9 @@
 #                  (3) ritual encourages fixation on thresholds (like 5%)
 #                  (4) fear of sanctions for violating conventions
 #                  (5) wishful thinking about p - value meaning
-                        (e.g. equating 1 - o with probability of replication - incorrect)
+#                        (e.g. equating 1 - o with probability of replication - incorrect)
 #                  (6) can discourage open inquiry and critical interpretation
-                      leading to reproducibility issues and misunderstanding
+#                      leading to reproducibility issues and misunderstanding
 
 #       (4) Why researchers should prefer Bayesian statistics?
 #            Bayesian statistics has advantages over traditional frequentist approachs:
@@ -479,4 +479,3 @@ cat("provides strong evidence for systematic duration differences across vowel\n
 cat("categories, with posterior distributions showing clear separation between\n")
 cat("vowel types.\n\n")
 
-cat("All plots and diagnostics saved to code/Week 7/ and code/outputs/\n")

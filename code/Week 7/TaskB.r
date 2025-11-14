@@ -118,9 +118,9 @@
 #                  (3) ritual encourages fixation on thresholds (like 5%)
 #                  (4) fear of sanctions for violating conventions
 #                  (5) wishful thinking about p - value meaning
-                        (e.g. equating 1 - o with probability of replication - incorrect)
+#                        (e.g. equating 1 - o with probability of replication - incorrect)
 #                  (6) can discourage open inquiry and critical interpretation
-                      leading to reproducibility issues and misunderstanding
+#                      leading to reproducibility issues and misunderstanding
 
 #       (4) Why researchers should prefer Bayesian statistics?
 #            Bayesian statistics has advantages over traditional frequentist approachs:
@@ -295,7 +295,7 @@ p1 <- ggplot(pupil_data, aes(x = Condition, y = pupil_max, fill = Condition)) +
   ) +
   theme_minimal()
 
-ggsave(here("code", "Week 7", "TaskB_pupil_distributions.png"),
+ggsave(here("code", "Week 7", "outputs", "TaskB_pupil_distributions.png"),
        p1, width = 8, height = 6)
 ggsave(here("code", "outputs", "Week7_TaskB_pupil_distributions.png"),
        p1, width = 8, height = 6)
@@ -312,7 +312,7 @@ p2 <- ggplot(pupil_data, aes(x = pupil_max, fill = Condition)) +
   ) +
   theme_minimal()
 
-ggsave(here("code", "Week 7", "TaskB_density_comparison.png"),
+ggsave(here("code", "Week 7", "outputs", "TaskB_density_comparison.png"),
        p2, width = 8, height = 6)
 ggsave(here("code", "outputs", "Week7_TaskB_density_comparison.png"),
        p2, width = 8, height = 6)
@@ -344,7 +344,7 @@ plot(pupil_model)
 
 # Posterior predictive check
 pp_check_plot <- pp_check(pupil_model, ndraws = 100)
-ggsave(here("code", "Week 7", "TaskB_pp_check.png"),
+ggsave(here("code", "Week 7", "outputs", "TaskB_pp_check.png"),
        pp_check_plot, width = 8, height = 6)
 ggsave(here("code", "outputs", "Week7_TaskB_pp_check.png"),
        pp_check_plot, width = 8, height = 6)
@@ -373,7 +373,7 @@ p3 <- posterior_draws %>%
   theme_minimal() +
   theme(legend.position = "none")
 
-ggsave(here("code", "Week 7", "TaskB_posterior_parameters.png"),
+ggsave(here("code", "Week 7", "outputs", "TaskB_posterior_parameters.png"),
        p3, width = 10, height = 6)
 ggsave(here("code", "outputs", "Week7_TaskB_posterior_parameters.png"),
        p3, width = 10, height = 6)
@@ -402,7 +402,7 @@ p4 <- predictions %>%
   ) +
   theme_minimal()
 
-ggsave(here("code", "Week 7", "TaskB_predictions.png"),
+ggsave(here("code", "Week 7", "outputs", "TaskB_predictions.png"),
        p4, width = 8, height = 6)
 ggsave(here("code", "outputs", "Week7_TaskB_predictions.png"),
        p4, width = 8, height = 6)
@@ -460,4 +460,3 @@ cat("word recognition as a function of lexical neighbourhood density. The poster
 cat("distributions and credible intervals quantify both the magnitude and uncertainty\n")
 cat("of any observed differences between conditions.\n\n")
 
-cat("All plots and diagnostics saved to code/Week 7/ and code/outputs/\n")

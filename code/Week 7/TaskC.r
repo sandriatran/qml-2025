@@ -119,9 +119,9 @@
 #                  (3) ritual encourages fixation on thresholds (like 5%)
 #                  (4) fear of sanctions for violating conventions
 #                  (5) wishful thinking about p - value meaning
-                        (e.g. equating 1 - o with probability of replication - incorrect)
+#                        (e.g. equating 1 - o with probability of replication - incorrect)
 #                  (6) can discourage open inquiry and critical interpretation
-                      leading to reproducibility issues and misunderstanding
+#                      leading to reproducibility issues and misunderstanding
 
 #       (4) Why researchers should prefer Bayesian statistics?
 #            Bayesian statistics has advantages over traditional frequentist approachs:
@@ -311,7 +311,7 @@ p1 <- ggplot(l2_critical, aes(x = Relation_type, y = RT, fill = Relation_type)) 
   theme_minimal() +
   theme(legend.position = "none")
 
-ggsave(here("code", "Week 7", "TaskC_rt_distributions.png"),
+ggsave(here("code", "Week 7", "outputs", "TaskC_rt_distributions.png"),
        p1, width = 10, height = 6)
 ggsave(here("code", "outputs", "Week7_TaskC_rt_distributions.png"),
        p1, width = 10, height = 6)
@@ -329,7 +329,7 @@ p2 <- ggplot(l2_critical, aes(x = RT, fill = Relation_type)) +
   ) +
   theme_minimal()
 
-ggsave(here("code", "Week 7", "TaskC_rt_densities.png"),
+ggsave(here("code", "Week 7", "outputs", "TaskC_rt_densities.png"),
        p2, width = 10, height = 8)
 ggsave(here("code", "outputs", "Week7_TaskC_rt_densities.png"),
        p2, width = 10, height = 8)
@@ -361,7 +361,7 @@ plot(rt_model)
 
 # Posterior predictive check
 pp_check_plot <- pp_check(rt_model, ndraws = 100)
-ggsave(here("code", "Week 7", "TaskC_pp_check.png"),
+ggsave(here("code", "Week 7", "outputs", "TaskC_pp_check.png"),
        pp_check_plot, width = 8, height = 6)
 ggsave(here("code", "outputs", "Week7_TaskC_pp_check.png"),
        pp_check_plot, width = 8, height = 6)
@@ -390,7 +390,7 @@ p3 <- posterior_draws %>%
   theme_minimal() +
   theme(legend.position = "none")
 
-ggsave(here("code", "Week 7", "TaskC_posterior_parameters.png"),
+ggsave(here("code", "Week 7", "outputs", "TaskC_posterior_parameters.png"),
        p3, width = 10, height = 10)
 ggsave(here("code", "outputs", "Week7_TaskC_posterior_parameters.png"),
        p3, width = 10, height = 10)
@@ -420,7 +420,7 @@ p4 <- predictions %>%
   theme_minimal() +
   theme(legend.position = "none", axis.text.x = element_text(angle = 45, hjust = 1))
 
-ggsave(here("code", "Week 7", "TaskC_predictions.png"),
+ggsave(here("code", "Week 7", "outputs", "TaskC_predictions.png"),
        p4, width = 10, height = 6)
 ggsave(here("code", "outputs", "Week7_TaskC_predictions.png"),
        p4, width = 10, height = 6)
@@ -487,4 +487,3 @@ cat("The Bayesian approach allows us to make probabilistic statements about effe
 cat("and provides full uncertainty quantification, avoiding the limitations of binary\n")
 cat("significance testing described in the null ritual.\n\n")
 
-cat("All plots and diagnostics saved to code/Week 7/ and code/outputs/\n")
