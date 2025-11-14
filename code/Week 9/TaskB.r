@@ -64,9 +64,10 @@ library(here)
 # Pupil width data: maximum pupil size by age group and neighbourhood density
 pupil <- read_csv(here("data", "mclaughlin2023", "pupil-width.csv"), show_col_types = FALSE) %>%
   mutate(
-    age_group = factor(age_group, levels = c("young", "old")),
-    density = factor(density, levels = c("sparse", "dense"))
-  )
+    Age = factor(Age, levels = c("YA", "OA")),
+    Condition = factor(Condition, levels = c("Sparse", "Dense"))
+  ) %>%
+  rename(age_group = Age, density = Condition, pupil_width = pupil_max)
 
 # Check data structure
 head(pupil)
