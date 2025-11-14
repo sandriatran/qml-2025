@@ -1,23 +1,55 @@
 # ==============================================================================
-# Week 9 - Task A: Shallow Structure Hypothesis with Group × Relation Type
-# Interaction
+# Week 9 | https://uoelel.github.io/qml/workshops/week-09.html
+# Title: Task A: Shallow Structure Hypothesis with Group × Relation Type Interaction
 # Author: Sandria Tran
 # Date: 2025-11-14
+# Topic: Workshop: Multiple predictors and interactions
+#        Lecture: Open research
 #
-# Research Question:
-#   How does the effect of relation type on accuracy differ in L1 vs L2
-#   participants on critical syntactic trials?
+# (i) Instructions:
+#   (1) Read the song2020/shallow.csv data.
+#   (2) Filter the data so it contains only critical trials.
+#   (3) Fit a regression model to answer: How does the effect of relation type
+#       on accuracy differ in L1 vs L2 participants?
+#   (4) Write a paragraph reporting the model. Produce plots of the posterior
+#       distributions of the model parameters and the expected predictions of
+#       accuracy for each relation type in L1 vs L2 participants.
+#   (5) Discuss the results with your group. (no need to write the discussion).
 #
-# Instructions:
-#   (1) Read the song2020/shallow.csv data
-#   (2) Filter data to critical trials only
-#   (3) Fit Bernoulli regression with Group × Relation_type interaction
-#   (4) Write paragraph report with posterior plots and predictions
-#   (5) Discuss results with group
+# (ii) Learning Objectives:
+#   (1) What is Open Research?
+#        - Principles: honest, transparent, reproducible, accessible research
+#        - Avoids questionable research behaviors
+#        - Promotes openness throughout research cycle
+#        - Makes outputs publicly accessible
+#
+#   (2) Research reliability: reproducible, replicable, robust, generalisable
+#        - Reproducible: same data + same pipeline = same results
+#        - Replicable: new data + same protocol = similar results
+#        - Robust: alternative methods (same data) = same findings
+#        - Generalisable: new data + new workflows = consistent findings
+#
+#   (3) Registered Reports
+#        - Peer-review BEFORE data collection starts
+#        - Stage 1: Review research plan
+#        - Stage 2: Review adherence to plan after analysis
+#        - Benefits: Prevent p-hacking, selective reporting, publication bias
+#
+#   (4) Modeling interactions in regression
+#        - Add interaction term: Y ~ X + Z + X:Z or Y ~ X * Z
+#        - Allows effect of one predictor to depend on another
+#        - Reference level matters for interpretation
+#        - Mean-centering reduces multicollinearity
+#
+# (iii) Skills:
+#      (1) Assess research in light of Open Research practices
+#      (2) Distinguish four ways research can be reliable
+#      (3) Fit and interpret categorical-categorical interactions in brms
+#      (4) Visualize and interpret interaction effects
 #
 # Resources:
-#   Lecture: https://uoelel.github.io/qml/lectures/week-09.html
-#   Textbook: https://stefanocoretta.github.io/qdal/ch-regression-interaction.html
+#    Lecture: https://uoelel.github.io/qml/lectures/week-09.html
+#    Textbook: https://stefanocoretta.github.io/qdal/ch-regression-interaction.html
 # ==============================================================================
 
 # Load required packages ----
