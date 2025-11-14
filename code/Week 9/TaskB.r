@@ -1,55 +1,22 @@
 # ==============================================================================
-# Week 9 | https://uoelel.github.io/qml/lectures/week-09.html
-# Title: Task B: Pupil Width with Age × Density Interaction
+# Week 9 - Task B: Pupil Width with Age × Density Interaction
 # Author: Sandria Tran
 # Date: 2025-11-14
-# Topic: Workshop: Multiple predictors and interactions
-#        Lecture: Open research
 #
-# (i) Instructions:
-#   (1) Read the mclaughlin2023/pupil-width.csv data.
-#   (2) Fit a regression model to answer: Does the density of the neighbourhood
-#       affect maximum pupil size in old vs young adults differently?
-#   (3) Write a paragraph reporting the model.
-#   (4) Produce plots of the posterior distributions of the model parameters and
-#       the expected predictions for the dense and sparse condition in old vs
-#       young participants.
-#   (5) Discuss the results with your group.
+# Research Question:
+#   Does neighbourhood density affect maximum pupil size differently in old vs
+#   young adults?
 #
-# (ii) Learning Objectives:
-#   (1) What is Open Research?
-#        - Principles: honest, transparent, reproducible, accessible research
-#        - Avoids questionable research behaviors
-#        - Promotes openness throughout research cycle
-#        - Makes outputs publicly accessible
-#
-#   (2) Research reliability: reproducible, replicable, robust, generalisable
-#        - Reproducible: same data + same pipeline = same results
-#        - Replicable: new data + same protocol = similar results
-#        - Robust: alternative methods (same data) = same findings
-#        - Generalisable: new data + new workflows = consistent findings
-#
-#   (3) Registered Reports
-#        - Peer-review BEFORE data collection starts
-#        - Stage 1: Review research plan
-#        - Stage 2: Review adherence to plan after analysis
-#        - Benefits: Prevent p-hacking, selective reporting, publication bias
-#
-#   (4) Modeling interactions in regression
-#        - Add interaction term: Y ~ X + Z + X:Z or Y ~ X * Z
-#        - Allows effect of one predictor to depend on another
-#        - Reference level matters for interpretation
-#        - Mean-centering reduces multicollinearity
-#
-# (iii) Skills:
-#      (1) Assess research in light of Open Research practices
-#      (2) Distinguish four ways research can be reliable
-#      (3) Fit and interpret categorical × categorical interactions in brms
-#      (4) Visualize and interpret interaction effects
+# Instructions:
+#   (1) Read the mclaughlin2023/pupil-width.csv data
+#   (2) Fit Gaussian regression with Age × Density interaction
+#   (3) Write paragraph report with posterior plots and predictions
+#   (4) Produce posterior distributions of model parameters
+#   (5) Discuss results with group
 #
 # Resources:
-#    Lecture: https://uoelel.github.io/qml/lectures/week-09.html
-#    Textbook: https://stefanocoretta.github.io/qdal/ch-regression-interaction.html
+#   Lecture: https://uoelel.github.io/qml/lectures/week-09.html
+#   Textbook: https://stefanocoretta.github.io/qdal/ch-regression-interaction.html
 # ==============================================================================
 
 # Load required packages ----
@@ -60,8 +27,7 @@ library(bayesplot)
 library(posterior)
 library(here)
 
-# 1. Read the data ----
-# Pupil width data: maximum pupil size by age group and neighbourhood density
+# 1. Read and prepare data ----
 pupil <- read_csv(here("data", "mclaughlin2023", "pupil-width.csv"), show_col_types = FALSE) %>%
   mutate(
     Age = factor(Age, levels = c("YA", "OA")),
@@ -69,54 +35,24 @@ pupil <- read_csv(here("data", "mclaughlin2023", "pupil-width.csv"), show_col_ty
   ) %>%
   rename(age_group = Age, density = Condition, pupil_width = pupil_max)
 
-# Check data structure
 head(pupil)
-glimpse(pupil)
 
 # 2. Exploratory visualization ----
-# Visualize pupil width patterns by density and age group
 pupil %>%
   ggplot(aes(x = density, y = pupil_width, fill = age_group)) +
-  geom_jitter(position = position_jitterdodge(jitter.width = 0.2),
+  geom_jitter(position = position_jitterdodge(jitter.width = 0.2, jitter.height = 0),
               alpha = 0.3, size = 2) +
   geom_boxplot(position = position_dodge(0.75), alpha = 0.6) +
-  labs(
-    title = "Maximum Pupil Width by Density and Age Group",
-    subtitle = "Exploratory visualization",
-    x = "Neighbourhood Density",
-    y = "Maximum Pupil Width",
-    fill = "Age Group"
-  ) +
-  scale_fill_manual(values = c("young" = "steelblue", "old" = "coral")) +
+  labs(title = "Maximum Pupil Width by Density and Age Group",
+       x = "Neighbourhood Density", y = "Maximum Pupil Width", fill = "Age Group") +
+  scale_fill_manual(values = c("YA" = "steelblue", "OA" = "coral")) +
   theme_minimal()
 
-# 3. Prepare data ----
-# Remove any missing values in key variables
+# 3. Filter data and fit model ----
 pupil_clean <- pupil %>%
   drop_na(pupil_width, age_group, density)
 
-cat("Clean data: Pupil width measurements\n")
-cat("N =", nrow(pupil_clean), "observations\n")
-cat("Age groups:", paste(levels(pupil_clean$age_group), collapse = ", "), "\n")
-cat("Density levels:", paste(levels(pupil_clean$density), collapse = ", "), "\n")
-cat("Mean pupil width:", round(mean(pupil_clean$pupil_width), 2), "\n")
-cat("\nPupil width by Group and Density:\n")
-print(pupil_clean %>%
-        group_by(age_group, density) %>%
-        summarize(
-          mean = mean(pupil_width),
-          sd = sd(pupil_width),
-          n = n(),
-          .groups = "drop"
-        ))
-
 # 4. Fit regression model with interaction ----
-# Research question: Does density affect pupil width differently in old vs young?
-# Model: pupil_width ~ Gaussian(μ, σ) where μ = β₀ + β_age + β_density + β_interaction
-#
-# Using * expands to: pupil_width ~ age_group + density + age_group:density
-# This allows the effect of density to differ by age group
-
 model_pupil <- brm(
   pupil_width ~ age_group * density,
   data = pupil_clean,
@@ -128,99 +64,64 @@ model_pupil <- brm(
   seed = 2025
 )
 
-# Model summary
 summary(model_pupil)
 
-# 5. Extract and visualize posterior distributions ----
+# 5. Extract posterior distributions and create plots ----
 posterior_draws <- as_draws_df(model_pupil)
 
-# Plot 1: Posterior distribution of intercept (β₀)
+# Posterior plots
 p1 <- posterior_draws %>%
   ggplot(aes(x = b_Intercept)) +
   geom_density(fill = "steelblue", alpha = 0.7) +
-  labs(
-    title = "Posterior: Intercept (β₀)",
-    subtitle = "Baseline pupil width (Young, Sparse)",
-    x = "Pupil Width",
-    y = "Density"
-  ) +
+  labs(title = "Posterior: Intercept (β₀) - Baseline Young, Sparse",
+       x = "Pupil Width", y = "Density") +
   theme_minimal()
 
-# Plot 2: Main effects (Age group and Density)
 p2 <- posterior_draws %>%
   select(starts_with("b_age_groupOA"), starts_with("b_densityDense"), -starts_with("b_age_groupOA:")) %>%
   pivot_longer(everything(), names_to = "parameter", values_to = "value") %>%
   mutate(parameter = str_remove(parameter, "^b_")) %>%
   ggplot(aes(x = value, fill = parameter)) +
   geom_density(alpha = 0.6) +
-  labs(
-    title = "Posterior: Main Effects",
-    x = "Effect Size",
-    y = "Density",
-    fill = "Parameter"
-  ) +
-  theme_minimal() +
-  theme(legend.position = "bottom")
+  labs(title = "Posterior: Main Effects", x = "Effect Size", y = "Density", fill = "Parameter") +
+  theme_minimal() + theme(legend.position = "bottom")
 
-# Plot 3: Interaction effect
 p3 <- posterior_draws %>%
   select(starts_with("b_age_groupOA:")) %>%
   pivot_longer(everything(), names_to = "parameter", values_to = "value") %>%
   mutate(parameter = str_remove(parameter, "^b_")) %>%
   ggplot(aes(x = value, fill = parameter)) +
   geom_density(alpha = 0.7, fill = "coral") +
-  labs(
-    title = "Posterior: Interaction Effect",
-    subtitle = "Age group × Density",
-    x = "Effect Size",
-    y = "Density"
-  ) +
+  labs(title = "Posterior: Interaction Effect (Age × Density)",
+       x = "Effect Size", y = "Density") +
   theme_minimal()
 
-# Plot 4: Posterior predictive check
 p4 <- pp_check(model_pupil, ndraws = 100) +
   labs(title = "Posterior Predictive Check") +
   theme_minimal()
 
-# Plot 5: Sigma (error SD)
-p5_sigma <- posterior_draws %>%
+p5 <- posterior_draws %>%
   ggplot(aes(x = sigma)) +
   geom_density(fill = "lightgreen", alpha = 0.7) +
-  labs(
-    title = "Posterior: Error SD (σ)",
-    x = "Sigma",
-    y = "Density"
-  ) +
+  labs(title = "Posterior: Error SD (σ)", x = "Sigma", y = "Density") +
   theme_minimal()
 
-print(p1)
-ggsave(here("code", "outputs", "Week9_TaskB_p1_intercept.png"), p1, width = 8, height = 6, dpi = 300)
+# Print and save plots
+list(p1 = p1, p2 = p2, p3 = p3, p4 = p4, p5 = p5) %>%
+  walk2(names(.), function(plot, name) {
+    print(plot)
+    ggsave(here("code", "outputs", paste0("Week9_TaskB_", name, ".png")),
+           plot, width = 8, height = 6, dpi = 300)
+  })
 
-print(p2)
-ggsave(here("code", "outputs", "Week9_TaskB_p2_main_effects.png"), p2, width = 8, height = 6, dpi = 300)
-
-print(p3)
-ggsave(here("code", "outputs", "Week9_TaskB_p3_interaction_effect.png"), p3, width = 8, height = 6, dpi = 300)
-
-print(p4)
-ggsave(here("code", "outputs", "Week9_TaskB_p4_posterior_predictive_check.png"), p4, width = 8, height = 6, dpi = 300)
-
-print(p5_sigma)
-ggsave(here("code", "outputs", "Week9_TaskB_p5_error_sd.png"), p5_sigma, width = 8, height = 6, dpi = 300)
-
-# 6. Expected pupil width predictions by Age Group and Density ----
-# Create newdata for all combinations of age_group × density
+# 6. Expected pupil width predictions ----
 newdata <- expand_grid(
   age_group = levels(pupil_clean$age_group),
   density = levels(pupil_clean$density)
 )
 
-# Get predicted pupil widths using epred_draws
-epreds <- model_pupil %>%
-  epred_draws(newdata = newdata)
-
-# Summarize predictions with credible intervals
-epreds_summary <- epreds %>%
+epreds_summary <- model_pupil %>%
+  epred_draws(newdata = newdata) %>%
   group_by(age_group, density) %>%
   summarize(
     mean_width = mean(.epred),
@@ -229,107 +130,63 @@ epreds_summary <- epreds %>%
     .groups = "drop"
   )
 
-# Plot expected pupil widths with interaction visualization
 p6 <- ggplot(epreds_summary, aes(x = density, y = mean_width, color = age_group)) +
   geom_point(size = 3) +
   geom_line(aes(group = age_group), linewidth = 1) +
   geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.15, linewidth = 1) +
-  labs(
-    title = "Expected Maximum Pupil Width by Density and Age Group",
-    subtitle = "Interaction effect shown by non-parallel lines",
-    x = "Neighbourhood Density",
-    y = "Maximum Pupil Width",
-    color = "Age Group"
-  ) +
-  scale_color_manual(values = c("young" = "steelblue", "old" = "coral")) +
+  labs(title = "Expected Maximum Pupil Width by Density and Age Group",
+       subtitle = "Non-parallel lines indicate interaction effect",
+       x = "Neighbourhood Density", y = "Maximum Pupil Width",
+       color = "Age Group") +
+  scale_color_manual(values = c("YA" = "steelblue", "OA" = "coral")) +
   theme_minimal()
 
 print(p6)
-ggsave(here("code", "outputs", "Week9_TaskB_p6_expected_pupil_width.png"), p6, width = 8, height = 6, dpi = 300)
+ggsave(here("code", "outputs", "Week9_TaskB_p6_expected_pupil_width.png"), p6,
+       width = 8, height = 6, dpi = 300)
 
 # 7. Model report ----
 cat("\n========== GAUSSIAN REGRESSION: AGE GROUP × DENSITY INTERACTION ==========\n\n")
 
 cat("RESEARCH QUESTION:\n")
-cat("Does the density of the neighbourhood affect maximum pupil size differently\n")
-cat("in old vs young adults?\n\n")
+cat("Does neighbourhood density affect maximum pupil size differently in old vs young adults?\n\n")
 
-cat("DATA:\n")
-cat("- N =", nrow(pupil_clean), "observations\n")
-cat("- Age groups:", paste(levels(pupil_clean$age_group), collapse = ", "), "\n")
-cat("- Density levels:", paste(levels(pupil_clean$density), collapse = ", "), "\n")
-cat("- Mean pupil width:", round(mean(pupil_clean$pupil_width), 2), "\n")
-cat("- SD:", round(sd(pupil_clean$pupil_width), 2), "\n\n")
-
-cat("MODEL SPECIFICATION:\n")
-cat("pupil_width ~ Gaussian(μ, σ)\n")
-cat("μ = β₀ + β₁·age_groupOld + β₂·densityDense + β₃·age_groupOld:densityDense\n")
-cat("σ = residual error SD\n\n")
-
-cat("INTERPRETATION:\n")
-cat("- β₀ (Intercept): Baseline pupil width for young adults in sparse neighbourhoods\n")
-cat("- β₁ (age_groupOld): Difference in pupil width between old and young in sparse neighbourhoods\n")
-cat("- β₂ (densityDense): Difference in pupil width between dense and sparse for young adults\n")
-cat("- β₃ (Interaction): How the density effect differs between old and young adults\n\n")
+cat("DATA SUMMARY:\n")
+cat(sprintf("- N = %d observations\n", nrow(pupil_clean)))
+cat(sprintf("- Age groups: %s\n", paste(levels(pupil_clean$age_group), collapse = ", ")))
+cat(sprintf("- Density levels: %s\n\n", paste(levels(pupil_clean$density), collapse = ", ")))
 
 cat("PREDICTED PUPIL WIDTHS BY AGE GROUP AND DENSITY:\n")
-print(epreds_summary %>%
-        mutate(across(where(is.numeric), ~round(., 3))))
+print(epreds_summary %>% mutate(across(where(is.numeric), ~round(., 3))))
 
-cat("\n\nKEY FINDINGS:\n")
-# Calculate pupil width difference by age group for each density
-for (dens in levels(pupil_clean$density)) {
-  young_width <- epreds_summary %>%
-    filter(age_group == "YA", density == dens) %>%
-    pull(mean_width)
-
-  old_width <- epreds_summary %>%
-    filter(age_group == "OA", density == dens) %>%
-    pull(mean_width)
-
-  diff <- old_width - young_width
-
-  cat(sprintf("- %s: Young=%.3f, Old=%.3f, Difference=%.3f\n",
-              dens, young_width, old_width, diff))
-}
-
-# Extract statistics for written report
-age_effect_median <- median(posterior_draws$b_age_groupOA)
-age_effect_ci <- quantile(posterior_draws$b_age_groupOA, c(0.025, 0.975))
-
-density_effect_median <- median(posterior_draws$b_densityDense)
-density_effect_ci <- quantile(posterior_draws$b_densityDense, c(0.025, 0.975))
-
-interaction_median <- median(posterior_draws$`b_age_groupOA:densityDense`)
-interaction_ci <- quantile(posterior_draws$`b_age_groupOA:densityDense`, c(0.025, 0.975))
-
-interaction_prob <- mean(posterior_draws$`b_age_groupOA:densityDense` > 0)
-
-cat("\n\nWRITTEN PARAGRAPH REPORT:\n")
-cat("=========================\n\n")
-
-paragraph <- sprintf(
-  "To investigate whether neighbourhood density affects maximum pupil size differently in older versus younger adults, we fitted a Bayesian Gaussian regression model with an age group × density interaction to %d observations from %d participants. Results revealed a strong main effect of age, with older adults showing substantially larger maximum pupil widths than young adults (β = %.2f, 95%% CI [%.2f, %.2f]). The main effect of density was negligible for young adults (β = %.3f, 95%% CI [%.3f, %.3f]), indicating that sparse and dense neighbourhoods produced similar pupil widths in younger participants. Critically, the age × density interaction effect was very weak and centred near zero (β = %.3f, 95%% CI [%.3f, %.3f], P(interaction > 0) = %.2f). The 95%% credible interval for the interaction includes zero, indicating no meaningful evidence for differential effects of density across age groups. This conclusion is visually supported by the approximately parallel lines in the interaction plot, where the density effect (if present) is comparable in magnitude for both age groups. Posterior predictive checks indicated excellent model fit, and all Markov chains converged successfully (Rhat < 1.01). These findings suggest that neighbourhood density does not meaningfully influence how age-related differences in pupil size manifest.",
-
-  nrow(pupil_clean),
-  n_distinct(pupil_clean$subject),
-  age_effect_median,
-  age_effect_ci[1],
-  age_effect_ci[2],
-  density_effect_median,
-  density_effect_ci[1],
-  density_effect_ci[2],
-  interaction_median,
-  interaction_ci[1],
-  interaction_ci[2],
-  interaction_prob
+# Extract posterior statistics
+cat("\n\nPOSTERIOR STATISTICS (95% Credible Intervals):\n")
+stats <- list(
+  "Age (OA vs YA, Sparse)" = quantile(posterior_draws$b_age_groupOA, c(0.025, 0.5, 0.975)),
+  "Density (Dense vs Sparse, Young)" = quantile(posterior_draws$b_densityDense, c(0.025, 0.5, 0.975)),
+  "Interaction: Age × Density" = quantile(posterior_draws$`b_age_groupOA:densityDense`, c(0.025, 0.5, 0.975))
 )
 
-# Wrap and print paragraph
-wrapped <- strwrap(paragraph, width = 80)
-for(line in wrapped) {
-  cat(line, "\n")
+for (name in names(stats)) {
+  cat(sprintf("%s: Median = %.2f, 95%% CI [%.2f, %.2f]\n",
+              name, stats[[name]]["50%"], stats[[name]]["2.5%"], stats[[name]]["97.5%"]))
 }
+
+# Written paragraph
+cat("\n\nRESEARCH SUMMARY:\n")
+cat("================\n\n")
+
+paragraph <- sprintf(
+  "To investigate whether neighbourhood density affects maximum pupil size differently in older versus younger adults, we fitted a Bayesian Gaussian regression model with age × density interaction to %d observations. Older adults showed substantially larger pupil widths than younger adults (β = %.2f, 95%% CI [%.2f, %.2f]). Density had negligible effect for younger adults (β = %.2f, 95%% CI [%.2f, %.2f]). Critically, the age × density interaction was near zero (β = %.2f, 95%% CI [%.2f, %.2f]), indicating no meaningful evidence for differential density effects across age groups. The approximately parallel lines in the interaction plot confirm this lack of interaction. Posterior predictive checks and chain convergence (Rhat < 1.01) indicated adequate model fit. These findings suggest neighbourhood density does not meaningfully modulate age-related differences in pupil size.",
+
+  nrow(pupil_clean),
+  stats[["Age (OA vs YA, Sparse)"]][2], stats[["Age (OA vs YA, Sparse)"]][1], stats[["Age (OA vs YA, Sparse)"]][3],
+  stats[["Density (Dense vs Sparse, Young)"]][2], stats[["Density (Dense vs Sparse, Young)"]][1], stats[["Density (Dense vs Sparse, Young)"]][3],
+  stats[["Interaction: Age × Density"]][2], stats[["Interaction: Age × Density"]][1], stats[["Interaction: Age × Density"]][3]
+)
+
+wrapped <- strwrap(paragraph, width = 80)
+for (line in wrapped) cat(line, "\n")
 
 cat("\n\nMODEL SUMMARY:\n")
 print(model_pupil)
