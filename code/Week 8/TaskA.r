@@ -167,7 +167,7 @@
 #   (3) Use model diagnostics to understand the model’s goodness of fit.
 #   (4) Apply standard solutions when models do not converge.
 
- Lecture: https://uoelel.github.io/qml/lectures/week-08.html
+# Lecture: https://uoelel.github.io/qml/lectures/week-08.html
 
 # Resources:
 #    Lecture: https://uoelel.github.io/qml/lectures/week-08.html
