@@ -148,7 +148,7 @@ p1 <- posterior_draws %>%
 
 # Plot 2: Main effects (Age group and Density)
 p2 <- posterior_draws %>%
-  select(starts_with("b_age_group"), starts_with("b_density")) %>%
+  select(starts_with("b_age_groupOA"), starts_with("b_densityDense"), -starts_with("b_age_groupOA:")) %>%
   pivot_longer(everything(), names_to = "parameter", values_to = "value") %>%
   mutate(parameter = str_remove(parameter, "^b_")) %>%
   ggplot(aes(x = value, fill = parameter)) +
@@ -164,7 +164,7 @@ p2 <- posterior_draws %>%
 
 # Plot 3: Interaction effect
 p3 <- posterior_draws %>%
-  select(starts_with("b_age_group") & ends_with(":")) %>%
+  select(starts_with("b_age_groupOA:")) %>%
   pivot_longer(everything(), names_to = "parameter", values_to = "value") %>%
   mutate(parameter = str_remove(parameter, "^b_")) %>%
   ggplot(aes(x = value, fill = parameter)) +
@@ -270,11 +270,11 @@ cat("\n\nKEY FINDINGS:\n")
 # Calculate pupil width difference by age group for each density
 for (dens in levels(pupil_clean$density)) {
   young_width <- epreds_summary %>%
-    filter(age_group == "young", density == dens) %>%
+    filter(age_group == "YA", density == dens) %>%
     pull(mean_width)
 
   old_width <- epreds_summary %>%
-    filter(age_group == "old", density == dens) %>%
+    filter(age_group == "OA", density == dens) %>%
     pull(mean_width)
 
   diff <- old_width - young_width

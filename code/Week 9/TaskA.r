@@ -65,7 +65,7 @@ library(here)
 shallow <- read_csv(here("data", "song2020", "shallow.csv"), show_col_types = FALSE) %>%
   mutate(
     Group = factor(Group, levels = c("L1", "L2")),
-    Relation_type = factor(Relation_type, levels = c("Unrelated", "Semantic", "Phonological"))
+    Relation_type = factor(Relation_type, levels = c("Unrelated", "Constituent", "NonConstituent"))
   )
 
 # Check data structure
@@ -78,8 +78,8 @@ shallow %>%
   filter(Critical_Filler == "Critical") %>%
   mutate(ACC_numeric = as.numeric(ACC)) %>%
   ggplot(aes(x = Relation_type, y = ACC_numeric, fill = Group)) +
-  geom_jitter(position = position_jitterdodge(jitter.width = 0.2),
-              alpha = 0.3, height = 0.05) +
+  geom_jitter(position = position_jitterdodge(jitter.width = 0.2, jitter.height = 0.05),
+              alpha = 0.3) +
   geom_boxplot(position = position_dodge(0.75), alpha = 0.6) +
   labs(
     title = "Accuracy by Relation Type and Group",
@@ -95,7 +95,8 @@ shallow %>%
 # 3. Filter data: Critical trials only ----
 shallow_critical <- shallow %>%
   filter(Critical_Filler == "Critical") %>%
-  drop_na(ACC, Relation_type, Group)
+  drop_na(ACC, Relation_type, Group) %>%
+  droplevels()  # Remove unused factor levels
 
 cat("Filtered data: Critical trials only\n")
 cat("N =", nrow(shallow_critical), "observations\n")
@@ -142,7 +143,7 @@ p1 <- posterior_draws %>%
 
 # Plot 2: Main effects (Group and Relation Type)
 p2 <- posterior_draws %>%
-  select(starts_with("b_Group"), starts_with("b_Relation_type")) %>%
+  select(starts_with("b_GroupL2"), starts_with("b_Relation_type"), -starts_with("b_GroupL2:")) %>%
   pivot_longer(everything(), names_to = "parameter", values_to = "value") %>%
   mutate(parameter = str_remove(parameter, "^b_")) %>%
   ggplot(aes(x = value, fill = parameter)) +
@@ -158,7 +159,7 @@ p2 <- posterior_draws %>%
 
 # Plot 3: Interaction effects
 p3 <- posterior_draws %>%
-  select(starts_with("b_Group") & ends_with(":")) %>%
+  select(starts_with("b_GroupL2:")) %>%
   pivot_longer(everything(), names_to = "parameter", values_to = "value") %>%
   mutate(parameter = str_remove(parameter, "^b_")) %>%
   ggplot(aes(x = value, fill = parameter)) +
