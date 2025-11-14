@@ -1,9 +1,9 @@
 # ==============================================================================
 # Week 9 |https://uoelel.github.io/qml/workshops/week-09.html
-# Title: Task B: Pupil Width with Age × Density Interaction
+# Title: Task B: Pupil Width 
 # Author: Sandria Tran
 # Date: 2025-11-14
-# Topic: Workshop: Multiple predictors and interactions
+# Topic: Workshop: Multiple predictors and interactions (with Age and Density Interaction)
 #        Lecture: Open research
 #
 # (i) Instructions:
