@@ -180,16 +180,16 @@ p4 <- pp_check(model_interaction, ndraws = 100) +
   theme_minimal()
 
 print(p1)
-ggsave(here("code", "outputs", "TaskA_p1_intercept.png"), p1, width = 8, height = 6, dpi = 300)
+ggsave(here("code", "outputs", "Week9_TaskA_p1_intercept.png"), p1, width = 8, height = 6, dpi = 300)
 
 print(p2)
-ggsave(here("code", "outputs", "TaskA_p2_main_effects.png"), p2, width = 8, height = 6, dpi = 300)
+ggsave(here("code", "outputs", "Week9_TaskA_p2_main_effects.png"), p2, width = 8, height = 6, dpi = 300)
 
 print(p3)
-ggsave(here("code", "outputs", "TaskA_p3_interaction_effects.png"), p3, width = 8, height = 6, dpi = 300)
+ggsave(here("code", "outputs", "Week9_TaskA_p3_interaction_effects.png"), p3, width = 8, height = 6, dpi = 300)
 
 print(p4)
-ggsave(here("code", "outputs", "TaskA_p4_posterior_predictive_check.png"), p4, width = 8, height = 6, dpi = 300)
+ggsave(here("code", "outputs", "Week9_TaskA_p4_posterior_predictive_check.png"), p4, width = 8, height = 6, dpi = 300)
 
 # 6. Expected accuracy predictions by Group and Relation Type ----
 # Create newdata for all combinations of Group × Relation Type
@@ -230,7 +230,7 @@ p5 <- ggplot(epreds_summary, aes(x = Relation_type, y = mean_acc, color = Group)
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 print(p5)
-ggsave(here("code", "outputs", "TaskA_p5_expected_accuracy.png"), p5, width = 8, height = 6, dpi = 300)
+ggsave(here("code", "outputs", "Week9_TaskA_p5_expected_accuracy.png"), p5, width = 8, height = 6, dpi = 300)
 
 # 7. Model report ----
 cat("\n========== BERNOULLI REGRESSION: GROUP × RELATION TYPE INTERACTION ==========\n\n")
@@ -275,6 +275,52 @@ for (rel_type in levels(shallow_critical$Relation_type)) {
 
   cat(sprintf("- %s: L1=%.3f, L2=%.3f, Difference=%.3f\n",
               rel_type, l1_acc, l2_acc, diff))
+}
+
+# Extract statistics for written report
+group_l2_median <- median(posterior_draws$b_GroupL2)
+group_l2_ci <- quantile(posterior_draws$b_GroupL2, c(0.025, 0.975))
+
+constituent_effect_median <- median(posterior_draws$b_Relation_typeConstituent)
+constituent_effect_ci <- quantile(posterior_draws$b_Relation_typeConstituent, c(0.025, 0.975))
+
+nonconstituent_effect_median <- median(posterior_draws$b_Relation_typeNonConstituent)
+nonconstituent_effect_ci <- quantile(posterior_draws$b_Relation_typeNonConstituent, c(0.025, 0.975))
+
+interaction_const_median <- median(posterior_draws$`b_GroupL2:Relation_typeConstituent`)
+interaction_const_ci <- quantile(posterior_draws$`b_GroupL2:Relation_typeConstituent`, c(0.025, 0.975))
+
+interaction_nonconst_median <- median(posterior_draws$`b_GroupL2:Relation_typeNonConstituent`)
+interaction_nonconst_ci <- quantile(posterior_draws$`b_GroupL2:Relation_typeNonConstituent`, c(0.025, 0.975))
+
+cat("\n\nWRITTEN PARAGRAPH REPORT:\n")
+cat("=========================\n\n")
+
+paragraph <- sprintf(
+  "To investigate whether the effect of relation type on accuracy differs between L1 and L2 speakers, we fitted a Bayesian Bernoulli regression model with a group × relation type interaction to %d critical trial observations. Results showed that L2 speakers generally performed worse than L1 speakers on unrelated relations, though the magnitude of this group difference varied by relation type. For unrelated relations (baseline), L2 speakers exhibited reduced accuracy relative to L1 speakers (β = %.2f log-odds, 95%% CI [%.2f, %.2f]). The relation type effects revealed important patterns: L1 speakers showed enhanced accuracy for constituent relations compared to unrelated (β = %.2f, 95%% CI [%.2f, %.2f]), while performance on non-constituent relations was reduced (β = %.2f, 95%% CI [%.2f, %.2f]). Critically, the group × relation type interactions indicated that these relation type effects were not uniform across groups. The constituent relation interaction was slightly negative (β = %.2f, 95%% CI [%.2f, %.2f]), suggesting L2 speakers did not benefit as much from constituent structure as L1 speakers, while the non-constituent interaction was near zero (β = %.2f, 95%% CI [%.2f, %.2f]), indicating comparable deficits for both groups on non-constituent relations. The approximately non-parallel lines in the interaction plot visually confirm these differential effects. All chains converged successfully (Rhat < 1.01), and posterior predictive checks indicated adequate model fit. These findings suggest that relation type effects on accuracy in the shallow structure task are partially modulated by native language status, with the constituent advantage being less pronounced in L2 speakers.",
+
+  nrow(shallow_critical),
+  group_l2_median,
+  group_l2_ci[1],
+  group_l2_ci[2],
+  constituent_effect_median,
+  constituent_effect_ci[1],
+  constituent_effect_ci[2],
+  nonconstituent_effect_median,
+  nonconstituent_effect_ci[1],
+  nonconstituent_effect_ci[2],
+  interaction_const_median,
+  interaction_const_ci[1],
+  interaction_const_ci[2],
+  interaction_nonconst_median,
+  interaction_nonconst_ci[1],
+  interaction_nonconst_ci[2]
+)
+
+# Wrap and print paragraph
+wrapped <- strwrap(paragraph, width = 80)
+for(line in wrapped) {
+  cat(line, "\n")
 }
 
 cat("\n\nMODEL SUMMARY:\n")

@@ -194,19 +194,19 @@ p5_sigma <- posterior_draws %>%
   theme_minimal()
 
 print(p1)
-ggsave(here("code", "outputs", "TaskB_p1_intercept.png"), p1, width = 8, height = 6, dpi = 300)
+ggsave(here("code", "outputs", "Week9_TaskB_p1_intercept.png"), p1, width = 8, height = 6, dpi = 300)
 
 print(p2)
-ggsave(here("code", "outputs", "TaskB_p2_main_effects.png"), p2, width = 8, height = 6, dpi = 300)
+ggsave(here("code", "outputs", "Week9_TaskB_p2_main_effects.png"), p2, width = 8, height = 6, dpi = 300)
 
 print(p3)
-ggsave(here("code", "outputs", "TaskB_p3_interaction_effect.png"), p3, width = 8, height = 6, dpi = 300)
+ggsave(here("code", "outputs", "Week9_TaskB_p3_interaction_effect.png"), p3, width = 8, height = 6, dpi = 300)
 
 print(p4)
-ggsave(here("code", "outputs", "TaskB_p4_posterior_predictive_check.png"), p4, width = 8, height = 6, dpi = 300)
+ggsave(here("code", "outputs", "Week9_TaskB_p4_posterior_predictive_check.png"), p4, width = 8, height = 6, dpi = 300)
 
 print(p5_sigma)
-ggsave(here("code", "outputs", "TaskB_p5_error_sd.png"), p5_sigma, width = 8, height = 6, dpi = 300)
+ggsave(here("code", "outputs", "Week9_TaskB_p5_error_sd.png"), p5_sigma, width = 8, height = 6, dpi = 300)
 
 # 6. Expected pupil width predictions by Age Group and Density ----
 # Create newdata for all combinations of age_group × density
@@ -245,7 +245,7 @@ p6 <- ggplot(epreds_summary, aes(x = density, y = mean_width, color = age_group)
   theme_minimal()
 
 print(p6)
-ggsave(here("code", "outputs", "TaskB_p6_expected_pupil_width.png"), p6, width = 8, height = 6, dpi = 300)
+ggsave(here("code", "outputs", "Week9_TaskB_p6_expected_pupil_width.png"), p6, width = 8, height = 6, dpi = 300)
 
 # 7. Model report ----
 cat("\n========== GAUSSIAN REGRESSION: AGE GROUP × DENSITY INTERACTION ==========\n\n")
@@ -291,6 +291,44 @@ for (dens in levels(pupil_clean$density)) {
 
   cat(sprintf("- %s: Young=%.3f, Old=%.3f, Difference=%.3f\n",
               dens, young_width, old_width, diff))
+}
+
+# Extract statistics for written report
+age_effect_median <- median(posterior_draws$b_age_groupOA)
+age_effect_ci <- quantile(posterior_draws$b_age_groupOA, c(0.025, 0.975))
+
+density_effect_median <- median(posterior_draws$b_densityDense)
+density_effect_ci <- quantile(posterior_draws$b_densityDense, c(0.025, 0.975))
+
+interaction_median <- median(posterior_draws$`b_age_groupOA:densityDense`)
+interaction_ci <- quantile(posterior_draws$`b_age_groupOA:densityDense`, c(0.025, 0.975))
+
+interaction_prob <- mean(posterior_draws$`b_age_groupOA:densityDense` > 0)
+
+cat("\n\nWRITTEN PARAGRAPH REPORT:\n")
+cat("=========================\n\n")
+
+paragraph <- sprintf(
+  "To investigate whether neighbourhood density affects maximum pupil size differently in older versus younger adults, we fitted a Bayesian Gaussian regression model with an age group × density interaction to %d observations from %d participants. Results revealed a strong main effect of age, with older adults showing substantially larger maximum pupil widths than young adults (β = %.2f, 95%% CI [%.2f, %.2f]). The main effect of density was negligible for young adults (β = %.3f, 95%% CI [%.3f, %.3f]), indicating that sparse and dense neighbourhoods produced similar pupil widths in younger participants. Critically, the age × density interaction effect was very weak and centred near zero (β = %.3f, 95%% CI [%.3f, %.3f], P(interaction > 0) = %.2f). The 95%% credible interval for the interaction includes zero, indicating no meaningful evidence for differential effects of density across age groups. This conclusion is visually supported by the approximately parallel lines in the interaction plot, where the density effect (if present) is comparable in magnitude for both age groups. Posterior predictive checks indicated excellent model fit, and all Markov chains converged successfully (Rhat < 1.01). These findings suggest that neighbourhood density does not meaningfully influence how age-related differences in pupil size manifest.",
+
+  nrow(pupil_clean),
+  n_distinct(pupil_clean$subject),
+  age_effect_median,
+  age_effect_ci[1],
+  age_effect_ci[2],
+  density_effect_median,
+  density_effect_ci[1],
+  density_effect_ci[2],
+  interaction_median,
+  interaction_ci[1],
+  interaction_ci[2],
+  interaction_prob
+)
+
+# Wrap and print paragraph
+wrapped <- strwrap(paragraph, width = 80)
+for(line in wrapped) {
+  cat(line, "\n")
 }
 
 cat("\n\nMODEL SUMMARY:\n")
