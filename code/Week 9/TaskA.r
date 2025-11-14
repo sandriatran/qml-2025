@@ -65,7 +65,7 @@ library(here)
 shallow <- read_csv(here("data", "song2020", "shallow.csv"), show_col_types = FALSE) %>%
   mutate(
     Group = factor(Group, levels = c("L1", "L2")),
-    Relation_type = factor(Relation_type, levels = c("Unrelated", "Syntactic", "Morphological"))
+    Relation_type = factor(Relation_type, levels = c("Unrelated", "Semantic", "Phonological"))
   )
 
 # Check data structure
