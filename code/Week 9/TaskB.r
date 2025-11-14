@@ -194,10 +194,19 @@ p5_sigma <- posterior_draws %>%
   theme_minimal()
 
 print(p1)
+ggsave(here("code", "outputs", "TaskB_p1_intercept.png"), p1, width = 8, height = 6, dpi = 300)
+
 print(p2)
+ggsave(here("code", "outputs", "TaskB_p2_main_effects.png"), p2, width = 8, height = 6, dpi = 300)
+
 print(p3)
+ggsave(here("code", "outputs", "TaskB_p3_interaction_effect.png"), p3, width = 8, height = 6, dpi = 300)
+
 print(p4)
+ggsave(here("code", "outputs", "TaskB_p4_posterior_predictive_check.png"), p4, width = 8, height = 6, dpi = 300)
+
 print(p5_sigma)
+ggsave(here("code", "outputs", "TaskB_p5_error_sd.png"), p5_sigma, width = 8, height = 6, dpi = 300)
 
 # 6. Expected pupil width predictions by Age Group and Density ----
 # Create newdata for all combinations of age_group × density
@@ -236,6 +245,7 @@ p6 <- ggplot(epreds_summary, aes(x = density, y = mean_width, color = age_group)
   theme_minimal()
 
 print(p6)
+ggsave(here("code", "outputs", "TaskB_p6_expected_pupil_width.png"), p6, width = 8, height = 6, dpi = 300)
 
 # 7. Model report ----
 cat("\n========== GAUSSIAN REGRESSION: AGE GROUP × DENSITY INTERACTION ==========\n\n")
