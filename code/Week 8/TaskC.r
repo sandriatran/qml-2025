@@ -263,6 +263,17 @@ print(p2)
 print(p3)
 print(p4)
 
+# Save plots to both central outputs and Week 8 outputs folders
+list(p1 = p1, p2 = p2, p3 = p3, p4 = p4) %>%
+  walk2(names(.), function(plot, name) {
+    # Save to central outputs folder
+    ggsave(here("code", "outputs", paste0("Week8_TaskC_", name, ".png")),
+           plot, width = 8, height = 6, dpi = 300)
+    # Save to Week 8 outputs folder
+    ggsave(here("code", "Week 8", "outputs", paste0("Week8_TaskC_", name, ".png")),
+           plot, width = 8, height = 6, dpi = 300)
+  })
+
 # 5. Expected reaction time predictions by relation type ----
 relation_types <- shallow_l2_rt %>%
   distinct(Relation_type) %>%
@@ -298,6 +309,12 @@ p5 <- ggplot(epreds_summary, aes(x = Relation_type, y = mean_rt)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 print(p5)
+
+# Save p5 to both central outputs and Week 8 outputs folders
+ggsave(here("code", "outputs", "Week8_TaskC_p5.png"), p5,
+       width = 8, height = 6, dpi = 300)
+ggsave(here("code", "Week 8", "outputs", "Week8_TaskC_p5.png"), p5,
+       width = 8, height = 6, dpi = 300)
 
 # 6. Model report ----
 cat("\n========== LOG-NORMAL REGRESSION: REACTION TIMES ==========\n\n")
