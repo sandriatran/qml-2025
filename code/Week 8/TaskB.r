@@ -39,7 +39,7 @@
 #                     probability of "success"
 #                     for observation i, and β coefficients are
 #                     estimated by the model
-            ex. a model would estimate log-odds of the outcome and have 1 group as a reference
+#            ex. a model would estimate log-odds of the outcome and have 1 group as a reference
 #        (i) LOG-ODDS back into Probabilities
 #             - To understand results:
 #                (i) transform the predicted log odds back to probabilities
@@ -167,7 +167,7 @@
 #   (3) Use model diagnostics to understand the model’s goodness of fit.
 #   (4) Apply standard solutions when models do not converge.
 
- Lecture: https://uoelel.github.io/qml/lectures/week-08.html
+# Lecture: https://uoelel.github.io/qml/lectures/week-08.html
 
 # Resources:
 #    Lecture: https://uoelel.github.io/qml/lectures/week-08.html
@@ -243,13 +243,13 @@ p2 <- posterior_draws %>%
 
 # Plot 3: Joint posterior
 p3 <- posterior_draws %>%
-  ggplot(aes(x = b_Intercept, y = b_Relation_typeMorphological)) +
+  ggplot(aes(x = b_Intercept, y = b_Relation_typeConstituent)) +
   stat_density_2d(aes(fill = after_stat(density)), geom = "raster", contour = FALSE) +
   scale_fill_viridis_c() +
   labs(
-    title = "Joint Posterior: Intercept vs Morphological Effect",
+    title = "Joint Posterior: Intercept vs Constituent Effect",
     x = "Intercept (β₀)",
-    y = "Morphological Effect"
+    y = "Constituent Effect"
   ) +
   theme_minimal()
 
