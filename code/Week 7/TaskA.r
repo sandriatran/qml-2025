@@ -243,6 +243,7 @@
 # Load required libraries
 library(tidyverse)
 library(brms)
+library(here)
 
 # IMPORTANT: Set working directory to project root
 # Option 1: Open qml-2025.Rproj in RStudio (recommended)
@@ -299,9 +300,9 @@ p1 <- ggplot(token_data, aes(x = vowel, y = v1_duration, fill = vowel)) +
   theme_minimal() +
   theme(legend.position = "none")
 
-ggsave("code/Week 7/TaskA_vowel_distributions.png",
+ggsave(here("code", "Week 7", "outputs", "TaskA_vowel_distributions.png"),
        p1, width = 10, height = 6)
-ggsave("code/outputs/Week7_TaskA_vowel_distributions.png",
+ggsave(here("code", "outputs", "Week7_TaskA_vowel_distributions.png"),
        p1, width = 10, height = 6)
 
 # Density plot by vowel
@@ -316,9 +317,9 @@ p2 <- ggplot(token_data, aes(x = v1_duration, fill = vowel)) +
   ) +
   theme_minimal()
 
-ggsave("code/Week 7/TaskA_vowel_densities.png",
+ggsave(here("code", "Week 7", "outputs", "TaskA_vowel_densities.png"),
        p2, width = 10, height = 8)
-ggsave("code/outputs/Week7_TaskA_vowel_densities.png",
+ggsave(here("code", "outputs", "Week7_TaskA_vowel_densities.png"),
        p2, width = 10, height = 8)
 
 # ==============================================================================
@@ -348,9 +349,9 @@ plot(vowel_model)
 
 # Save diagnostic plots
 pp_check_plot <- pp_check(vowel_model, ndraws = 100)
-ggsave("code/Week 7/TaskA_pp_check.png",
+ggsave(here("code", "Week 7", "outputs", "TaskA_pp_check.png"),
        pp_check_plot, width = 8, height = 6)
-ggsave("code/outputs/Week7_TaskA_pp_check.png",
+ggsave(here("code", "outputs", "Week7_TaskA_pp_check.png"),
        pp_check_plot, width = 8, height = 6)
 
 # ==============================================================================
@@ -376,9 +377,9 @@ p3 <- posterior_draws %>%
   theme_minimal() +
   theme(legend.position = "none")
 
-ggsave("code/Week 7/TaskA_posterior_parameters.png",
+ggsave(here("code", "Week 7", "outputs", "TaskA_posterior_parameters.png"),
        p3, width = 12, height = 10)
-ggsave("code/outputs/Week7_TaskA_posterior_parameters.png",
+ggsave(here("code", "outputs", "Week7_TaskA_posterior_parameters.png"),
        p3, width = 12, height = 10)
 
 # ==============================================================================
@@ -434,13 +435,13 @@ p4 <- ggplot(
   coord_flip()
 
 ggsave(
-  "code/Week 7/TaskA_predictions.png",
+  here("code", "Week 7", "outputs", "TaskA_predictions.png"),
   p4,
   width = 10,
   height = 6
 )
 ggsave(
-  "code/outputs/Week7_TaskA_predictions.png",
+  here("code", "outputs", "Week7_TaskA_predictions.png"),
   p4,
   width = 10,
   height = 6
