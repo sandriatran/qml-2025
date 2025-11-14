@@ -180,9 +180,16 @@ p4 <- pp_check(model_interaction, ndraws = 100) +
   theme_minimal()
 
 print(p1)
+ggsave(here("code", "outputs", "TaskA_p1_intercept.png"), p1, width = 8, height = 6, dpi = 300)
+
 print(p2)
+ggsave(here("code", "outputs", "TaskA_p2_main_effects.png"), p2, width = 8, height = 6, dpi = 300)
+
 print(p3)
+ggsave(here("code", "outputs", "TaskA_p3_interaction_effects.png"), p3, width = 8, height = 6, dpi = 300)
+
 print(p4)
+ggsave(here("code", "outputs", "TaskA_p4_posterior_predictive_check.png"), p4, width = 8, height = 6, dpi = 300)
 
 # 6. Expected accuracy predictions by Group and Relation Type ----
 # Create newdata for all combinations of Group × Relation Type
@@ -223,6 +230,7 @@ p5 <- ggplot(epreds_summary, aes(x = Relation_type, y = mean_acc, color = Group)
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 print(p5)
+ggsave(here("code", "outputs", "TaskA_p5_expected_accuracy.png"), p5, width = 8, height = 6, dpi = 300)
 
 # 7. Model report ----
 cat("\n========== BERNOULLI REGRESSION: GROUP × RELATION TYPE INTERACTION ==========\n\n")
