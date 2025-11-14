@@ -1,6 +1,6 @@
 # ==============================================================================
 # Week 9 | https://uoelel.github.io/qml/workshops/week-09.html
-# Title: Task A: Shallow Structure Hypothesis with Group × Relation Type Interaction
+# Title: Task A: Shallow Structure Hypothesis
 # Author: Sandria Tran
 # Date: 2025-11-14
 # Topic: Workshop: Multiple predictors and interactions
