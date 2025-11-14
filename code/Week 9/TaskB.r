@@ -1,22 +1,55 @@
 # ==============================================================================
-# Week 9 - Task B: Pupil Width with Age × Density Interaction
+# Week 9 |https://uoelel.github.io/qml/workshops/week-09.html
+# Title: Task B: Pupil Width with Age × Density Interaction
 # Author: Sandria Tran
 # Date: 2025-11-14
+# Topic: Workshop: Multiple predictors and interactions
+#        Lecture: Open research
 #
-# Research Question:
-#   Does neighbourhood density affect maximum pupil size differently in old vs
-#   young adults?
+# (i) Instructions:
+#   (1) Read the mclaughlin2023/pupil-width.csv data.
+#   (2) Fit a regression model to answer: Does the density of the neighbourhood
+#       affect maximum pupil size in old vs young adults differently?
+#   (3) Write a paragraph reporting the model.
+#   (4) Produce plots of the posterior distributions of the model parameters and
+#       the expected predictions for the dense and sparse condition in old vs
+#       young participants.
+#   (5) Discuss the results with your group. (no need to write the discussion).
 #
-# Instructions:
-#   (1) Read the mclaughlin2023/pupil-width.csv data
-#   (2) Fit Gaussian regression with Age × Density interaction
-#   (3) Write paragraph report with posterior plots and predictions
-#   (4) Produce posterior distributions of model parameters
-#   (5) Discuss results with group
+# (ii) Learning Objectives:
+#   (1) What is Open Research?
+#        - Principles: honest, transparent, reproducible, accessible research
+#        - Avoids questionable research behaviors
+#        - Promotes openness throughout research cycle
+#        - Makes outputs publicly accessible
+#
+#   (2) Research reliability: reproducible, replicable, robust, generalisable
+#        - Reproducible: same data + same pipeline = same results
+#        - Replicable: new data + same protocol = similar results
+#        - Robust: alternative methods (same data) = same findings
+#        - Generalisable: new data + new workflows = consistent findings
+#
+#   (3) Registered Reports
+#        - Peer-review BEFORE data collection starts
+#        - Stage 1: Review research plan
+#        - Stage 2: Review adherence to plan after analysis
+#        - Benefits: Prevent p-hacking, selective reporting, publication bias
+#
+#   (4) Modeling interactions in regression
+#        - Add interaction term: Y ~ X + Z + X:Z or Y ~ X * Z
+#        - Allows effect of one predictor to depend on another
+#        - Reference level matters for interpretation
+#        - Mean-centering reduces multicollinearity
+#
+# (iii) Skills:
+#      (1) Assess research in light of Open Research practices
+#      (2) Distinguish four ways research can be reliable
+#      (3) Fit and interpret categorical × categorical interactions in brms
+#      (4) Visualize and interpret interaction effects
 #
 # Resources:
-#   Lecture: https://uoelel.github.io/qml/lectures/week-09.html
-#   Textbook: https://stefanocoretta.github.io/qdal/ch-regression-interaction.html
+#    Lecture: https://uoelel.github.io/qml/lectures/week-09.html
+#    Textbook: https://stefanocoretta.github.io/qdal/ch-regression-interaction.html
 # ==============================================================================
 
 # Load required packages ----
