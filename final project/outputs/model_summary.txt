@@ -1,0 +1,24 @@
+ Family: bernoulli 
+  Links: mu = logit 
+Formula: accuracy ~ lr_coded + (1 | subject_id) + (1 | item_id) 
+   Data: data_model (Number of observations: 389) 
+  Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+         total post-warmup draws = 4000
+
+Multilevel Hyperparameters:
+~item_id (Number of levels: 20) 
+              Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sd(Intercept)     1.50      0.40     0.88     2.40 1.00     1262     1934
+
+~subject_id (Number of levels: 20) 
+              Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sd(Intercept)     0.89      0.28     0.41     1.50 1.00     1421     1756
+
+Regression Coefficients:
+          Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+Intercept     1.54      1.56    -1.63     4.65 1.00     6045     2491
+lr_coded      0.00      1.50    -2.95     2.89 1.00     7018     2382
+
+Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+and Tail_ESS are effective sample size measures, and Rhat is the potential
+scale reduction factor on split chains (at convergence, Rhat = 1).
