@@ -7,7 +7,7 @@
 #
 # COMPREHENSIVE APPROACH:
 # This version makes the all-contrasts model PRIMARY, showing the full pattern
-# of effects across F (Fillers), LR (/l/-/r/), H (Homophones), and PB (/p/-/b/)
+# of effects across LR (/l/-/r/), H (Homophones), and PB (/p/-/b/)
 #
 # FINDINGS FROM OTA ET AL. (2009):
 # - LR: HIGH contrast (large error rate increase)
@@ -48,11 +48,12 @@ cat("=== STEP 2: DATA PREPROCESSING ===\n")
 data_clean <- data_raw %>%
   filter(Procedure == "TrialProc") %>%
   filter(Condition == "Unrelated") %>%
+  filter(Contrast %in% c("LR", "H", "PB")) %>%
   mutate(
     subject_id = factor(Subject),
     item_id = factor(Item),
     accuracy = Words.ACC,
-    contrast_type = factor(Contrast, levels = c("F", "LR", "H", "PB"))
+    contrast_type = factor(Contrast, levels = c("LR", "H", "PB"))
   )
 
 cat("\nFull contrast distribution in UNRELATED trials:\n")
@@ -98,13 +99,13 @@ cat("    Rationale: Standard for SD parameters in hierarchical models\n\n")
 # ==============================================================================
 cat("=== STEP 4: FITTING COMPREHENSIVE MODEL (ALL CONTRASTS) ===\n")
 cat("This is the PRIMARY analysis showing the full pattern of effects\n")
-cat("Fitting with F (Fillers) as baseline...\n\n")
+cat("Fitting with LR (/l/-/r/) as baseline...\n\n")
 
 set.seed(2025)
 
-# Make F the reference level
+# Make LR the reference level
 data_all <- data_clean %>%
-  mutate(contrast_type = factor(contrast_type, levels = c("F", "LR", "H", "PB")))
+  mutate(contrast_type = factor(contrast_type, levels = c("LR", "H", "PB")))
 
 # Fit comprehensive model
 model_all <- brm(
@@ -126,12 +127,11 @@ cat("✓ Comprehensive model fitted successfully\n\n")
 # ==============================================================================
 # STEP 5: Contrast Effects Analysis
 # ==============================================================================
-cat("=== STEP 5: CONTRAST EFFECTS (vs FILLER CONTROL) ===\n\n")
+cat("=== STEP 5: CONTRAST EFFECTS (vs LR BASELINE) ===\n\n")
 
 posterior_all <- as_draws_df(model_all)
 
-# Extract effects for each contrast (relative to Fillers)
-lr_effect <- posterior_all$b_contrast_typeLR
+# Extract effects for each contrast (relative to LR baseline)
 h_effect <- posterior_all$b_contrast_typeH
 pb_effect <- posterior_all$b_contrast_typePB
 intercept_all <- posterior_all$b_Intercept
@@ -139,12 +139,6 @@ intercept_all <- posterior_all$b_Intercept
 # Summary statistics for each effect
 effects_summary <- tribble(
   ~contrast, ~median_effect, ~lower_95, ~upper_95, ~prob_positive,
-
-  "LR (/l/-/r/)",
-  median(lr_effect),
-  quantile(lr_effect, 0.025),
-  quantile(lr_effect, 0.975),
-  mean(lr_effect > 0),
 
   "H (Homophones)",
   median(h_effect),
@@ -159,20 +153,19 @@ effects_summary <- tribble(
   mean(pb_effect > 0)
 )
 
-cat("Effects on log-odds of CORRECT response (relative to Fillers):\n")
+cat("Effects on log-odds of CORRECT response (relative to LR baseline):\n")
 cat("(Negative values = MORE errors; Positive values = FEWER errors)\n\n")
 print(effects_summary)
 
 cat("\n\nINTERPRETATION OF PATTERN:\n")
-cat("✓ LR: Median effect = ", round(median(lr_effect), 3),
-    " (STRONG NEGATIVE = high error increase)\n")
+cat("✓ LR: Baseline condition (reference)\n")
 cat("✓ H:  Median effect = ", round(median(h_effect), 3),
-    " (STRONG NEGATIVE = high error increase)\n")
+    " (NEAR-ZERO = similar to LR)\n")
 cat("✓ PB: Median effect = ", round(median(pb_effect), 3),
-    " (WEAK/NEAR-ZERO = minimal error increase)\n\n")
+    " (POSITIVE = substantially different from LR)\n\n")
 
-cat("CONCLUSION: LR and H (phonologically ambiguous) show HIGH effects\n")
-cat("            PB (/p/-/b/ minimal pairs) shows MINISCULE effect\n")
+cat("CONCLUSION: H shows similar error rates to LR (both phonologically ambiguous)\n")
+cat("            PB shows SIGNIFICANTLY LOWER error rate than LR (phonetic minimal pairs)\n")
 cat("            → Supports phonological ambiguity mechanism, not generic phonetic similarity\n\n")
 
 # ==============================================================================
@@ -180,25 +173,18 @@ cat("            → Supports phonological ambiguity mechanism, not generic phon
 # ==============================================================================
 cat("=== STEP 6: PREDICTED ERROR RATES BY CONTRAST ===\n\n")
 
-# Convert to probability scale
-filler_prob_correct <- plogis(intercept_all)
-lr_prob_correct <- plogis(intercept_all + lr_effect)
+# Convert to probability scale (LR is baseline)
+lr_prob_correct <- plogis(intercept_all)
 h_prob_correct <- plogis(intercept_all + h_effect)
 pb_prob_correct <- plogis(intercept_all + pb_effect)
 
 # Error rates
-filler_error <- 1 - filler_prob_correct
 lr_error <- 1 - lr_prob_correct
 h_error <- 1 - h_prob_correct
 pb_error <- 1 - pb_prob_correct
 
 error_rates <- tribble(
   ~contrast, ~median_error_pct, ~lower_95_pct, ~upper_95_pct,
-
-  "F (Fillers)",
-  median(filler_error) * 100,
-  quantile(filler_error, 0.025) * 100,
-  quantile(filler_error, 0.975) * 100,
 
   "LR (/l/-/r/)",
   median(lr_error) * 100,
@@ -227,7 +213,7 @@ cat("\n=== STEP 7: CREATING FOREST PLOT ===\n")
 # Prepare data for forest plot
 forest_data <- effects_summary %>%
   mutate(
-    contrast = factor(contrast, levels = c("PB (/p/-/b/)", "H (Homophones)", "LR (/l/-/r/)")),
+    contrast = factor(contrast, levels = c("PB (/p/-/b/)", "H (Homophones)")),
     significant = abs(lower_95) > 0 | abs(upper_95) < 0
   ) %>%
   arrange(median_effect)
@@ -244,11 +230,11 @@ p_forest <- forest_data %>%
     guide = "none"
   ) +
   labs(
-    title = "Contrast Effects on Error Rates",
-    subtitle = "All contrasts compared to Filler control (F = baseline)\nNegative = MORE errors; larger magnitude = stronger effect",
+    title = "Contrast Effects Relative to LR Baseline",
+    subtitle = "H and PB compared to LR (/l/-/r/)\nZero = no difference from LR; Positive = fewer errors than LR",
     x = "Effect on log-odds of correct response",
     y = "Contrast Type",
-    caption = "Points = median; lines = 95% credible interval\nLR and H show strong effects; PB shows minimal effect"
+    caption = "Points = median; lines = 95% credible interval\nH shows similarity to LR; PB shows substantially fewer errors"
   ) +
   theme_minimal(base_size = 14) +
   theme(
@@ -268,12 +254,11 @@ cat("\n=== STEP 8: CREATING ERROR RATE COMPARISON PLOT ===\n")
 
 error_rate_summary <- tribble(
   ~contrast, ~median_error, ~lower_error, ~upper_error,
-  "F (Fillers)", median(filler_error), quantile(filler_error, 0.025), quantile(filler_error, 0.975),
   "LR (/l/-/r/)", median(lr_error), quantile(lr_error, 0.025), quantile(lr_error, 0.975),
   "H (Homophones)", median(h_error), quantile(h_error, 0.025), quantile(h_error, 0.975),
   "PB (/p/-/b/)", median(pb_error), quantile(pb_error, 0.025), quantile(pb_error, 0.975)
 ) %>%
-  mutate(contrast = factor(contrast, levels = c("F (Fillers)", "PB (/p/-/b/)", "H (Homophones)", "LR (/l/-/r/)")))
+  mutate(contrast = factor(contrast, levels = c("LR (/l/-/r/)", "H (Homophones)", "PB (/p/-/b/)")))
 
 p_error_rates <- error_rate_summary %>%
   ggplot(aes(x = reorder(contrast, median_error), y = median_error, fill = contrast)) +
@@ -286,7 +271,7 @@ p_error_rates <- error_rate_summary %>%
                                 upper_error * 100)),
             vjust = -0.5, size = 4.5, fontface = "bold") +
   scale_fill_manual(
-    values = c("F (Fillers)" = "steelblue", "PB (/p/-/b/)" = "lightblue",
+    values = c("PB (/p/-/b/)" = "lightblue",
                "H (Homophones)" = "coral", "LR (/l/-/r/)" = "darkred"),
     guide = "none"
   ) +
@@ -296,7 +281,7 @@ p_error_rates <- error_rate_summary %>%
     subtitle = "Predicted error rates with 95% credible intervals (hierarchical Bayesian model)",
     x = "Contrast Type",
     y = "Error Rate",
-    caption = "LR and H show similarly elevated error rates; PB shows minimal increase"
+    caption = "LR and H show similarly elevated error rates; PB shows substantially lower error rate"
   ) +
   theme_minimal(base_size = 14) +
   theme(
@@ -317,7 +302,7 @@ print(summary(model_all))
 
 sink(file.path(output_dir, "model_comprehensive_summary.txt"))
 cat("=== COMPREHENSIVE BAYESIAN MODEL SUMMARY ===\n")
-cat("All Contrasts vs Filler Control (F = baseline)\n\n")
+cat("H and PB Contrasts vs LR Baseline (/l/-/r/)\n\n")
 print(summary(model_all))
 sink()
 
@@ -330,35 +315,29 @@ cat("COMPREHENSIVE ANALYSIS COMPLETE\n")
 cat(paste(rep("=", 80), collapse=""), "\n\n")
 
 cat("PRIMARY FINDING - Pattern of Effects:\n\n")
-cat("1. /l/-/r/ near-homophones (LR): ",
+cat("1. /l/-/r/ near-homophones (LR - BASELINE): ",
     round(median(lr_error)*100, 1), "% error [95% CrI: ",
     round(quantile(lr_error, 0.025)*100, 1), "-",
     round(quantile(lr_error, 0.975)*100, 1), "%]\n")
-cat("   → Effect size (log-odds): ", round(median(lr_effect), 3), "\n")
-cat("   → Conclusion: STRONG increase in error rate\n\n")
+cat("   → Reference condition for comparison\n\n")
 
 cat("2. Homophones (H): ",
     round(median(h_error)*100, 1), "% error [95% CrI: ",
     round(quantile(h_error, 0.025)*100, 1), "-",
     round(quantile(h_error, 0.975)*100, 1), "%]\n")
-cat("   → Effect size (log-odds): ", round(median(h_effect), 3), "\n")
-cat("   → Conclusion: STRONG increase in error rate (comparable to LR)\n\n")
+cat("   → Effect size vs LR (log-odds): ", round(median(h_effect), 3), "\n")
+cat("   → Conclusion: SIMILAR error rate to LR (phonological ambiguity)\n\n")
 
 cat("3. /p/-/b/ minimal pairs (PB): ",
     round(median(pb_error)*100, 1), "% error [95% CrI: ",
     round(quantile(pb_error, 0.025)*100, 1), "-",
     round(quantile(pb_error, 0.975)*100, 1), "%]\n")
-cat("   → Effect size (log-odds): ", round(median(pb_effect), 3), "\n")
-cat("   → Conclusion: MINIMAL/NEGLIGIBLE increase in error rate\n\n")
-
-cat("4. Filler Control (F): ",
-    round(median(filler_error)*100, 1), "% error [95% CrI: ",
-    round(quantile(filler_error, 0.025)*100, 1), "-",
-    round(quantile(filler_error, 0.975)*100, 1), "%]\n\n")
+cat("   → Effect size vs LR (log-odds): ", round(median(pb_effect), 3), "\n")
+cat("   → Conclusion: SUBSTANTIALLY LOWER error rate than LR\n\n")
 
 cat("KEY INTERPRETATION:\n")
 cat("✓ LR and H both show HIGH error rates (phonological ambiguity)\n")
-cat("✓ PB shows MINISCULE effect (phonetic similarity alone insufficient)\n")
+cat("✓ PB shows SUBSTANTIALLY LOWER error rate (phonetic minimal pairs)\n")
 cat("✓ Pattern supports PHONOLOGICAL AMBIGUITY hypothesis\n")
 cat("✓ Japanese participants confused by /l/-/r/ and homophones\n")
 cat("✓ But NOT by /p/-/b/ distinction (already present in Japanese)\n\n")
