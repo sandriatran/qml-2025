@@ -346,7 +346,7 @@ p1 <- ggplot(data.frame(x = lr_effect_draws), aes(x = x)) +
            vjust = 1.5, hjust = -0.1, color = "darkred", size = 5, fontface = "bold") +
   labs(
     title = "Posterior Distribution: LR Effect (β₁)",
-    subtitle = "Negative values support hypothesis: /l/-/r/ ambiguity increases errors",
+    subtitle = "Negative values support hypothesis: /l/-/r/ increases errors",
     x = "β₁ (log-odds)",
     y = "Density",
     caption = "Red dashed line = null; dotted lines = 95% CrI"
