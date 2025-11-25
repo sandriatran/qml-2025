@@ -305,7 +305,7 @@ p4 <- ggplot(data.frame(x = lr_effect_draws), aes(x = x)) +
     subtitle = "Effect of /l/-/r/ ambiguity on log-odds of correct response",
     x = "β₁ (log-odds)",
     y = "Density",
-    caption = "Negative values = MORE errors in LR (supports hypothesis)"
+    caption = "Negative values support hypothesis: /l/-/r/ ambiguity on log-odds of correct response"
   ) +
   theme_minimal(base_size = 14)
 
