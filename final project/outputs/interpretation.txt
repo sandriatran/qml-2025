@@ -1,0 +1,7 @@
+=== BAYESIAN RE-ANALYSIS OF OTA ET AL. (2009) ===
+
+Control error rate: 1.0% [95% CrI: 0.4%, 2.0%]
+LR error rate: 16.2% [95% CrI: 7.9%, 29.2%]
+Difference: 15.0 percentage points [95% CrI: 7.1, 28.0]
+
+Probability that LR has MORE errors: 100.0%
