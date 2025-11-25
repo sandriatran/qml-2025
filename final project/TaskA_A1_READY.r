@@ -379,10 +379,10 @@ p2 <- pred_summary %>%
   scale_fill_manual(values = c("Control" = "steelblue", "LR" = "coral")) +
   scale_y_continuous(labels = scales::percent, limits = c(0, 0.35)) +
   labs(
-    title = "Predicted Error Rates with 95% Credible Intervals",
-    subtitle = "Bayesian posterior predictions (hierarchical model)",
+    title = "False Positive Errors: /l/-/r/ vs Control",
+    subtitle = "Predicted error rates with 95% credible intervals",
     x = "Condition",
-    y = "Predicted Error Rate",
+    y = "Error Rate",
     fill = "Condition"
   ) +
   theme_minimal(base_size = 14) +
