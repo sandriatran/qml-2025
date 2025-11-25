@@ -1,0 +1,29 @@
+=== COMPREHENSIVE BAYESIAN MODEL SUMMARY ===
+LR, H, and PB Contrasts vs Spelling Control Baseline (F)
+
+ Family: bernoulli 
+  Links: mu = logit 
+Formula: accuracy ~ contrast_type + (1 | subject_id) + (1 | item_id) 
+   Data: data_all (Number of observations: 2368) 
+  Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+         total post-warmup draws = 4000
+
+Multilevel Hyperparameters:
+~item_id (Number of levels: 80) 
+              Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sd(Intercept)     0.58      0.17     0.27     0.94 1.00      973     1571
+
+~subject_id (Number of levels: 20) 
+              Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sd(Intercept)     0.73      0.16     0.47     1.08 1.00     1388     2318
+
+Regression Coefficients:
+                Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+Intercept           4.00      0.27     3.49     4.57 1.00     1251     1947
+contrast_typeLR    -2.69      0.27    -3.22    -2.17 1.00     1736     2377
+contrast_typeH     -2.72      0.27    -3.26    -2.22 1.00     1777     2437
+contrast_typePB    -0.71      0.34    -1.38    -0.06 1.00     2303     2927
+
+Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+and Tail_ESS are effective sample size measures, and Rhat is the potential
+scale reduction factor on split chains (at convergence, Rhat = 1).
