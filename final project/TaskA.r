@@ -25,6 +25,7 @@ library(tidyverse)   # For data manipulation and visualization
 library(brms)        # For Bayesian regression models
 library(tidybayes)   # For working with posterior distributions
 library(bayesplot)   # For diagnostic plots
+library(here)        # For clean project-relative paths
 
 # STEP 1: Load and Inspect the Data ----
 cat("\n=== STEP 1: LOADING DATA ===\n")
@@ -123,8 +124,10 @@ summary_stats <- data_analysis %>%
 print(summary_stats)
 
 # Create output directory
-dir.create("outputs", showWarnings = FALSE)
-dir.create("outputs/plots", showWarnings = FALSE)
+output_dir <- here("final project", "outputs")
+output_plots_dir <- here("final project", "outputs", "plots")
+dir.create(output_dir, showWarnings = FALSE)
+dir.create(output_plots_dir, showWarnings = FALSE)
 
 # ==============================================================================
 # STEP 4: Visualize the Raw Data ----
@@ -150,7 +153,7 @@ p1 <- data_analysis %>%
   theme(legend.position = "bottom")
 
 print(p1)
-ggsave("outputs/plots/01_raw_error_rates.png", p1, width = 9, height = 6, dpi = 300)
+ggsave(file.path(output_plots_dir, "01_raw_error_rates.png"), p1, width = 9, height = 6, dpi = 300)
 cat("Saved: 01_raw_error_rates.png\n")
 
 # Plot 2: Error rates with confidence intervals
@@ -175,7 +178,7 @@ p2 <- summary_stats %>%
   theme_minimal(base_size = 14)
 
 print(p2)
-ggsave("outputs/plots/02_error_rates_ci.png", p2, width = 9, height = 6, dpi = 300)
+ggsave(file.path(output_plots_dir, "02_error_rates_ci.png"), p2, width = 9, height = 6, dpi = 300)
 cat("Saved: 02_error_rates_ci.png\n")
 
 # ==============================================================================
@@ -225,7 +228,7 @@ model <- brm(
   cores = 4,
   seed = 2025,
   refresh = 0,
-  file = "outputs/bayesian_model"  # Save the model
+  file = file.path(output_dir, "bayesian_model")  # Save the model
 )
 
 # Print summary
@@ -233,7 +236,7 @@ cat("\n=== MODEL SUMMARY ===\n\n")
 print(summary(model))
 
 # Save summary to file
-sink("outputs/model_summary.txt")
+sink(file.path(output_dir, "model_summary.txt"))
 summary(model)
 sink()
 
@@ -282,7 +285,7 @@ p3 <- ggplot(data.frame(x = intercept_draws), aes(x = x)) +
   theme_minimal(base_size = 14)
 
 print(p3)
-ggsave("outputs/plots/03_posterior_intercept.png", p3, width = 9, height = 6, dpi = 300)
+ggsave(file.path(output_plots_dir, "03_posterior_intercept.png"), p3, width = 9, height = 6, dpi = 300)
 cat("Saved: 03_posterior_intercept.png\n")
 
 # Plot 4: Posterior of LR effect
@@ -307,7 +310,7 @@ p4 <- ggplot(data.frame(x = lr_effect_draws), aes(x = x)) +
   theme_minimal(base_size = 14)
 
 print(p4)
-ggsave("outputs/plots/04_posterior_lr_effect.png", p4, width = 9, height = 6, dpi = 300)
+ggsave(file.path(output_plots_dir, "04_posterior_lr_effect.png"), p4, width = 9, height = 6, dpi = 300)
 cat("Saved: 04_posterior_lr_effect.png\n")
 
 # Plot 5: Posterior predictive check
@@ -316,7 +319,7 @@ p5 <- pp_check(model, ndraws = 100) +
   theme_minimal(base_size = 14)
 
 print(p5)
-ggsave("outputs/plots/05_posterior_predictive_check.png", p5, width = 9, height = 6, dpi = 300)
+ggsave(file.path(output_plots_dir, "05_posterior_predictive_check.png"), p5, width = 9, height = 6, dpi = 300)
 cat("Saved: 05_posterior_predictive_check.png\n")
 
 # ==============================================================================
@@ -384,7 +387,7 @@ p6 <- ggplot(data.frame(x = error_rate_difference), aes(x = x)) +
   theme_minimal(base_size = 14)
 
 print(p6)
-ggsave("outputs/plots/06_difference_distribution.png", p6, width = 9, height = 6, dpi = 300)
+ggsave(file.path(output_plots_dir, "06_difference_distribution.png"), p6, width = 9, height = 6, dpi = 300)
 cat("Saved: 06_difference_distribution.png\n")
 
 # Plot 7: Predicted error rates with uncertainty
@@ -415,7 +418,7 @@ p7 <- pred_data %>%
   theme_minimal(base_size = 14)
 
 print(p7)
-ggsave("outputs/plots/07_predicted_error_rates.png", p7, width = 9, height = 6, dpi = 300)
+ggsave(file.path(output_plots_dir, "07_predicted_error_rates.png"), p7, width = 9, height = 6, dpi = 300)
 cat("Saved: 07_predicted_error_rates.png\n")
 
 # ==============================================================================
@@ -482,7 +485,7 @@ cat("  - Uncertainty in all parameter estimates\n")
 cat("  - Proper handling of binary outcome data (Bernoulli likelihood)\n\n")
 
 # Save interpretation to file
-sink("outputs/interpretation.txt")
+sink(file.path(output_dir, "interpretation.txt"))
 cat("=== BAYESIAN RE-ANALYSIS OF OTA ET AL. (2009) ===\n\n")
 cat(sprintf("Control error rate: %.1f%% [95%% CrI: %.1f%%, %.1f%%]\n",
             median(control_error_rate) * 100,
@@ -502,8 +505,8 @@ sink()
 cat(paste(rep("=", 80), collapse=""), "\n")
 cat("ANALYSIS COMPLETE!\n")
 cat(paste(rep("=", 80), collapse=""), "\n\n")
-cat("Results saved to outputs/ folder:\n")
-cat("  - Plots: outputs/plots/\n")
-cat("  - Model: outputs/bayesian_model\n")
-cat("  - Summary: outputs/model_summary.txt\n")
-cat("  - Interpretation: outputs/interpretation.txt\n\n")
+cat("Results saved to:\n")
+cat(paste("  - Plots:", file.path(output_plots_dir), "\n"))
+cat(paste("  - Model:", file.path(output_dir, "bayesian_model"), "\n"))
+cat(paste("  - Summary:", file.path(output_dir, "model_summary.txt"), "\n"))
+cat(paste("  - Interpretation:", file.path(output_dir, "interpretation.txt"), "\n\n"))
