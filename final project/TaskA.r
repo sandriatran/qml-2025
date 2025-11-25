@@ -390,30 +390,39 @@ print(p6)
 ggsave(file.path(output_plots_dir, "06_difference_distribution.png"), p6, width = 9, height = 6, dpi = 300)
 cat("Saved: 06_difference_distribution.png\n")
 
-# Plot 7: Predicted error rates with uncertainty
-pred_data <- data.frame(
-  condition = rep(c("Control", "LR"), each = length(control_error_rate)),
-  error_rate = c(control_error_rate, lr_error_rate)
+# Plot 7: Predicted error rates with uncertainty (simplified to avoid graphics issues)
+pred_summary <- tibble(
+  condition = c("Control", "LR"),
+  median_error = c(
+    median(control_error_rate),
+    median(lr_error_rate)
+  ),
+  lower_error = c(
+    quantile(control_error_rate, 0.025),
+    quantile(lr_error_rate, 0.025)
+  ),
+  upper_error = c(
+    quantile(control_error_rate, 0.975),
+    quantile(lr_error_rate, 0.975)
+  )
 )
 
-p7 <- pred_data %>%
-  ggplot(aes(x = condition, y = error_rate)) +
-  geom_jitter(alpha = 0.05, width = 0.2, color = "gray50") +
-  stat_summary(fun = median, geom = "point", size = 5, color = "gold", shape = 21, stroke = 2) +
-  stat_summary(fun.data = function(x) {
-    data.frame(
-      y = median(x),
-      ymin = quantile(x, 0.025),
-      ymax = quantile(x, 0.975)
-    )
-  }, geom = "errorbar", width = 0.2, linewidth = 1.2, color = "black") +
-  scale_y_continuous(labels = scales::percent) +
+p7 <- pred_summary %>%
+  ggplot(aes(x = condition, y = median_error)) +
+  geom_col(fill = "steelblue", alpha = 0.7, width = 0.5, color = "black", linewidth = 1.2) +
+  geom_errorbar(aes(ymin = lower_error, ymax = upper_error),
+                width = 0.2, linewidth = 1.2, color = "black") +
+  geom_text(aes(label = sprintf("%.1f%%\n[%.1f, %.1f]",
+                                median_error * 100,
+                                lower_error * 100,
+                                upper_error * 100)),
+            vjust = -0.5, size = 5, fontface = "bold") +
+  scale_y_continuous(labels = scales::percent, limits = c(0, 0.35)) +
   labs(
     title = "Predicted Error Rates with 95% Credible Intervals",
     subtitle = "Bayesian posterior predictions",
     x = "Condition",
-    y = "Predicted Error Rate",
-    caption = "Gold dot = median | Error bars = 95% CrI"
+    y = "Predicted Error Rate"
   ) +
   theme_minimal(base_size = 14)
 
