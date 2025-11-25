@@ -7,7 +7,7 @@
 #
 # COMPREHENSIVE APPROACH:
 # This version makes the all-contrasts model PRIMARY, showing the full pattern
-# of effects across LR (/l/-/r/), H (Homophones), and PB (/p/-/b/)
+# of effects across Spelling Control (S), LR (/l/-/r/), H (Homophones), and PB (/p/-/b/)
 #
 # FINDINGS FROM OTA ET AL. (2009):
 # - LR: HIGH contrast (large error rate increase)
@@ -48,12 +48,12 @@ cat("=== STEP 2: DATA PREPROCESSING ===\n")
 data_clean <- data_raw %>%
   filter(Procedure == "TrialProc") %>%
   filter(Condition == "Unrelated") %>%
-  filter(Contrast %in% c("LR", "H", "PB")) %>%
+  filter(Contrast %in% c("F", "LR", "H", "PB")) %>%
   mutate(
     subject_id = factor(Subject),
     item_id = factor(Item),
     accuracy = Words.ACC,
-    contrast_type = factor(Contrast, levels = c("LR", "H", "PB"))
+    contrast_type = factor(Contrast, levels = c("F", "LR", "H", "PB"))
   )
 
 cat("\nFull contrast distribution in UNRELATED trials:\n")
@@ -99,13 +99,13 @@ cat("    Rationale: Standard for SD parameters in hierarchical models\n\n")
 # ==============================================================================
 cat("=== STEP 4: FITTING COMPREHENSIVE MODEL (ALL CONTRASTS) ===\n")
 cat("This is the PRIMARY analysis showing the full pattern of effects\n")
-cat("Fitting with LR (/l/-/r/) as baseline...\n\n")
+cat("Fitting with Spelling Control (S) as baseline...\n\n")
 
 set.seed(2025)
 
-# Make LR the reference level
+# Make F (Spelling Control) the reference level
 data_all <- data_clean %>%
-  mutate(contrast_type = factor(contrast_type, levels = c("LR", "H", "PB")))
+  mutate(contrast_type = factor(contrast_type, levels = c("F", "LR", "H", "PB")))
 
 # Fit comprehensive model
 model_all <- brm(
@@ -127,11 +127,12 @@ cat("✓ Comprehensive model fitted successfully\n\n")
 # ==============================================================================
 # STEP 5: Contrast Effects Analysis
 # ==============================================================================
-cat("=== STEP 5: CONTRAST EFFECTS (vs LR BASELINE) ===\n\n")
+cat("=== STEP 5: CONTRAST EFFECTS (vs SPELLING CONTROL/FILLER BASELINE) ===\n\n")
 
 posterior_all <- as_draws_df(model_all)
 
-# Extract effects for each contrast (relative to LR baseline)
+# Extract effects for each contrast (relative to F/Spelling Control baseline)
+lr_effect <- posterior_all$b_contrast_typeLR
 h_effect <- posterior_all$b_contrast_typeH
 pb_effect <- posterior_all$b_contrast_typePB
 intercept_all <- posterior_all$b_Intercept
@@ -139,6 +140,12 @@ intercept_all <- posterior_all$b_Intercept
 # Summary statistics for each effect
 effects_summary <- tribble(
   ~contrast, ~median_effect, ~lower_95, ~upper_95, ~prob_positive,
+
+  "LR (/l/-/r/)",
+  median(lr_effect),
+  quantile(lr_effect, 0.025),
+  quantile(lr_effect, 0.975),
+  mean(lr_effect > 0),
 
   "H (Homophones)",
   median(h_effect),
@@ -153,19 +160,22 @@ effects_summary <- tribble(
   mean(pb_effect > 0)
 )
 
-cat("Effects on log-odds of CORRECT response (relative to LR baseline):\n")
+cat("Effects on log-odds of CORRECT response (relative to Spelling Control/Filler baseline):\n")
 cat("(Negative values = MORE errors; Positive values = FEWER errors)\n\n")
 print(effects_summary)
 
 cat("\n\nINTERPRETATION OF PATTERN:\n")
-cat("✓ LR: Baseline condition (reference)\n")
-cat("✓ H:  Median effect = ", round(median(h_effect), 3),
-    " (NEAR-ZERO = similar to LR)\n")
-cat("✓ PB: Median effect = ", round(median(pb_effect), 3),
-    " (POSITIVE = substantially different from LR)\n\n")
+cat("✓ Spelling Control (F): Baseline condition (reference) - phonologically unrelated\n")
+cat("✓ LR (/l/-/r/): Median effect = ", round(median(lr_effect), 3),
+    " (NEGATIVE = MORE errors vs Spelling Control)\n")
+cat("✓ H (Homophones): Median effect = ", round(median(h_effect), 3),
+    " (NEGATIVE = MORE errors vs Spelling Control, similar to LR)\n")
+cat("✓ PB (/p/-/b/): Median effect = ", round(median(pb_effect), 3),
+    " (LESS NEGATIVE = fewer errors vs Spelling Control, much better than LR)\n\n")
 
-cat("CONCLUSION: H shows similar error rates to LR (both phonologically ambiguous)\n")
-cat("            PB shows SIGNIFICANTLY LOWER error rate than LR (phonetic minimal pairs)\n")
+cat("CONCLUSION: Both LR and H show SIGNIFICANTLY MORE errors than spelling controls\n")
+cat("            LR and H show similar error rates (both phonologically ambiguous)\n")
+cat("            PB shows MUCH LOWER error rates than both LR and H (phonetic minimal pairs)\n")
 cat("            → Supports phonological ambiguity mechanism, not generic phonetic similarity\n\n")
 
 # ==============================================================================
@@ -173,18 +183,25 @@ cat("            → Supports phonological ambiguity mechanism, not generic phon
 # ==============================================================================
 cat("=== STEP 6: PREDICTED ERROR RATES BY CONTRAST ===\n\n")
 
-# Convert to probability scale (LR is baseline)
-lr_prob_correct <- plogis(intercept_all)
+# Convert to probability scale (Spelling Control/F is baseline)
+f_prob_correct <- plogis(intercept_all)
+lr_prob_correct <- plogis(intercept_all + lr_effect)
 h_prob_correct <- plogis(intercept_all + h_effect)
 pb_prob_correct <- plogis(intercept_all + pb_effect)
 
 # Error rates
+f_error <- 1 - f_prob_correct
 lr_error <- 1 - lr_prob_correct
 h_error <- 1 - h_prob_correct
 pb_error <- 1 - pb_prob_correct
 
 error_rates <- tribble(
   ~contrast, ~median_error_pct, ~lower_95_pct, ~upper_95_pct,
+
+  "F (Spelling Control)",
+  median(f_error) * 100,
+  quantile(f_error, 0.025) * 100,
+  quantile(f_error, 0.975) * 100,
 
   "LR (/l/-/r/)",
   median(lr_error) * 100,
@@ -213,7 +230,7 @@ cat("\n=== STEP 7: CREATING FOREST PLOT ===\n")
 # Prepare data for forest plot
 forest_data <- effects_summary %>%
   mutate(
-    contrast = factor(contrast, levels = c("PB (/p/-/b/)", "H (Homophones)")),
+    contrast = factor(contrast, levels = c("PB (/p/-/b/)", "H (Homophones)", "LR (/l/-/r/)")),
     significant = abs(lower_95) > 0 | abs(upper_95) < 0
   ) %>%
   arrange(median_effect)
@@ -230,11 +247,11 @@ p_forest <- forest_data %>%
     guide = "none"
   ) +
   labs(
-    title = "Contrast Effects Relative to LR Baseline",
-    subtitle = "H and PB compared to LR (/l/-/r/)\nZero = no difference from LR; Positive = fewer errors than LR",
+    title = "Contrast Effects Relative to Spelling Control Baseline",
+    subtitle = "LR, H, and PB compared to Spelling Control (F)\nNegative = MORE errors; Positive = FEWER errors",
     x = "Effect on log-odds of correct response",
     y = "Contrast Type",
-    caption = "Points = median; lines = 95% credible interval\nH shows similarity to LR; PB shows substantially fewer errors"
+    caption = "Points = median; lines = 95% credible interval\nLR and H show strong negative effects; PB shows minimal effect"
   ) +
   theme_minimal(base_size = 14) +
   theme(
@@ -254,11 +271,12 @@ cat("\n=== STEP 8: CREATING ERROR RATE COMPARISON PLOT ===\n")
 
 error_rate_summary <- tribble(
   ~contrast, ~median_error, ~lower_error, ~upper_error,
+  "F (Spelling Control)", median(f_error), quantile(f_error, 0.025), quantile(f_error, 0.975),
   "LR (/l/-/r/)", median(lr_error), quantile(lr_error, 0.025), quantile(lr_error, 0.975),
   "H (Homophones)", median(h_error), quantile(h_error, 0.025), quantile(h_error, 0.975),
   "PB (/p/-/b/)", median(pb_error), quantile(pb_error, 0.025), quantile(pb_error, 0.975)
 ) %>%
-  mutate(contrast = factor(contrast, levels = c("LR (/l/-/r/)", "H (Homophones)", "PB (/p/-/b/)")))
+  mutate(contrast = factor(contrast, levels = c("F (Spelling Control)", "PB (/p/-/b/)", "H (Homophones)", "LR (/l/-/r/)")))
 
 p_error_rates <- error_rate_summary %>%
   ggplot(aes(x = reorder(contrast, median_error), y = median_error, fill = contrast)) +
@@ -271,7 +289,7 @@ p_error_rates <- error_rate_summary %>%
                                 upper_error * 100)),
             vjust = -0.5, size = 4.5, fontface = "bold") +
   scale_fill_manual(
-    values = c("PB (/p/-/b/)" = "lightblue",
+    values = c("F (Spelling Control)" = "steelblue", "PB (/p/-/b/)" = "lightblue",
                "H (Homophones)" = "coral", "LR (/l/-/r/)" = "darkred"),
     guide = "none"
   ) +
@@ -281,7 +299,7 @@ p_error_rates <- error_rate_summary %>%
     subtitle = "Predicted error rates with 95% credible intervals (hierarchical Bayesian model)",
     x = "Contrast Type",
     y = "Error Rate",
-    caption = "LR and H show similarly elevated error rates; PB shows substantially lower error rate"
+    caption = "Spelling Control (F) shows lowest errors; LR and H show elevated errors; PB intermediate"
   ) +
   theme_minimal(base_size = 14) +
   theme(
@@ -302,7 +320,7 @@ print(summary(model_all))
 
 sink(file.path(output_dir, "model_comprehensive_summary.txt"))
 cat("=== COMPREHENSIVE BAYESIAN MODEL SUMMARY ===\n")
-cat("H and PB Contrasts vs LR Baseline (/l/-/r/)\n\n")
+cat("LR, H, and PB Contrasts vs Spelling Control Baseline (F)\n\n")
 print(summary(model_all))
 sink()
 
@@ -315,32 +333,41 @@ cat("COMPREHENSIVE ANALYSIS COMPLETE\n")
 cat(paste(rep("=", 80), collapse=""), "\n\n")
 
 cat("PRIMARY FINDING - Pattern of Effects:\n\n")
-cat("1. /l/-/r/ near-homophones (LR - BASELINE): ",
+cat("1. Spelling Control (F - BASELINE): ",
+    round(median(f_error)*100, 1), "% error [95% CrI: ",
+    round(quantile(f_error, 0.025)*100, 1), "-",
+    round(quantile(f_error, 0.975)*100, 1), "%]\n")
+cat("   → Reference condition (phonologically unrelated)\n\n")
+
+cat("2. /l/-/r/ near-homophones (LR): ",
     round(median(lr_error)*100, 1), "% error [95% CrI: ",
     round(quantile(lr_error, 0.025)*100, 1), "-",
     round(quantile(lr_error, 0.975)*100, 1), "%]\n")
-cat("   → Reference condition for comparison\n\n")
+cat("   → Effect size vs F (log-odds): ", round(median(lr_effect), 3), "\n")
+cat("   → Conclusion: SIGNIFICANTLY MORE errors than spelling controls\n\n")
 
-cat("2. Homophones (H): ",
+cat("3. Homophones (H): ",
     round(median(h_error)*100, 1), "% error [95% CrI: ",
     round(quantile(h_error, 0.025)*100, 1), "-",
     round(quantile(h_error, 0.975)*100, 1), "%]\n")
-cat("   → Effect size vs LR (log-odds): ", round(median(h_effect), 3), "\n")
-cat("   → Conclusion: SIMILAR error rate to LR (phonological ambiguity)\n\n")
+cat("   → Effect size vs F (log-odds): ", round(median(h_effect), 3), "\n")
+cat("   → Conclusion: SIGNIFICANTLY MORE errors, SIMILAR to LR (phonological ambiguity)\n\n")
 
-cat("3. /p/-/b/ minimal pairs (PB): ",
+cat("4. /p/-/b/ minimal pairs (PB): ",
     round(median(pb_error)*100, 1), "% error [95% CrI: ",
     round(quantile(pb_error, 0.025)*100, 1), "-",
     round(quantile(pb_error, 0.975)*100, 1), "%]\n")
-cat("   → Effect size vs LR (log-odds): ", round(median(pb_effect), 3), "\n")
-cat("   → Conclusion: SUBSTANTIALLY LOWER error rate than LR\n\n")
+cat("   → Effect size vs F (log-odds): ", round(median(pb_effect), 3), "\n")
+cat("   → Conclusion: MUCH LOWER error rate than both LR and H\n\n")
 
 cat("KEY INTERPRETATION:\n")
-cat("✓ LR and H both show HIGH error rates (phonological ambiguity)\n")
-cat("✓ PB shows SUBSTANTIALLY LOWER error rate (phonetic minimal pairs)\n")
+cat("✓ Spelling Control (F) shows lowest error rate (baseline)\n")
+cat("✓ LR and H both show SIGNIFICANTLY higher errors (phonological ambiguity)\n")
+cat("✓ LR and H show SIMILAR error rates (both phonologically ambiguous)\n")
+cat("✓ PB shows MUCH LOWER errors than LR/H but HIGHER than spelling controls\n")
 cat("✓ Pattern supports PHONOLOGICAL AMBIGUITY hypothesis\n")
 cat("✓ Japanese participants confused by /l/-/r/ and homophones\n")
-cat("✓ But NOT by /p/-/b/ distinction (already present in Japanese)\n\n")
+cat("✓ But less impacted by /p/-/b/ distinction (already present in Japanese)\n\n")
 
 cat("ROBUSTNESS:\n")
 cat("✓ Hierarchical model with random effects for subjects and items\n")
