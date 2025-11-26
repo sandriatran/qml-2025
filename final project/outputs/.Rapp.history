@@ -1,0 +1,2 @@
+load("/Users/s/Desktop/qml-2025/final project/outputs/model_comprehensive.rds")
+load("/Users/s/Desktop/qml-2025/final project/outputs/model_linguistic.rds")
