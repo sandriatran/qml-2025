@@ -50,13 +50,11 @@ A challenge emerged from translating from a frequentist model to that of a Bayes
 
 ## Group Project Output
 
-Github Repository to Model
-
-*   **`Statement`**: [Re-Analyzing Ota, Hartsuiker and Haywood (2009): A Bayesian Approach to Representational Indeterminacy](https://github.com/sandriatran/qml-2025/tree/main/code)
-*   **`Comparative Analysis`**: [Analysis QML](https://uoe-my.sharepoint.com/:w:/r/personal/s2512561_ed_ac_uk/_layouts/15/Doc.aspx?sourcedoc=%7B529095E7-B828-4492-BC06-F6AC1A19C42D%7D&file=Analysis%20QML1.docx&action=default&mobileredirect=true) 
-*   **`QML-Esque Workshop`**: A visual semantic-relatedness decision task in English
-*   **`Plots | Figure 1 -4 `**: 
-*   **`Plots | All 14 `**: 
+* **[Statement: Re-Analyzing Ota, Hartsuiker and Haywood (2009): A Bayesian Approach to Representational Indeterminacy](https://github.com/sandriatran/qml-2025/blob/main/final%20project/final%20project/Re-Analyzing%20Ota%20-%20%20%20A%20Bayesian%20Approach%20to%20Representational%20Indeterminacy.r)**
+* **[Comparative Analysis](https://uoe-my.sharepoint.com/:w:/r/personal/s2512561_ed_ac_uk/_layouts/15/Doc.aspx?sourcedoc=%7B529095E7-B828-4492-BC06-F6AC1A19C42D%7D&file=Analysis%20QML1.docx&action=default&mobileredirect=true)**
+* **[ A visual semantic-relatedness decision task in English | QML Workshop](https://github.com/sandriatran/qml-2025/blob/main/final%20project/final%20project/A%20visual%20semantic-relatedness%20decision%20task%20in%20English.r)**
+* **[Plots | Figure 1-4](https://github.com/sandriatran/qml-2025/tree/main/final%20project/plots%20%7C%20figure%201%20-4)**:
+* **[Plots | All 14](https://github.com/sandriatran/qml-2025/tree/main/final%20project/outputs)**
 
 ### Summary
 
