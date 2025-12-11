@@ -60,6 +60,12 @@ The course emphasizes general principles of data analysis and fosters an egalita
 - Week 10: 	Case study
 - Week 11: ————————————————  Group project 
 
+**⋆. 𐙚 ˚Group Project  . 𐙚 ˚**
+
+- Model Bayesian hierarchical logistic regression model with crossed random intercepts for subjects and items,
+- predicting the probability of correct responses to test whether /l/-/r/ near-homophones
+-  increase false positive errors in L2 Japanese speakers.
+
 **⋆. 𐙚 ˚Resources ⋆. 𐙚 ˚** 
 -  Main Website: https://uoelel.github.io/qml/
 -  Textbook: https://stefanocoretta.github.io/qdal/
