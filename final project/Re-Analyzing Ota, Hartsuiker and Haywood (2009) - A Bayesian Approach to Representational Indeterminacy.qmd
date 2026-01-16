@@ -41,6 +41,13 @@ This study presents a rigorous Bayesian re-examination of @ota2009, investigatin
 
 Employing a **Bayesian Hierarchical Logistic Regression**, we successfully replicated the original findings with high precision. Our analysis reveals that for Japanese speakers, English words containing the /l/-/r/ contrast elicit error rates of **21.1%** [95% CrI: 14.2, 30.2]—statistically indistinguishable from true homophones. Furthermore, by conceptualizing "phonological distinctness" as a continuous predictor, we demonstrate that this deficit is not a binary failure but a gradient probabilistic constraint characterized by the unavailability of specific L1 phonemic categories.
 
+::: {.callout-important title="Key Findings"}
+1. **L1-Absent contrasts** (/l/-/r/) produce 21% error rates—functionally equivalent to true homophones
+2. **Phonological distinctness** acts as a gradient constraint, not a binary deficit
+3. **The effect generalizes** across all lexical items (not driven by outliers)
+4. **Bayesian validation** confirms robust model convergence and predictive accuracy
+:::
+
 # Theoretical Context: Comparative Analysis
 
 To situate our re-analysis within the broader theoretical landscape of visual word recognition, it is instructive to contrast the framework of @ota2009 with recent findings by @jiao2024.
@@ -57,7 +64,7 @@ We utilized the **`brms`** package [@burkner2017] to fit Generalized Linear Mixe
 
 ## 1. Data Coding and Theory
 
-Transending simple categorical comparisons, we engineered a `phonologically_distinct` variable to operationalize the theoretical mechanism of "indeterminacy".
+We engineered a `phonologically_distinct` variable to operationalize the theoretical mechanism of "indeterminacy".
 
 ::: {.callout-note title="Theoretical Coding Scheme"}
 *   **Homophone (0.0)**: Phonological distinctness is zero (identical sound).
@@ -164,7 +171,11 @@ We fitted the Linguistic Model to test if the "L1-Absent" condition clusters wit
 # MODEL 2: Linguistic Hierarchy
 model_linguistic <- brm(
   formula = accuracy ~ phonological_status + (1 | subject_id) + (1 | item_id),
-  data = data_linguistic ...
+  data = data_linguistic,
+  family = bernoulli(link = "logit"),
+  prior = c(prior(normal(0, 1.5), class = Intercept),
+            prior(normal(0, 1.5), class = b)),
+  iter = 2000, chains = 4, seed = 2025
 )
 ```
 
@@ -181,7 +192,13 @@ Finally, we modeled accuracy as a function of the **Phonological Distinctness Sc
 ```{r model-spec-distinctness, eval=FALSE}
 # MODEL 3: Distinctness Mechanism
 model_distinctness <- brm(
-  formula = accuracy ~ phonological_distinctness_scaled + ...
+  formula = accuracy ~ phonological_distinctness_scaled + 
+                       (1 | subject_id) + (1 | item_id),
+  data = data_distinctness,
+  family = bernoulli(link = "logit"),
+  prior = c(prior(normal(0, 1.5), class = Intercept),
+            prior(normal(0, 1.5), class = b)),
+  iter = 2000, chains = 4, seed = 2025
 )
 ```
 
