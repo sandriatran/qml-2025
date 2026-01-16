@@ -99,8 +99,8 @@
 #                (4) Report results from Bayesian Gaussian models.
 # Important Terms & Information:
 #       Lecture: https://uoelel.github.io/qml/lectures/week-04.html
-#       Textbook (Online): https://stefanocoretta.github.io/qdal/ch-probability.html
-#       Textbook (PDF): https://stefanocoretta.github.io/qdal/Quantitative-Data-Analysis-for-Linguists-in-R.pdf
+#       Textbook (Online): https://stefanocoretta.github.io/qdal/
+        Textbook (PDF): https://stefanocoretta.github.io/qdal/Quantitative-Data-Analysis-for-Linguists-in-R.pdf
 # ----------------------------------------------------------------------
 
 # Week 4 | 22  Fitting Gaussian models with brms

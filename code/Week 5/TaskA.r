@@ -91,9 +91,10 @@
 #       (4) Report results from regression models.
 #
 # Resources:
-#    Lecture: https://uoelel.github.io/qml/lectures/week-05.html#/title-slide
-#    Textbook (PDF): https://stefanocoretta.github.io/qdal/Quantitative-Data-Analysis-for-Linguists-in-R.pdf
+#    Lecture: https://uoelel.github.io/qml/lectures/week-05.html#/title-slide''
 #    Textbook (Online): https://stefanocoretta.github.io/qdal/ch-regression-intro.html
+#    Textbook (PDF): https://stefanocoretta.github.io/qdal/Quantitative-Data-Analysis-for-Linguists-in-R.pdf
+#
 # ==============================================================================
 
 # Load required packages ----

@@ -1,118 +1,262 @@
 ---
-title: "Re-Analyzing Ota, Hartsuiker and Haywood (2009): A Bayesian Approach to Representational Indeterminacy"
+title: "The KEY to the ROCK: A Bayesian Re-analysis of Representational Indeterminacy"
+subtitle: "Final Project & Critical Reflection"
 author:
-  - Violet Manson, Sandria Tran
-date: "December 2, 2025"
-format: pdf
+  - Violet Manson
+  - Sandria Tran
+date: "January 16, 2026"
+bibliography: references.bib
+format: 
+  pdf:
+    toc: true
+    number-sections: true
+    colorlinks: true
+    geometry:
+      - top=25mm
+      - left=25mm
+      - right=25mm
+      - bottom=25mm
 ---
 
-## Final Reflection
+**Project Repository:** [https://github.com/sandriatran/qml-2025/](https://github.com/sandriatran/qml-2025/)
 
-### Proposed Mark and Justification
+# Critical Reflection on Learning and Progress
 
-**Proposed Mark: 75 (A3)**
+Reflecting on the transition from frequentist to Bayesian frameworks, this project marked a distinct shift in my statistical epistemology. Initially, my engagement with `brms` was procedural—viewing syntax as rules rather than a language for expressing probabilistic beliefs. However, the requirement to specify priors forced a confrontation with the data-generating process itself. I moved from simply "running a test" to explicitly defining the anticipated distribution of effects, realizing that robust science requires quantifying uncertainty, not just detecting significance.
 
-**Justification:**
+Methodologically, I struggled with the concept of regularization. Understanding why we use **weakly informative priors** (`normal(0, 1.5)`) rather than flat priors was a pivotal moment; it illuminated how Bayesian methods protect against overfitting in small samples by suppressing unrealistic effect sizes (e.g., log-odds > 5). 
 
-We propose a mark of 75 (A3), reflecting a project that is "outstanding in some respects" and demonstrates "methods correctly and effectively, showing original and sophisticated independent thinking". Our work successfully replicated the core findings of Ota et. al (2009) using a contemporary Bayesian framework but also extended the analysis to test the underlying linguistic theory "demonstrating sound understanding". "Shows original and sophisticated application. . .  with critical and insightful evaluation of transparency, reproducibility, and responsible practices." (A1 92 Excellent  + A2 Excellent)
+Critically, I acknowledge the limitations of my visualization choices. While Figure 2 (Bar Plot) concisely summarizes group means, it collapses the rich distributional information inherent in the posterior. A density plot would have offered greater transparency regarding the skew and kurtosis of the uncertainty intervals. Furthermore, while the code-sharing is robust, the interpretation of "log-odds" remains an abstraction that requires careful translation into cognitive probabilities to be truly accessible. This project has thus been a lesson in *communicating* uncertainty as much as calculating it.
 
-**1. Understanding of Data Analysis Principles (A2)**
+# Project Output Links
 
-Our project shows a sophisticated understanding of data analysis by translating a frequentist ANOVA into a more robust Bayesian hierarchical logistic regression. This model, specified as `accuracy ~ contrast_type + (1 | subject_id) + (1 | item_id)`, correctly accounts for the nested structure of the data with random intercepts for both subjects and items. Our original thinking is evident in the development of three distinct models:
+*   **[R Script Repository](https://github.com/sandriatran/qml-2025/blob/main/final%20project/final%20project/Re-Analyzing%20Ota%20-%20%20%20A%20Bayesian%20Approach%20to%20Representational%20Indeterminacy.r)**
+*   **[Comparative Analysis Document](https://uoe-my.sharepoint.com/:w:/r/personal/s2512561_ed_ac_uk/_layouts/15/Doc.aspx?sourcedoc=%7B529095E7-B828-4492-BC06-F6AC1A19C42D%7D&file=Analysis%20QML1.docx&action=default&mobileredirect=true)**
+*   **[QML-Inspired Workshop Material](https://github.com/sandriatran/qml-2025/blob/main/final%20project/final%20project/A%20visual%20semantic-relatedness%20decision%20task%20in%20English.r)**
+*   **[All Figures (01-14)](https://github.com/sandriatran/qml-2025/tree/main/final%20project/outputs)**
 
-| Model | Formula | Purpose |
-|---|---|---|
-| Comprehensive | `accuracy ~ contrast_type + (1\|subject_id) + (1\|item_id)` | ("Do effects exist?") Replicate original design with F (Spelling Word Control) |
-| Linguistic | `accuracy ~ phonological_status + (1\|subject_id) + (1\|item_id)` | ("How L1's effects affects L2 visualization?") Phonological Mediation hierarchy (Orthography ⟶  Phonology ⟶ Semantics)|
-| Distinctness | `accuracy ~ phonological_ + distinctness_scaled + (1\|subject_id) + (1\|item_id )` | ("Does phonological distinctness mediate accuracy?") Test the hypothesis of "Representational Indeterminacy" theory of how the bilingual mind represents language.|
+# Executive Summary
 
-Our multi-model integrates linguistic theory  beyond simple replication and demonstrates  the "original and sophisticated independent thinking" required for an A2/A3 mark. 
+This study presents a rigorous Bayesian re-examination of @ota2009, investigating the phenomenon of **Representational Indeterminacy**. The core hypothesis suggests that second-language (L2) learners are constrained by their native (L1) phonological inventory, causing L2 contrasts absent in the L1 (e.g., /l/-/r/ for Japanese speakers) to be processed as near-homophones.
 
-**2. Open Scholarship Practices (A2)**
+Employing a **Bayesian Hierarchical Logistic Regression**, we successfully replicated the original findings with high precision. Our analysis reveals that for Japanese speakers, English words containing the /l/-/r/ contrast elicit error rates of **21.1%** [95% CrI: 14.2, 30.2]—statistically indistinguishable from true homophones. Furthermore, by conceptualizing "phonological distinctness" as a continuous predictor, we demonstrate that this deficit is not a binary failure but a gradient probabilistic constraint characterized by the unavailability of specific L1 phonemic categories.
 
-The entire analysis, processing 1,389 trials from 20 subjects, (i.e. based on Japanese participants only, accuracy filters, reaction time (RT) bounds), is available in a fully documented R script (**A visual semantic-relatedness decision task in English.r**) and will be shared on a [public GitHub repository](https://github.com/sandriatran/qml-2025/blob/main/final%20project/final%20project/Re-Analyzing%20Ota%20-%20%20%20A%20Bayesian%20Approach%20to%20Representational%20Indeterminacy.r).
+# Theoretical Context: Comparative Analysis
 
-**3. R Data Analysis Skills (A2)**
+To situate our re-analysis within the broader theoretical landscape of visual word recognition, it is instructive to contrast the framework of @ota2009 with recent findings by @jiao2024.
 
-Our technical R implementation "demonstrates a thorough understanding and use of R" throughout the Bayesian Multilevel/Hierarchical/generalized mixed-effects model (GLMM)  that is “very good or excellent in most respects". We used brms package to fit Bayesian regression models, and designed  ***`formula = accuracy ~ phonological_distinctness_scaled + (1 | subject_id) + (1 | item_id)`***  to test the hypothesis of "Representational Indeterminacy", wherein the  L1 phonology constrains L2 representations (e.g. creating the phonologically_distinct and phonological_status variables to create 14 data visualizations using `ggplot2` and `tidybayes`). 
+While both studies examine the L1-L2 interface, they diverge on the primacy of phonology:
+*   **@jiao2024 (Orthographic Triggering)**: Utilizing a masked priming paradigm, they argue that in logographic scripts (Chinese/Japanese), orthography is the primary access route, with phonology playing a secondary, supportive role. They propose that L2 words "trigger" L1 representations via orthographic links, minimizing the impact of phonological deficits.
+*   **@ota2009 (Structural Filtering)**: Conversely, Ota et al. posit that phonology acts as a **structural filter**. They argue that the L1 phonological inventory fundamentally constrains how L2 lexical forms are stored. Consequently, Japanese speakers do merely "mishear" /l/-/r/; they lack the distinct representational slots to differentiate "rock" from "lock", effectively rendering them homophones at the lexical level.
 
+Our analysis specifically tests the mechanistic validity of Ota's "Representational Indeterminacy" hypothesis against this comparative backdrop.
 
-### Reflection on QML Experience and Learning Growth
+# Methodological Framework
 
-Our Bayesian model highlighted our learning in Quantitative Methods in Linguistics. 
-A challenge emerged from translating from a frequentist model to that of a Bayesian model. We solidified our Bayesian model knowledge with model parameters that quantify uncertainty with credible intervals, apply posterior predictions to understand our model’s statistical features, and interpret the model's parameters as full probability distributions. This project amplified our understanding in  interpreting, validating, and building future Bayesian statistical research models. 
+We utilized the **`brms`** package [@burkner2017] to fit Generalized Linear Mixed Models (GLMMs) with a Bernoulli likelihood function (logit link), appropriate for binary accuracy data.
 
-### Individual Contribution
+## 1. Data Coding and Theory
 
-*   **Violet Manson:** I ensured rigorous theoretical deliverables weaving quantitative evidence into a clear linguistic narrative to establish key research questions, synthesizing a comprehensive analysis of Ota et. al (2009). I weaved  raw quantitative data into a coherent  linguistic narrative to establish compelling analysis, evidence, and theoretical conclusions central to Bayesian modelling. 
- 
-*   **Sandria Tran:** I was responsible for the breadth and depth of the Bayesian technical R implementation, which generated 14 high-quality data visualizations to ensure the Ota et. al (2009)'s findings were conclusive and coherent. I made an inspirational QML-esque workshop, and was responsible for the xeLateX.
+Transending simple categorical comparisons, we engineered a `phonologically_distinct` variable to operationalize the theoretical mechanism of "indeterminacy".
 
-## Group Project Output
+::: {.callout-note title="Theoretical Coding Scheme"}
+*   **Homophone (0.0)**: Phonological distinctness is zero (identical sound).
+*   **L1-Absent /l/-/r/ (0.3)**: Distinctness is comprised/low (indeterminate).
+*   **L1-Present /p/-/b/ (0.8)**: Distinctness is robust (identifiable).
+*   **Control (1.0)**: Distinctness is maximal (unrelated).
+:::
 
-* **[ Re-Analyzing Ota, Hartsuiker and Haywood (2009): A Bayesian Approach to Representational Indeterminacy.r (Github)](https://github.com/sandriatran/qml-2025/blob/main/final%20project/final%20project/Re-Analyzing%20Ota%20-%20%20%20A%20Bayesian%20Approach%20to%20Representational%20Indeterminacy.r)**
-* **[Comparative Analysis](https://uoe-my.sharepoint.com/:w:/r/personal/s2512561_ed_ac_uk/_layouts/15/Doc.aspx?sourcedoc=%7B529095E7-B828-4492-BC06-F6AC1A19C42D%7D&file=Analysis%20QML1.docx&action=default&mobileredirect=true)**
-* **[ A visual semantic-relatedness decision task in English | QML Workshop](https://github.com/sandriatran/qml-2025/blob/main/final%20project/final%20project/A%20visual%20semantic-relatedness%20decision%20task%20in%20English.r)**
-* **[Plots | Figure 1-4](https://github.com/sandriatran/qml-2025/tree/main/final%20project/plots%20%7C%20figure%201%20-4)**
-* **[Plots | All 14](https://github.com/sandriatran/qml-2025/tree/main/final%20project/outputs)**
+## 2. Descriptive Data Inspection
 
-### Summary
+Prior to formal modeling, we inspected the raw data structure.
 
-This project reanalyses the study by Ota, Hartsuiker, and Haywood (2009). This explored how native language phonology can effect second language understandings in bilingual speakers. They studied Japanese, a language which does not have the nonnative /l-r/ contrast present in English, concluding that Japanese speakers find difficulty in identifying English words with the contrast. Using a Bayesian hierarchal logistic regression model, we reanalysed their data to test the robustness of their findings. Our analysis corresponded with the Ota et. al (2009) findings, suggesting a representational indeterminacy when encountering /l-r/ contrast in Japanese speakers. Our findings suggest a  ratio of error-to-no-error with /l-r/ contrast are 10 times higher than with control words (spelling controls). Furthermore, our analysis suggests that this is not a categorical effect, and is instead driven by a lack of phonological distinction present in speakers native language. This supports the theory presented by Ota et. al (2009).
+### Stacked Error Distributions
 
-### Methods
+```{r viz-stacked, eval=FALSE}
+# Visualization: Stacked Bar Chart of Raw Counts
+ggplot(data_clean, aes(x = Contrast, fill = factor(accuracy))) +
+  geom_bar(position = "stack") +
+  labs(title = "Stacked Error Rates: Correct (0) vs Error (1)")
+```
 
-Using the original Ota et. al (2009) dataset, we focused on data pertaining to accuracy in native Japanese speakers when presented with a semantic-relatedness task. This analysis was conducted in R using Bayesian hierarchical/multilevel logistic regression.
+**Figure A1 Interpretation (Stacked Error Rates):**  
+This plot visualizes the raw count of Correct (0) versus Incorrect (1) responses across conditions.
+*   **Technical**: It displays the absolute frequency of errors, highlighting the data imbalance (accuracy is generally high).
+*   **Theoretical**: The visible increase in "Error" volume for **LR** (/l/-/r/) and **H** (Homophone) conditions provides the first empirical hint that these conditions are cognitively taxing compared to the **F** (Control) baseline.
 
-Formula:  
-`accuracy ~ contrast_type + (1 | subject_id) + (1 | item_id)`
+![**Figure A1:** Stacked Error Rates. Distinguishing correct (0) vs error (1) counts.](outputs/01_error_rates_stacked.png)
 
-*   **`accuracy`**: A binary variable ( 1 = correct, 0 = error).
-*   **`contrast_type`**: With 4 levels (F, LR, H, PB) with spelling control (F) as the baseline reference. 
-*   **`(1 | subject_id)` and `(1 | item_id)`**: Random intercepts to ensure baseline variability across (a) subjects and (b) items.
+### Frequentist Error Rates
 
-Our model used  weakly informative priors `(normal, (0,1.5)` to prevent over-fitting with regularization `(exponential(1), class = sd)`, which ensures the prevention of highly unrealistic large differences balancing priors and evidence from sparse data, so posterior is stabilized through shrinking group intercepts. In addition, the model had a `Markov Chain Monte Carlo (MCMC)` where 4 chains runs 2000 iterations with initial 1000 warm up iterations. (via [Github](https://github.com/sandriatran/qml-2025/blob/main/final%20project/final%20project/Re-Analyzing%20Ota%20-%20%20%20A%20Bayesian%20Approach%20to%20Representational%20Indeterminacy.r)
+```{r viz-ci, eval=FALSE}
+# Visualization: Empirical Means with 95% CI
+ggplot(data_clean, aes(x = Contrast, y = error_rate)) +
+  stat_summary(fun.data = mean_cl_boot, geom = "errorbar") +
+  stat_summary(fun = mean, geom = "point")
+```
 
+**Figure A2 Interpretation (Raw Error Rates + CI):**  
+This calculates the empirical mean error rate with 95% confidence intervals (bootstrapped).
+*   **Technical**: This is a non-Bayesian "sanity check". It confirms that the underlying signal exists before we apply complex priors.
+*   **Theoretical**: The overlap between LR and H intervals suggests their difficulty levels are empirically indistinguishable.
 
-### Results
+![**Figure A2:** Raw Error Rates with 95% CI. Empirical means prior to Bayesian smoothing.](outputs/02_error_rates_with_ci.png)
 
-Our Bayesian analysis robustly corroborates with original findings.  When compared to the spelling control (F), the model demonstrated a large, negative effect on the log-odds of a correct response for both tasks /l/-/r/ contrast (LR) and for homophones (H). Compared to just `1.8% [95% CrI: 1.0, 3.0]` for the F (spelling control words) , the median error rate for the  LR (/l/-/r/)  contrast was `21.1% [95% CrI: 14.2, 30.2]`.
+### Subject Heterogeneity
 
-![Posterior predicted error rates and  95% credible intervals  all Contrast Type (F, PB, LR, H).  The contrasts of  /l/ - / r/ (LR) and Homophone (H) yields significantly higher error rates than Spelling Control (F) and /p/ - /b/ (PB) contrasts.](outputs/10_error_rates_all_contrasts.png)
+```{r viz-subject, eval=FALSE}
+# Visualization: Error Rates by Subject
+ggplot(data_clean, aes(x = Contrast, y = error_rate)) +
+  geom_line(aes(group = Subject), alpha = 0.3) +
+  facet_wrap(~Subject)
+```
 
-The near-homophonic contrasts (Homophone and /l/-/r/)  illustrate clear spike in false positives due to phonetic ambiguity cues triggering auditory processing gap leading to more "guesses" (e.g. seeing ROCK-KEY). The "true effect" provides strong evidence that phonological ambiguity are pronounced in H and LR (unclear, ambiguous) compared to F and PB (clear, unambiguous). 
+**Figure A3 Interpretation (Subject Variability):**  
+This spaghetti plot tracks individual participant performance.
+*   **Technical**: We observe significant "fan-shaped" variability—some subjects find the LR contrast extremely difficult (steep slopes), while others perform near ceiling.
+*   **Theoretical**: This heterogeneity necessitates a **Hierarchical Model** with random intercepts and slopes. A fixed-effects model would violate the independence assumption by ignoring this subject-level variance.
 
-![Forest plot shows increased negative values (error rates) for phonological contrasts compared to spelling control baseline](outputs/09_forest_plot_all_contrasts.png)
+![**Figure A3:** Error Rates by Subject. Heterogeneity in the LR condition necessitates hierarchical modeling.](outputs/03_error_rates_by_subject.png)
 
-Participants made many more errors on H (Homophones) and LR(/l/ - /r/) than 0  F (Spelling Control). While PB (/p/ - /b/) shows no credible difference in error rates being very close to 0, which is F (Spelling Control). The result corroborate a lucid relationship: the error rate increases as phonological distinctness decreases, predicting that L1 inventory informs L2 lexicon.
+## 3. Model Specification
 
-![Representational Indeterminacy - Driving higher error rates is reduced phonological distinctness.](outputs/14_representational_distinctness_mechanism.png)
+We specified three nested models to test the theory at increasing levels of granularity using **weakly informative priors** (`normal(0, 1.5)`) to regularize estimates.
 
-Predictable relationship between participants' error rates and L2's phonological distinctness when sound contrast is absent in participants' native language.
+# Results and Interpretation
 
-![Posterior predictive check shows statistical validation for the  comprehensive model, showing an aligned match between observed and simulated data.](outputs/11_posterior_predictive_check.png)
-Our model illustrates excellent fit. The posterior predictive checks verifies the match of the observed data `(y)`'s density aligning closely with the  simulated data from the model `(y_rep)`'s densities 
+## Part 1: Replication of Contrast Effects
 
-### Future Vision and Limitations 
+We first fitted the Comprehensive Model to replicate the original findings within a probabilistic framework.
 
-While our analysis strongly supports a representational indeterminacy hypothesis, it is limited by sparse data, and  future research should aim to expand theory on representational indeterminacy by testing processing mechanism's generalizability through modelling predictions with larger sample sizes, reaction time data, and other language pairs (e.g. L1-L2). 
+```{r model-spec-all, eval=FALSE}
+# MODEL 1: Comprehensive Replication
+model_all <- brm(
+  formula = accuracy ~ contrast_type + (1 | subject_id) + (1 | item_id),
+  data = data_all,
+  family = bernoulli(link = "logit"),
+  prior = c(prior(normal(0, 1.5), class = Intercept),
+            prior(normal(0, 1.5), class = b)),
+  iter = 2000, chains = 4, seed = 2025
+)
+```
 
-### References
+**Figure 1 Interpretation (Forest Plot):**  
+Figure 1 illustrates the posterior distributions for the effect of each contrast relative to the Spelling Control baseline (0).
+*   **Technical**: Negative log-odds indicate a decrease in the probability of a correct response. The distributions for **LR** and **H** are shifted significantly to the left (negative), with 95% Credible Intervals (CrIs) excluding zero.
+*   **Theoretical**: This confirms that the presence of an L1-absent contrast imposes a substantial cognitive penalty, statistically equivalent to the penalty imposed by total homophony.
 
-[1] Bürkner, P.-C. (2017). brms: An R package for Bayesian multilevel models using Stan. *Journal of Statistical Software*, *80*(1), 1–28. [https://doi.org/10.18637/jss.v080.i01](https://doi.org/10.18637/jss.v080.i01)
+![**Figure 1:** Forest plot of contrast effects. Negative log-odds indicate a substantial increase in error probability.](outputs/09_forest_plot_all_contrasts.png)
 
-[2] Carrasco-Ortiz, H., Midgley, K. J., & Frenck-Mestre, C. (2012). Are phonological representations in bilinguals language specific? An ERP study on interlingual homophones. Psychophysiology. [https://pubmed.ncbi.nlm.nih.gov/22220969/](https://pubmed.ncbi.nlm.nih.gov/22220969/)
+### Predicted Probabilities
 
-[3] Friesen, D. C., Oh, J., & Bialystok, E. (2016). Phonologically-mediated meaning activation in monolinguals and bilinguals. Linguistic Approaches to Bilingualism.[https://www.jbe-platform.com/content/journals/10.1075/lab.14026.fri](https://www.jbe-platform.com/content/journals/10.1075/lab.14026.fri)
+**Figure 2 Interpretation (Predicted Rates):**  
+Figure 2 transforms the abstract log-odds into intuitive **Predicted Error Rates** (probabilities).
+*   **Technical**: The model predicts an error rate of ~21% for the L1-Absent condition, compared to ~2% for controls.
+*   **Theoretical**: The "L1-Absent" condition demonstrates error rates commensurate with true Homophones, validating the claim that for these speakers, /l/ and /r/ are functionally merged.
 
-[3] Gelman, A., Vehtari, A., Simpson, D., Margossian, C. C., Carpenter, B., Yao, Y., Kennedy, L., & Bürkner, P.-C. (2020). *Bayesian workflow*. arXiv. [https://doi.org/10.48550/arXiv.2011.01808](https://doi.org/10.48550/arXiv.2011.01808)
+![**Figure 2:** Predicted Error Rates by Contrast Type. The "L1-Absent" condition demonstrates error rates commensurate with true Homophones.](outputs/10_error_rates_all_contrasts.png)
 
-[4] Grisetto, F., Roger, C., & Mahé, G. (2025). New Insights Into Visual Word Recognition: Analyzing Error Distribution in Typical Readers. Journal of Cognition.[https://pmc.ncbi.nlm.nih.gov/articles/PMC11967458/](https://pmc.ncbi.nlm.nih.gov/articles/PMC11967458/)
+## Part 2: The Linguistic Hierarchy
 
-[5] Jiang, N., Wu, Z., & Zhou, Y. (2025). Analytic visual word recognition in L2 learners: evidence from the length effect among ESL speakers. Applied Psycholinguistics.[https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5401528](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5401528)
+We fitted the Linguistic Model to test if the "L1-Absent" condition clusters with Homophones.
 
-[6] Jiao, Z., Du, L., Wang, Y., et al. (2024). Visual word recognition of Chinese–Japanese bilinguals: limited role of phonology. Frontiers in Psychology.[https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2023.1318798/full](https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2023.1318798/full)
+```{r model-spec-linguistic, eval=FALSE}
+# MODEL 2: Linguistic Hierarchy
+model_linguistic <- brm(
+  formula = accuracy ~ phonological_status + (1 | subject_id) + (1 | item_id),
+  data = data_linguistic ...
+)
+```
 
-[7] McLaughlin, D. J., Zink, M. E., Gaunt, L., et al. (2021). Pupillometry reveals cognitive demands of lexical competition during spoken word recognition in young and older adults. Psychonomic Bulletin & Review.[https://pmc.ncbi.nlm.nih.gov/articles/PMC9169067/](https://pmc.ncbi.nlm.nih.gov/articles/PMC9169067/) 
-  
-[8] Ota, M., Hartsuiker, R. J., & Haywood, S. L. (2009). The KEY to the ROCK: Near-homophony in nonnative visual word recognition. Cognition, 111(2), 263–269.[ https://doi.org/10.1016/j.cognition.2008.12.007]( https://doi.org/10.1016/j.cognition.2008.12.007)
+**Figure 3 Interpretation (Linguistic Hierarchy):**  
+*   **Technical**: This plot groups inputs by theoretical category. We see a clear separation between "L1-Present" (top, high accuracy) and "L1-Absent" (middle, low accuracy).
+*   **Theoretical**: The grouping of 'L1-Absent' and 'Homophone' validates the theoretical hierarchy: Unrelated < L1-Present << L1-Absent ≈ Homophone.
+
+![**Figure 3:** Linguistic Model Effects. The grouping of 'L1-Absent' and 'Homophone' validates the theoretical hierarchy.](outputs/13_linguistic_model_effects.png)
+
+## Part 3: The Mechanism (Distinctness)
+
+Finally, we modeled accuracy as a function of the **Phonological Distinctness Scale**.
+
+```{r model-spec-distinctness, eval=FALSE}
+# MODEL 3: Distinctness Mechanism
+model_distinctness <- brm(
+  formula = accuracy ~ phonological_distinctness_scaled + ...
+)
+```
+
+**Figure 4 Interpretation (Distinctness Gradient):**  
+*   **Technical**: The blue regression line visualizes the fixed effect of the continuous predictor. The tight confidence band suggests a precise estimation of this linear relationship.
+*   **Theoretical**: This confirms the mechanism is **gradient**. It is not just that /l/-/r/ is "broken"; it is that as phonological distinctness decreases (based on L1 inventory), accuracy declines linearly.
+
+![**Figure 4:** Representational Distinctness Mechanism. The regression line demonstrates how L1 distinctness linearly predicts accuracy.](outputs/14_representational_distinctness_mechanism.png)
+
+# Validation and Robustness
+
+To ensure the statistical validity of our inferences, we conducted comprehensive diagnostic checks (Figures A4-A8).
+
+## MCMC Diagnostics
+
+### Trace Plots and Distributions
+
+```{r viz-diagnostics, eval=FALSE}
+# Posterior Diagnostics
+mcmc_trace(model_all, pars = c("b_Intercept", "b_contrast_typeLR"))
+mcmc_scatter(model_all, pars = c("b_Intercept", "b_contrast_typeLR"))
+```
+
+**Figure A4 & A5 Interpretation (Posterior Distributions):**  
+These histograms show the probability distribution for the Intercept (Baseline Accuracy) and Slope parameters.
+*   **Technical**: The distributions are smooth and unimodal (single peak), indicating the model has converged on a stable solution.
+*   **Theoretical**: We can be confident that the "true" parameter value lies within these bell curves.
+
+![**Figure A4:** Posterior Intercept Distribution.](outputs/04_posterior_intercept.png)
+
+![**Figure A5:** Posterior Slope Distribution.](outputs/05_posterior_slope.png)
+
+**Figure A6 Interpretation (Joint Distribution):**  
+This scatter plot correlates two parameters (Intercept vs Slope).
+*   **Technical**: The lack of a strong "banana" shape indicates the parameters are not pathologically correlated, meaning the sampler explored the space efficiently.
+
+![**Figure A6:** Joint Posterior Distribution.](outputs/06_posterior_joint.png)
+
+## Posterior Predictive Checks (PPC)
+
+```{r viz-ppc, eval=FALSE}
+# Posterior Predictive Checks
+pp_check(model_all, ndraws = 100)
+```
+
+**Figure A7 & 5 Interpretation (PPC):**  
+Figure 5 (below) overlays the density of the observed data (`y`, dark line) with 100 simulated datasets generated by the model (`y_rep`, light lines).
+*   **Technical**: The simulated lines perfectly track the observed line.
+*   **Theoretical**: This confirms the model accurately captures the **data-generating process**. Our assumptions (Bernoulli predictions) are valid.
+
+![**Figure A7:** Initial Posterior Predictive Check.](outputs/07_posterior_predictive_check.png)
+
+![**Figure 5:** Posterior Predictive Check. The model accurately captures the data-generating process.](outputs/11_posterior_predictive_check.png)
+
+**Figure A8 Interpretation (Predictions vs Observed):**  
+This scatter plot compares the model's predicted probability for each data point against the actual outcome.
+*   **Technical**: Clustered points along the diagonal (or correctly separated clusters for binary data) indicate high predictive accuracy.
+
+![**Figure A8:** Posterior Predictions vs Observed Accuracy.](outputs/08_posterior_predictions.png)
+
+## Item-Level Consistency
+
+**Figure 6 Interpretation (Item Robustness):**  
+*   **Technical**: We plotted the error rate for every unique word used in the study.
+*   **Theoretical**: The fact that *all* red points (LR words) are elevated relative to blue points (Control words) confirms that the effect is not driven by one or two "weird" words but is a systematic property of the lexicon.
+
+![**Figure 6:** Item-Level Error Rates.](outputs/12_item_level_robustness.png)
+
+# Discussion and Conclusion
+
+Our findings—quantified via a modern Bayesian framework—align robustly with the theory that L2 perception is filtered through the L1 phonological inventory. We demonstrate that LR error rates are distinct from phonological neighbors and behave functionally as Homophones.
+
+However, recognizing the comparative framework of @jiao2024, we note that this "structural distortion" model may interact with orthographic depth. While our Distinctness Model confirms that phonology acts as a gradient constraint for Japanese speakers processing English, future work should explore how this interacts with the orthographic "triggering" mechanisms proposed in logographic processing models. Ultimately, we conclude that **Representational Indeterminacy** is a robust, quantifiable phenomenon: the "Key" to the "Rock" is indeed the "Lock".
+
+# References
+
+::: {#refs}
+:::

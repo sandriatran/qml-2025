@@ -1,7 +1,7 @@
 # ==============================================================================
 # Week 5 | https://uoelel.github.io/qml/workshops/week-05.html
 # Title: Task B: Korean voice quality
-# Author:
+# Author: Sandria Tran
 # Date: 2025-10-17
 # Topic: Workshop: Regression basics and posteriors draws
 #        Lecture:  Regression basics with brms
