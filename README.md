@@ -1,12 +1,27 @@
 # Quantitative Methods for Linguistics and English Language in R
 ## University of Edinburgh (◕‿◕)♡ ₊˚⊹♡₊
 
+## ⋆. 𐙚 ˚ Final Project (Updated January 2026) ⋆. 𐙚 ˚
+*A Bayesian re-analysis of phonological indeterminacy in L2 learners, replicating Ota et al. (2009) with modern statistical methods.*
+
+** Key Findings** 
+1. L1-Absent contrasts (/l/-/r/) produce 21% error rates—functionally equivalent to true homophones
+2. Phonological distinctness acts as a **gradient** constraint, not a binary deficit
+3. The effect generalizes across all lexical items (not driven by outliers)
+
 **⋆. 𐙚 ˚ Project Output Links ⋆. 𐙚 ˚** 
 
-*   **[R Script Repository](https://github.com/sandriatran/qml-2025/blob/main/final%20project/Re-Analyzing%20Ota%20-%20%20%20A%20Bayesian%20Approach%20to%20Representational%20Indeterminacy.r)**
-*   **[Comparative Analysis Document](https://uoe-my.sharepoint.com/:w:/r/personal/s2512561_ed_ac_uk/_layouts/15/Doc.aspx?sourcedoc=%7B529095E7-B828-4492-BC06-F6AC1A19C42D%7D&file=Analysis%20QML1.docx&action=default&mobileredirect=true)**
-*   **[QML-Inspired Workshop Material](https://github.com/sandriatran/qml-2025/blob/main/final%20project/A%20visual%20semantic-relatedness%20decision%20task%20in%20English.r)**
-*   **[All Figures (01-14)](https://github.com/sandriatran/qml-2025/tree/main/final%20project/outputs)**
+**📄 Final Report:**  
+[The KEY to the ROCK: A Bayesian Re-analysis of Representational Indeterminacy](https://github.com/sandriatran/qml-2025/blob/main/final%20project/Re-Analyzing-Ota%2C-Hartsuiker-and-Haywood--2009----A-Bayesian-Approach-to-Representational-Indeterminacy.pdf)
+**💻 Code:**  
+[R Script Repository](https://github.com/sandriatran/qml-2025/blob/main/final%20project/Re-Analyzing%20Ota%20-%20%20%20A%20Bayesian%20Approach%20to%20Representational%20Indeterminacy.r)
+**📊 Theoretical Analysis:**  
+[Comparative Analysis Document](https://uoe-my.sharepoint.com/:w:/r/personal/s2512561_ed_ac_uk/_layouts/15/Doc.aspx?sourcedoc=%7B529095E7-B828-4492-BC06-F6AC1A19C42D%7D&file=Analysis%20QML1.docx&action=default&mobileredirect=true)
+**🔬 QML-Inspired Workshop:**  
+[Workshop Material](https://github.com/sandriatran/qml-2025/blob/main/final%20project/A%20visual%20semantic-relatedness%20decision%20task%20in%20English.r)
+**📈 Outputs:**  
+[All Figures (01-14)](https://github.com/sandriatran/qml-2025/tree/main/final%20project/outputs)
+
 
 
 **⋆. 𐙚 ˚ Overview ⋆. 𐙚 ˚** 
