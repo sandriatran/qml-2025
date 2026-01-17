@@ -80,7 +80,9 @@ The course emphasizes general principles of data analysis and fosters an egalita
 - Week 10: 	Case study
 - Week 11: ————————————————  Group project 
 
-**⋆. 𐙚 ˚Group Project  . 𐙚 ˚**
+**⋆. 𐙚 ˚Final Report   . 𐙚 ˚**
+
+📄 Final Report: [The KEY to the ROCK: A Bayesian Re-analysis of Representational Indeterminacy](https://github.com/sandriatran/qml-2025/blob/main/final%20project/Re-Analyzing-Ota%2C-Hartsuiker-and-Haywood--2009----A-Bayesian-Approach-to-Representational-Indeterminacy.pdf)
 
 - Model Bayesian hierarchical logistic regression model with crossed random intercepts for subjects and items, predicting the probability of correct responses to test whether /l/-/r/ near-homophone increase false positive errors in L2 Japanese speakers.
 
