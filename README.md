@@ -1,6 +1,14 @@
 # Quantitative Methods for Linguistics and English Language in R
 ## University of Edinburgh (◕‿◕)♡ ₊˚⊹♡₊
 
+**⋆. 𐙚 ˚ Project Output Links ⋆. 𐙚 ˚** 
+
+*   **[R Script Repository](https://github.com/sandriatran/qml-2025/blob/main/final%20project/final%20project/Re-Analyzing%20Ota%20-%20%20%20A%20Bayesian%20Approach%20to%20Representational%20Indeterminacy.r)**
+*   **[Comparative Analysis Document](https://uoe-my.sharepoint.com/:w:/r/personal/s2512561_ed_ac_uk/_layouts/15/Doc.aspx?sourcedoc=%7B529095E7-B828-4492-BC06-F6AC1A19C42D%7D&file=Analysis%20QML1.docx&action=default&mobileredirect=true)**
+*   **[QML-Inspired Workshop Material](https://github.com/sandriatran/qml-2025/blob/main/final%20project/final%20project/A%20visual%20semantic-relatedness%20decision%20task%20in%20English.r)**
+*   **[All Figures (01-14)](https://github.com/sandriatran/qml-2025/tree/main/final%20project/outputs)**
+
+
 **⋆. 𐙚 ˚ Overview ⋆. 𐙚 ˚** 
 
 This course introduces the fundamentals of statistics and quantitative data analysis for linguistics. Students will learn how to design robust studies that address meaningful research questions. Drawing from various branches of linguistics, the curriculum emphasizes open scholarship and research integrity.
