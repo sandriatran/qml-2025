@@ -1,7 +1,7 @@
 # Quantitative Methods for Linguistics and English Language in R
 ## University of Edinburgh (◕‿◕)♡ ₊˚⊹♡₊
 
-## ⋆. 𐙚 ˚ Final Project (Updated January 2026) ⋆. 𐙚 ˚
+⋆. 𐙚 ˚ Final Project (Updated January 2026) ⋆. 𐙚 ˚
 *A Bayesian re-analysis of phonological indeterminacy in L2 learners, replicating Ota et al. (2009) with modern statistical methods.*
 
 ⋆. 𐙚 ˚ Key Findings ⋆. 𐙚 ˚
