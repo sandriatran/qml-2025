@@ -2,6 +2,7 @@
 ## University of Edinburgh (◕‿◕)♡ ₊˚⊹♡₊
 
 **⋆. 𐙚 ˚ Final Project (Updated January 2026) ⋆. 𐙚 ˚** 
+
 A Bayesian re-analysis of phonological indeterminacy in L2 learners, replicating Ota et al. (2009) with modern statistical methods.
 
 **⋆. 𐙚 ˚ Key Findings ⋆. 𐙚 ˚** 
@@ -10,6 +11,7 @@ A Bayesian re-analysis of phonological indeterminacy in L2 learners, replicating
 3. The effect generalizes across all lexical items (not driven by outliers)
 
 **⋆. 𐙚 ˚ Project Output Links ⋆. 𐙚 ˚** 
+
 📄 Final Report: [The KEY to the ROCK: A Bayesian Re-analysis of Representational Indeterminacy](https://github.com/sandriatran/qml-2025/blob/main/final%20project/Re-Analyzing-Ota%2C-Hartsuiker-and-Haywood--2009----A-Bayesian-Approach-to-Representational-Indeterminacy.pdf)
 
 💻 Code:  [R Script Repository](https://github.com/sandriatran/qml-2025/blob/main/final%20project/Re-Analyzing%20Ota%20-%20%20%20A%20Bayesian%20Approach%20to%20Representational%20Indeterminacy.r)
