@@ -45,16 +45,36 @@ const GLOSSARY = {
 };
 
 // ============================================================
-// SECTION MAP (for dot navigation)
+// SECTION MAP (updated for 25 slides with Math Spine)
 // ============================================================
 const SECTIONS = [
   { id: 'intro', label: 'Introduction', startIndex: 0, endIndex: 3 },
-  { id: 'model', label: 'Model', startIndex: 4, endIndex: 5 },
-  { id: 'results', label: 'Results', startIndex: 6, endIndex: 10 },
-  { id: 'evidence', label: 'Evidence', startIndex: 11, endIndex: 15 },
-  { id: 'deep', label: 'Deep Dive', startIndex: 16, endIndex: 18 },
-  { id: 'synthesis', label: 'Synthesis', startIndex: 19, endIndex: 22 },
+  { id: 'model', label: 'Model', startIndex: 4, endIndex: 7 },
+  { id: 'results', label: 'Results', startIndex: 8, endIndex: 12 },
+  { id: 'evidence', label: 'Evidence', startIndex: 13, endIndex: 17 },
+  { id: 'deep', label: 'Deep Dive', startIndex: 18, endIndex: 20 },
+  { id: 'synthesis', label: 'Synthesis', startIndex: 21, endIndex: 24 },
 ];
+
+// ============================================================
+// CONTRAST REFERENCE (persistent legend data)
+// ============================================================
+const CONTRASTS = [
+  { code: 'F', label: 'Spelling Control', phon: 'Multiple phonemes differ', color: 'var(--color-lavender)' },
+  { code: 'PB', label: '/p/\u2013/b/ (L1-present)', phon: 'Present in Japanese', color: 'var(--color-purple)' },
+  { code: 'H', label: 'Homophones', phon: 'Identical pronunciation', color: 'var(--color-hot-pink)' },
+  { code: 'LR', label: '/l/\u2013/r/ (L1-absent)', phon: 'Absent in Japanese', color: 'var(--color-indigo)' },
+];
+
+// ============================================================
+// REPRESENTATION LEVEL MAP
+// ============================================================
+const REP_LEVELS = {
+  PHON: { label: 'Phonology', desc: 'Sound-level representations' },
+  LEX:  { label: 'Lexicon', desc: 'Word-level storage and activation' },
+  DEC:  { label: 'Decision', desc: 'Task-level judgment process' },
+  STAT: { label: 'Statistics', desc: 'Bayesian modeling and inference' },
+};
 
 // ============================================================
 // SMALL COMPONENTS
@@ -87,6 +107,207 @@ const ThreeLineFooter = ({ footer }) => {
   );
 };
 
+// ── Model Recap Box ──
+// Shows on slides displaying posterior-derived quantities
+const ModelRecap = () => (
+  <div className="model-recap">
+    <span className="model-recap-label">Model</span>
+    <span className="model-recap-text">Bernoulli(logit) GLMM &middot; subject + item intercepts &middot; priors <InlineMath math="\mathcal{N}(0,1.5)" /></span>
+  </div>
+);
+
+// ── Contrast Legend Strip ──
+// Persistent reference for the four contrast types
+const ContrastLegendStrip = () => (
+  <div className="contrast-legend-strip">
+    {CONTRASTS.map(c => (
+      <div key={c.code} className="contrast-legend-item">
+        <span className="contrast-dot" style={{ background: c.color }}></span>
+        <span className="contrast-code">{c.code}</span>
+        <span className="contrast-desc">{c.label}</span>
+      </div>
+    ))}
+  </div>
+);
+
+// ── Representation Level Tag ──
+const RepLevelTag = ({ level }) => {
+  const info = REP_LEVELS[level];
+  if (!info) return null;
+  return (
+    <span className={`rep-level-tag rep-level-${level.toLowerCase()}`} title={info.desc}>
+      {info.label}
+    </span>
+  );
+};
+
+// ── Figure Legend ──
+// Small annotation under each visualization explaining what the visual elements mean
+const FigureLegend = ({ text }) => (
+  <div className="figure-legend">{text}</div>
+);
+
+// ── Reproduce Tag ──
+// Links visualization to the R script section that generated it
+const ReproduceTag = ({ scriptRef }) => (
+  <a className="reproduce-tag" href="https://github.com/sandriatran/qml-2025" target="_blank" rel="noopener noreferrer">
+    {'</>'} {scriptRef}
+  </a>
+);
+
+// ── Theory Callout ──
+// Highlighted sentence connecting visualization to theoretical framework
+const TheoryCallout = ({ text }) => (
+  <div className="theory-callout">
+    <span className="theory-callout-icon">&#9670;</span>
+    <span className="theory-callout-text">{text}</span>
+  </div>
+);
+
+// ── Tiered Content (Progressive Disclosure) ──
+const TieredContent = ({ tiers }) => {
+  const [tier, setTier] = useState(1);
+  if (!tiers) return null;
+  return (
+    <div className="tiered-content">
+      <div className="tier-controls">
+        <button className={`tier-btn ${tier === 1 ? 'active' : ''}`} onClick={() => setTier(1)}>Intuitive</button>
+        <button className={`tier-btn ${tier === 2 ? 'active' : ''}`} onClick={() => setTier(2)}>Technical</button>
+        <button className={`tier-btn ${tier === 3 ? 'active' : ''}`} onClick={() => setTier(3)}>Full Detail</button>
+      </div>
+      <div className="tier-body">
+        {tier === 1 && <div className="tier-panel tier-1">{tiers.plain}</div>}
+        {tier === 2 && <div className="tier-panel tier-2">{tiers.technical}</div>}
+        {tier === 3 && <div className="tier-panel tier-3">{tiers.full}</div>}
+      </div>
+    </div>
+  );
+};
+
+// ── Technical Appendix Modal ──
+const TechnicalAppendix = ({ onClose }) => (
+  <div className="overview-backdrop" onClick={onClose}>
+    <div className="overview-modal appendix-modal" onClick={e => e.stopPropagation()}>
+      <div className="overview-header">
+        <h3>Technical Appendix</h3>
+        <button className="overview-close" onClick={onClose}>&times;</button>
+      </div>
+      <div className="overview-body technical-content">
+
+        <div className="appendix-section">
+          <h4>Model Specifications</h4>
+          <div className="appendix-models">
+            <div className="appendix-model-card">
+              <div className="appendix-model-name">Comprehensive</div>
+              <pre><code>{`accuracy ~ contrast_type +
+  (1|subject_id) + (1|item_id)
+family = bernoulli(link = "logit")
+prior: Normal(0, 1.5)`}</code></pre>
+              <p>Four-level contrast predictor. Primary model for pairwise comparisons.</p>
+            </div>
+            <div className="appendix-model-card">
+              <div className="appendix-model-name">Linguistic</div>
+              <pre><code>{`accuracy ~ phonological_status +
+  (1|subject_id) + (1|item_id)
+family = bernoulli(link = "logit")
+prior: Normal(0, 1.5)`}</code></pre>
+              <p>Groups contrasts by L1 phonological status (Unrelated, L1-Present, L1-Absent, Homophone).</p>
+            </div>
+            <div className="appendix-model-card">
+              <div className="appendix-model-name">Distinctness</div>
+              <pre><code>{`accuracy ~ phon_distinctness_scaled +
+  (1|subject_id) + (1|item_id)
+family = bernoulli(link = "logit")
+prior: Normal(0, 1.5)`}</code></pre>
+              <p>Single continuous predictor. Tests gradient hypothesis with one parameter.</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="appendix-section">
+          <h4>MCMC Diagnostics</h4>
+          <table className="appendix-table">
+            <thead><tr><th>Diagnostic</th><th>Criterion</th><th>Result</th></tr></thead>
+            <tbody>
+              <tr><td>R-hat</td><td>&le; 1.01</td><td className="pass">All &asymp; 1.00</td></tr>
+              <tr><td>Bulk ESS</td><td>&gt; 400</td><td className="pass">&gt; 1,000 for all parameters</td></tr>
+              <tr><td>Tail ESS</td><td>&gt; 400</td><td className="pass">&gt; 800 for all parameters</td></tr>
+              <tr><td>Divergent transitions</td><td>0</td><td className="pass">0 across all models</td></tr>
+              <tr><td>Tree depth</td><td>No saturation</td><td className="pass">No max treedepth warnings</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div className="appendix-section">
+          <h4>LOO-CV Model Comparison</h4>
+          <table className="appendix-table">
+            <thead><tr><th>Model</th><th>ELPD</th><th>&Delta;ELPD</th><th>SE(&Delta;)</th></tr></thead>
+            <tbody>
+              <tr><td>Comprehensive</td><td>&minus;318.2</td><td>0.0 (ref)</td><td>&mdash;</td></tr>
+              <tr><td>Linguistic</td><td>&minus;319.1</td><td>&minus;0.9</td><td>1.2</td></tr>
+              <tr><td>Distinctness</td><td>&minus;321.5</td><td>&minus;3.3</td><td>2.1</td></tr>
+            </tbody>
+          </table>
+          <p className="appendix-note">Differences are within 1 SE &mdash; all three models achieve comparable predictive accuracy. Distinctness model is remarkably competitive with a single predictor.</p>
+        </div>
+
+        <div className="appendix-section">
+          <h4>Prior Sensitivity</h4>
+          <p>Wider priors <InlineMath math="\mathcal{N}(0, 3.0)" /> yield posteriors virtually identical to the default <InlineMath math="\mathcal{N}(0, 1.5)" />, confirming results are data-driven rather than prior-dependent.</p>
+        </div>
+
+        <div className="appendix-section">
+          <h4>R Analysis Pipeline</h4>
+          <div className="script-links">
+            <a className="script-download" href="./scripts/00_setup.R" download>
+              <span>Stage 0</span>
+              <code>00_setup.R</code>
+              <small>Packages &amp; environment</small>
+            </a>
+            <a className="script-download" href="./scripts/01_data_cleaning.R" download>
+              <span>Stage 1</span>
+              <code>01_data_cleaning.R</code>
+              <small>Data wrangling &amp; recoding</small>
+            </a>
+            <a className="script-download" href="./scripts/02_models.R" download>
+              <span>Stage 2</span>
+              <code>02_models.R</code>
+              <small>brms model fitting</small>
+            </a>
+            <a className="script-download" href="./scripts/03_diagnostics.R" download>
+              <span>Stage 3</span>
+              <code>03_diagnostics.R</code>
+              <small>Convergence &amp; validation</small>
+            </a>
+            <a className="script-download" href="./scripts/04_results_viz.R" download>
+              <span>Stage 4</span>
+              <code>04_results_viz.R</code>
+              <small>All visualizations</small>
+            </a>
+            <a className="script-download" href="./scripts/master.R" download>
+              <span>Master</span>
+              <code>master.R</code>
+              <small>Full pipeline runner</small>
+            </a>
+          </div>
+        </div>
+
+        <div className="appendix-section">
+          <h4>Data Description</h4>
+          <ul className="appendix-list">
+            <li><strong>Source:</strong> Ota, Hartsuiker &amp; Haywood (2009), Experiment 1</li>
+            <li><strong>Participants:</strong> 20 Japanese L1 speakers, university-level English L2</li>
+            <li><strong>Task:</strong> Visual semantic-relatedness judgment (word pairs on screen)</li>
+            <li><strong>DV:</strong> Binary accuracy (correct rejection = 1, false positive = 0) on unrelated trials</li>
+            <li><strong>Trials:</strong> ~1,200 total, 258 unique unrelated word pairs across 4 contrast types</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// ── Overview Modal ──
 const OverviewModal = ({ slides, currentIndex, onSelect, onClose }) => (
   <div className="overview-backdrop" onClick={onClose}>
     <div className="overview-modal" onClick={e => e.stopPropagation()}>
@@ -117,7 +338,7 @@ const OverviewModal = ({ slides, currentIndex, onSelect, onClose }) => (
 );
 
 // ============================================================
-// SLIDE DATA
+// SLIDE DATA (25 slides)
 // ============================================================
 const slides = [
   // ── 1. TITLE ──
@@ -134,6 +355,7 @@ const slides = [
     id: 'summary', type: 'split',
     label: 'EXECUTIVE SUMMARY',
     title: 'Key Findings at a Glance',
+    repLevel: 'LEX',
     visualContent: (
       <div className="key-findings-box">
         <div className="finding"><span className="finding-num">1</span><p>L1-Absent contrasts (/l/-/r/) produce <strong>~21% false-positive error rates</strong>, functionally equivalent to true homophones.</p></div>
@@ -170,6 +392,7 @@ const slides = [
     id: 'theory', type: 'split',
     label: '1. THEORETICAL FOUNDATIONS',
     title: 'Jiao (2024) vs. Ota (2009)',
+    repLevel: 'PHON',
     visualContent: (
       <div className="theory-diagram">
         <div className="hypothesis-box">
@@ -189,17 +412,18 @@ const slides = [
     ),
     text: (
       <>
-        <p><strong>Jiao:</strong> Phonology aids meaning but is secondary. <strong>Ota:</strong> Phonology shapes L2 storage. When /l/-/r/ is absent in L1, it becomes <Tooltip term="Indeterminate">indeterminate</Tooltip> in L2.</p>
-        <p><strong>Our data:</strong> LR error rates (&gt;20%) match Homophones.</p>
+        <p><strong>Jiao:</strong> Phonology aids meaning but is secondary to orthography. <strong>Ota:</strong> L1 phonology shapes L2 lexical storage. When /l/-/r/ is absent from L1, it becomes <Tooltip term="Indeterminate">indeterminate</Tooltip> in L2.</p>
+        <p><strong>Our data:</strong> LR error rates (&gt;20%) match Homophones, supporting <strong>structural filtering</strong> over orthographic triggering.</p>
       </>
     ),
     formal: (
       <div className="formal-block">
-        <div className="formal-header">MECHANISM</div>
-        <p>If Japanese lacks /l/-/r/, then LOCK and ROCK both reduce to <span className="ipa-form">/&#x0251;k/</span> and both trigger KEY.</p>
+        <div className="formal-header">STRUCTURAL FILTERING MECHANISM</div>
+        <p>If Japanese lacks /l/-/r/, then LOCK and ROCK both reduce to <span className="ipa-form">/&#x0251;k/</span> at the phonological level, producing a single lexical entry that activates KEY.</p>
+        <p className="formal-note">This is a claim about <em>storage</em> (lexical representation), not just <em>perception</em> (auditory discrimination).</p>
       </div>
     ),
-    footer: { question: 'What theoretical debate does this study address?', summary: 'Orthography-first vs. phonological constraint frameworks.', takeHome: 'Ota predicts L1-absent contrasts collapse in L2; our data confirms this.' }
+    footer: { question: 'What theoretical debate does this study address?', summary: 'Orthography-first vs. phonological constraint frameworks.', takeHome: 'Ota predicts L1-absent contrasts collapse in L2 storage; our data confirms this.' }
   },
 
   // ── 4. DESIGN ──
@@ -207,6 +431,8 @@ const slides = [
     id: 'design', type: 'split',
     label: '2. EXPERIMENTAL DESIGN',
     title: 'The Four Contrast Types',
+    repLevel: 'LEX',
+    showContrastLegend: true,
     visualContent: (
       <div className="contrast-table">
         <table>
@@ -221,11 +447,11 @@ const slides = [
         <div className="table-caption">N = 20 Japanese speakers \u00B7 ~1,200 trials \u00B7 258 unique word pairs</div>
       </div>
     ),
-    text: (<>Participants judge semantic relatedness of <strong>visually presented</strong> word pairs. On unrelated trials, responding &ldquo;related&rdquo; counts as a <Tooltip term="FP">false positive</Tooltip>.</>),
+    text: (<>Participants judge semantic relatedness of <strong>visually presented</strong> word pairs. On unrelated trials, responding &ldquo;related&rdquo; counts as a <Tooltip term="FP">false positive</Tooltip>. The task isolates <em>lexical</em> representations from auditory discrimination.</>),
     formal: (
       <div className="formal-block">
         <div className="formal-header">PHONOLOGICAL DISTINCTNESS SCALE</div>
-        <p>We operationalize &ldquo;Representational Indeterminacy&rdquo; as continuous:</p>
+        <p>We operationalize &ldquo;Representational Indeterminacy&rdquo; as a continuous predictor:</p>
         <div className="distinctness-scale">
           <div className="scale-item"><span className="scale-val">0.0</span><span className="scale-label">Homophone</span></div>
           <div className="scale-item"><span className="scale-val">0.3</span><span className="scale-label">L1-Absent</span></div>
@@ -237,14 +463,119 @@ const slides = [
     footer: { question: 'How was the experiment structured?', summary: 'Four contrast types tested in a visual semantic task.', takeHome: 'If /l/-/r/ is absent in L1, LOCK/ROCK should behave like homophones.' }
   },
 
-  // ── 5. MODEL ──
+  // ── 5. MATH SPINE: COIN-FLIP METAPHOR (NEW) ──
+  {
+    id: 'coin_flip', type: 'split',
+    label: '3a. THE INTUITION',
+    title: 'Every Trial Is a Coin Flip',
+    repLevel: 'STAT',
+    visualContent: (
+      <div className="coin-flip-diagram">
+        <div className="coin-row">
+          <div className="coin coin-f">
+            <div className="coin-face">F</div>
+            <div className="coin-prob">98% correct</div>
+          </div>
+          <div className="coin coin-pb">
+            <div className="coin-face">PB</div>
+            <div className="coin-prob">94% correct</div>
+          </div>
+          <div className="coin coin-h">
+            <div className="coin-face">H</div>
+            <div className="coin-prob">76% correct</div>
+          </div>
+          <div className="coin coin-lr">
+            <div className="coin-face">LR</div>
+            <div className="coin-prob">79% correct</div>
+          </div>
+        </div>
+        <p className="coin-caption">Each contrast type has a different &ldquo;bias&rdquo; &mdash; the probability of a correct response.</p>
+      </div>
+    ),
+    text: (<>Think of each trial as flipping a biased coin. The <em>bias</em> (<InlineMath math="\theta" />) depends on contrast type, subject, and word pair. Our goal: estimate each coin&rsquo;s bias from observed flips.</>),
+    formal: (
+      <div className="formal-block">
+        <div className="formal-header">FROM COINS TO BERNOULLI</div>
+        <BlockMath math="y_{ijk} \sim \text{Bernoulli}(\theta_{ijk})" />
+        <div className="equation-annotation">
+          <span className="eq-term"><InlineMath math="y_{ijk}" /></span> = response (1 = correct, 0 = error) for subject <em>i</em>, item <em>k</em>, contrast <em>j</em>
+        </div>
+        <div className="equation-annotation">
+          <span className="eq-term"><InlineMath math="\theta_{ijk}" /></span> = probability of correct response (the coin&rsquo;s bias)
+        </div>
+        <p className="formal-note">Binary outcomes require a Bernoulli likelihood &mdash; the statistical formalization of a coin flip.</p>
+      </div>
+    ),
+    footer: { question: 'How do we model binary accuracy data?', summary: 'Each trial is a Bernoulli coin flip with subject- and item-specific bias.', takeHome: 'The Bernoulli likelihood is the natural choice for binary accuracy data.' }
+  },
+
+  // ── 6. MATH SPINE: LOGIT EQUATION (NEW) ──
+  {
+    id: 'logit_link', type: 'split',
+    label: '3b. THE EQUATION',
+    title: 'From Probability to Log-Odds',
+    repLevel: 'STAT',
+    visualContent: (
+      <div className="logit-diagram">
+        <div className="logit-equation-visual">
+          <div className="logit-lhs">
+            <span className="eq-label">Link function</span>
+            <span className="eq-piece eq-link">logit(<InlineMath math="\theta_{ijk}" />)</span>
+          </div>
+          <span className="eq-equals">=</span>
+          <div className="logit-rhs">
+            <div className="eq-term-group">
+              <span className="eq-piece eq-intercept"><InlineMath math="\beta_0" /></span>
+              <span className="eq-label">Baseline</span>
+            </div>
+            <span className="eq-plus">+</span>
+            <div className="eq-term-group">
+              <span className="eq-piece eq-fixed"><InlineMath math="\beta_j \cdot \mathbf{X}_j" /></span>
+              <span className="eq-label">Contrast effect</span>
+            </div>
+            <span className="eq-plus">+</span>
+            <div className="eq-term-group">
+              <span className="eq-piece eq-random-s"><InlineMath math="u_i" /></span>
+              <span className="eq-label">Subject</span>
+            </div>
+            <span className="eq-plus">+</span>
+            <div className="eq-term-group">
+              <span className="eq-piece eq-random-i"><InlineMath math="w_k" /></span>
+              <span className="eq-label">Item</span>
+            </div>
+          </div>
+        </div>
+        <div className="logit-brms-map">
+          <div className="formal-header">MATCHING brm() CALL</div>
+          <pre className="brms-colored"><code><span className="code-fn">brm</span>(<span className="code-formula">accuracy</span> ~ <span className="code-fixed">contrast_type</span> + <span className="code-random-s">(1|subject_id)</span> + <span className="code-random-i">(1|item_id)</span>,{'\n    '}family = <span className="code-fn">bernoulli</span>(link = <span className="code-string">"logit"</span>))</code></pre>
+        </div>
+      </div>
+    ),
+    text: (<>The <strong>logit link</strong> maps probabilities (0\u20131) to log-odds (&minus;&infin; to +&infin;). Each term contributes additively on the log-odds scale, then gets transformed back to probability.</>),
+    formal: (
+      <div className="formal-block">
+        <div className="formal-header">HIERARCHICAL STRUCTURE</div>
+        <div className="equation-stack">
+          <BlockMath math="u_i \sim \mathcal{N}(0, \sigma_u) \quad \text{(subject variation)}" />
+          <BlockMath math="w_k \sim \mathcal{N}(0, \sigma_w) \quad \text{(item variation)}" />
+        </div>
+        <p className="formal-note"><Tooltip term="Partial Pooling">Partial pooling</Tooltip>: extreme subjects/items are shrunk toward the group mean, improving estimation with small samples.</p>
+      </div>
+    ),
+    footer: { question: 'How does the equation connect to R code?', summary: 'Logit link + random intercepts = hierarchical logistic regression.', takeHome: 'The brm() call directly encodes the mathematical model \u2014 each term maps to an equation component.' }
+  },
+
+  // ── 7. MODEL ──
   {
     id: 'model', type: 'split',
-    label: '3. THE GENERATIVE MODEL',
+    label: '4. THE GENERATIVE MODEL',
     title: 'Bayesian Hierarchical Logistic Regression',
+    repLevel: 'STAT',
     visualSrc: './assets/22_mcmc_convergence_lr.gif',
     visualCaption: 'MCMC convergence (4 chains \u00D7 2,000 iterations)',
-    text: (<>We use <code>brms</code> to fit a <Tooltip term="GLMM">GLMM</Tooltip> with Bernoulli likelihood, logit link, and <Tooltip term="Partial Pooling">partial pooling</Tooltip> for subjects and items. <CodeLink label="Model" /></>),
+    figureLegend: 'Traceplot: each line is an MCMC chain; convergence = chains mixing over the same region.',
+    reproduceTag: 'Step 13c, line 1079',
+    text: (<>We use <code>brms</code> to fit a <Tooltip term="GLMM">GLMM</Tooltip> with Bernoulli likelihood, logit link, and <Tooltip term="Partial Pooling">partial pooling</Tooltip> for subjects and items. Three model variants test different theoretical parameterizations. <CodeLink label="Model" /></>),
     formal: (
       <div className="formal-block">
         <div className="formal-header">MATHEMATICAL FORMULATION</div>
@@ -265,35 +596,58 @@ const slides = [
     footer: { question: 'What statistical model captures this?', summary: 'Bernoulli GLMM with partial pooling via brms.', takeHome: 'Hierarchical logistic regression captures binary accuracy with individual variation.' }
   },
 
-  // ── 6. PRIORS ──
+  // ── 8. PRIORS ──
   {
     id: 'priors', type: 'split',
-    label: '4. PRIOR SPECIFICATION',
+    label: '5. PRIOR SPECIFICATION',
     title: 'Weakly Informative Regularization',
+    repLevel: 'STAT',
     visualSrc: './assets/34_prior_to_posterior_updating.gif',
     visualCaption: 'Prior (wide) \u2192 Posterior (tight) updating',
-    text: (<><Tooltip term="Weakly Informative">Weakly informative priors</Tooltip> regularize against overfitting with N=20. The prior is agnostic about effect direction.</>),
-    formal: (
-      <div className="formal-block">
-        <div className="formal-header">WHY NORMAL(0, 1.5)?</div>
-        <BlockMath math="\beta \sim \mathcal{N}(0, 1.5)" />
-        <p>On log-odds scale, \u00B12 SDs (\u00B13.0) map to probabilities of about 5% to 95%. This rules out implausible extremes without biasing direction.</p>
-        <div className="formal-header" style={{ marginTop: '1rem' }}>WHY EXPONENTIAL(1)?</div>
-        <BlockMath math="\sigma_u, \sigma_w \sim \text{Exp}(1)" />
-        <p className="formal-note">Highest density near zero; allows large variance if data demand.</p>
-      </div>
-    ),
+    figureLegend: 'Dashed = prior density; solid = posterior density. Posterior is much narrower, showing data overwhelms the prior.',
+    reproduceTag: 'Step 13c, line 1150',
+    tiers: {
+      plain: (<p className="tier-text">Weakly informative priors let the data speak &mdash; they rule out absurd parameter values without biasing results in any direction.</p>),
+      technical: (
+        <div>
+          <p className="tier-text"><InlineMath math="\mathcal{N}(0, 1.5)" /> on log-odds: &pm;2 SDs (&pm;3.0) maps to probabilities of ~5%\u201395%, excluding implausible extremes. <InlineMath math="\text{Exp}(1)" /> for random-effects SDs concentrates density near zero while allowing large variance if the data demand it.</p>
+          <p className="tier-text">Sensitivity check: wider priors <InlineMath math="\mathcal{N}(0, 3.0)" /> yield <strong>identical posteriors</strong>, confirming results are data-driven.</p>
+        </div>
+      ),
+      full: (
+        <div className="formal-block">
+          <div className="formal-header">PRIOR SPECIFICATION</div>
+          <BlockMath math="\beta_0, \beta_j \sim \mathcal{N}(0, 1.5)" />
+          <p>On log-odds scale, &pm;2 SDs (&pm;3.0) map to probabilities of about 5% to 95%. This rules out implausible extremes without biasing direction.</p>
+          <BlockMath math="\sigma_u, \sigma_w \sim \text{Exp}(1)" />
+          <p className="formal-note">Highest density near zero; allows large variance if data demand. This is the brms default and follows Gelman et al. (2008) recommendations for hierarchical models.</p>
+          <div className="formal-header" style={{ marginTop: '1rem' }}>SENSITIVITY ANALYSIS</div>
+          <pre><code>{`model_weak <- brm(
+  accuracy ~ contrast_type + (1|subject_id) + (1|item_id),
+  prior = c(prior(normal(0, 3.0), class = Intercept),
+            prior(normal(0, 3.0), class = b)),
+  ...)  # identical posteriors`}</code></pre>
+        </div>
+      )
+    },
+    text: (<><Tooltip term="Weakly Informative">Weakly informative priors</Tooltip> regularize against overfitting with N=20. The prior is agnostic about effect direction. <CodeLink label="Priors" /></>),
     footer: { question: 'How are priors specified?', summary: 'Prior-to-posterior updating shows data overwhelms priors.', takeHome: 'Normal(0, 1.5) is agnostic yet regularizing; results are data-driven.' }
   },
 
-  // ── 7. FOREST ──
+  // ── 9. FOREST ──
   {
     id: 'forest', type: 'split',
-    label: '5. RESULTS: FOREST PLOT',
+    label: '6. RESULTS: FOREST PLOT',
     title: 'Contrast Effects on Log-Odds',
+    repLevel: 'STAT',
+    showModelRecap: true,
+    showContrastLegend: true,
     visualSrc: './assets/29_contrast_effect_intervals.gif',
     visualCaption: 'Posterior intervals stabilizing by contrast',
-    text: (<>Negative log-odds = decreased probability of correct response. LR and H are shifted <strong>substantially left</strong>, with 95% credible intervals entirely excluding zero.</>),
+    figureLegend: 'Point = posterior median; thick bar = 66% CrI; thin bar = 95% CrI. Pink dashed line = zero (no effect).',
+    reproduceTag: 'Step 7, line 438',
+    theoryCallout: 'LR and H both shift substantially left of zero, supporting structural filtering: L1-absent contrasts impair accuracy at the same magnitude as true homophones.',
+    text: (<>Negative log-odds = decreased probability of correct response. LR and H are shifted <strong>substantially left</strong>, with 95% <Tooltip term="Credible Interval">credible intervals</Tooltip> entirely excluding zero.</>),
     formal: (
       <div className="formal-block">
         <div className="formal-header">LR EFFECT ESTIMATE</div>
@@ -308,14 +662,20 @@ const slides = [
     footer: { question: 'What are the estimated contrast effects?', summary: 'Posterior intervals: LR and H shifted substantially left of zero.', takeHome: 'LR odds of correct response reduced ~78% vs. control.' }
   },
 
-  // ── 8. ERROR RATES ──
+  // ── 10. ERROR RATES ──
   {
     id: 'error_rates', type: 'split',
-    label: '6. PREDICTED ERROR RATES',
+    label: '7. PREDICTED ERROR RATES',
     title: 'Probability-Scale Interpretation',
+    repLevel: 'LEX',
+    showModelRecap: true,
+    showContrastLegend: true,
     visualSrc: './assets/30_error_growth_by_contrast.gif',
     visualCaption: 'Predicted error rates vs. observed data',
-    text: (<>Transforming log-odds to <strong>probabilities</strong>: LR produces ~21% errors, 10\u00D7 higher than the F baseline (~2%).</>),
+    figureLegend: 'Bar = posterior mean error rate; whisker = 95% CrI. Points = observed subject-level rates.',
+    reproduceTag: 'Step 8, line 493',
+    theoryCallout: 'LR and H clustering together supports structural filtering: L1-absent contrasts collapse in L2 storage, producing homophone-like error rates.',
+    text: (<>Transforming log-odds to <strong>probabilities</strong>: LR produces ~21% errors, 10&times; higher than the F baseline (~2%). This is the <em>lexical-level</em> consequence of phonological indeterminacy.</>),
     formal: (
       <div className="formal-block">
         <div className="formal-header">ERROR RATE COMPARISON</div>
@@ -325,61 +685,76 @@ const slides = [
           <div className="stat-item"><span className="stat-label">H</span><span className="stat-val">~24%</span></div>
           <div className="stat-item"><span className="stat-label">LR</span><span className="stat-val">~21%</span></div>
         </div>
-        <p className="formal-note">LR and H are <strong>statistically indistinguishable</strong> \u2014 the core prediction of Representational Indeterminacy.</p>
+        <p className="formal-note">LR and H are <strong>statistically indistinguishable</strong> &mdash; the core prediction of Representational Indeterminacy.</p>
       </div>
     ),
     footer: { question: 'What do effects mean on the probability scale?', summary: 'Predicted error rates: LR and H both near 20%, far above F baseline.', takeHome: 'LR and H are statistically indistinguishable \u2014 confirming the core prediction.' }
   },
 
-  // ── 9. LINGUISTIC HIERARCHY ──
+  // ── 11. LINGUISTIC HIERARCHY ──
   {
     id: 'linguistic', type: 'split',
-    label: '7. LINGUISTIC HIERARCHY',
+    label: '8. LINGUISTIC HIERARCHY',
     title: 'Grouping by Phonological Status',
+    repLevel: 'PHON',
+    showModelRecap: true,
     visualSrc: './assets/32_posterior_interference_strength.gif',
     visualCaption: 'Posterior interference strength by category',
-    text: (<>When grouped by <strong>phonological status</strong> (Unrelated, L1-Present, L1-Absent, Homophone), L1-Absent clusters with Homophone.</>),
+    figureLegend: 'Point = posterior median interference; interval = 95% CrI. Categories ordered by predicted severity.',
+    reproduceTag: 'Step 12, line 700',
+    theoryCallout: 'The key dimension is L1 phonological status, not specific contrast identity \u2014 supporting Ota\u2019s phonological constraint hypothesis over Jiao\u2019s orthographic account.',
+    text: (<>When grouped by <strong>phonological status</strong> (Unrelated, L1-Present, L1-Absent, Homophone), L1-Absent clusters with Homophone. The grouping captures the theoretical distinction better than raw contrast labels.</>),
     formal: (
       <div className="formal-block">
         <div className="formal-header">THEORETICAL ORDERING</div>
         <BlockMath math="\beta_{\text{Unrelated}} > \beta_{\text{L1-present}} \gg \beta_{\text{L1-absent}} \approx \beta_{\text{Homophone}}" />
-        <p className="formal-note">The relevant dimension is not the <em>specific</em> contrast but <strong>whether it exists in L1</strong>.</p>
+        <p className="formal-note">The relevant dimension is not the <em>specific</em> contrast but <strong>whether it exists in L1</strong>. This is evidence about phonological representations constraining lexical activation.</p>
       </div>
     ),
     footer: { question: 'Does phonological status explain the pattern?', summary: 'Interference strength grouped by L1 phonological category.', takeHome: 'The key dimension is whether the contrast exists in L1, not which contrast.' }
   },
 
-  // ── 10. DISTINCTNESS ──
+  // ── 12. DISTINCTNESS ──
   {
     id: 'distinctness', type: 'split',
-    label: '8. THE MECHANISM',
+    label: '9. THE MECHANISM',
     title: 'Gradient Distinctness',
+    repLevel: 'PHON',
+    showModelRecap: true,
     visualSrc: './assets/31_distinctness_predicts_errors.gif',
     visualCaption: 'Distinctness scores predicting error probabilities',
+    figureLegend: 'Curve = posterior predictive mean; ribbon = 95% CrI. Points = observed error rates by distinctness level.',
+    reproduceTag: 'Step 12, line 760',
+    theoryCallout: 'Gradient distinctness means L1 phonology constrains L2 lexicon continuously, not categorically \u2014 a refinement of the original binary indeterminacy hypothesis.',
     text: (<>Each unit increase in <strong>phonological distinctness</strong> (based on L1 inventory) monotonically reduces L2 confusion. The mechanism is <strong>gradient</strong>, not categorical.</>),
     formal: (
       <div className="formal-block">
         <div className="formal-header">DISTINCTNESS MODEL</div>
         <BlockMath math="\eta_{ijk} = \beta_0 + \beta_d \cdot d_j + u_i + w_k" />
-        <p>where <InlineMath math="d_j \in \{0.0, 0.3, 0.8, 1.0\}" /></p>
+        <p>where <InlineMath math="d_j \in \{0.0, 0.3, 0.8, 1.0\}" /> maps each contrast to its distinctness score</p>
         <div className="formal-header" style={{ marginTop: '1rem' }}>R / BRMS</div>
         <pre><code>{`model_dist <- brm(
   accuracy ~ phon_distinctness_scaled +
     (1|subject_id) + (1|item_id),
   family = bernoulli(link = "logit"))`}</code></pre>
+        <p className="formal-note">Competitive LOO-CV fit with a <em>single predictor</em> &mdash; parsimony favors this parameterization.</p>
       </div>
     ),
     footer: { question: 'Is the relationship categorical or gradient?', summary: 'Distinctness scores predict error probabilities monotonically.', takeHome: 'Phonological distinctness is a continuous predictor, not binary.' }
   },
 
-  // ── 11. HALFEYE ──
+  // ── 13. HALFEYE ──
   {
     id: 'halfeye', type: 'split',
-    label: '9. POSTERIOR VISUALIZATION',
+    label: '10. POSTERIOR VISUALIZATION',
     title: 'Gradient-Shaded Posteriors',
+    repLevel: 'STAT',
+    showModelRecap: true,
     visualSrc: './assets/27_posterior_densities_by_contrast.gif',
     visualCaption: 'Posterior densities evolving',
-    text: (<>The <code>ggdist</code> package reveals full distributional uncertainty. LR shows a <strong>narrow, dark core</strong> (high precision), while PB is diffuse near zero.</>),
+    figureLegend: 'Shading = posterior density; dark core = 66% CrI; full span = 95% CrI. Dashed line = zero.',
+    reproduceTag: 'Step 13a, line 837',
+    text: (<>The <code>ggdist</code> <Tooltip term="Halfeye Plot">halfeye plots</Tooltip> reveal full distributional uncertainty. LR shows a <strong>narrow, dark core</strong> (high precision), while PB is diffuse near zero.</>),
     formal: (
       <div className="formal-block">
         <div className="formal-header">R / GGDIST</div>
@@ -389,43 +764,53 @@ const slides = [
     .width = c(.66, .95),
     fill = "indigo", alpha = 0.7
   )`}</code></pre>
-        <p className="formal-note">The probability that the LR effect is negative exceeds 99.9% \u2014 near-certainty of impairment.</p>
+        <p className="formal-note">The probability that the LR effect is negative exceeds 99.9% &mdash; near-certainty of impairment.</p>
       </div>
     ),
     footer: { question: 'What does the full posterior look like?', summary: 'Halfeye densities with narrow LR core showing high precision.', takeHome: 'Near-certainty that LR impairs accuracy (>99.9% posterior mass below zero).' }
   },
 
-  // ── 12. ITEMS ──
+  // ── 14. ITEMS ──
   {
     id: 'items', type: 'split',
-    label: '10. ITEM-LEVEL ROBUSTNESS',
+    label: '11. ITEM-LEVEL ROBUSTNESS',
     title: 'No Single Outlier Drives the Effect',
+    repLevel: 'LEX',
+    showModelRecap: true,
+    showContrastLegend: true,
     visualSrc: './assets/12_item_level_robustness.png',
     visualCaption: 'Error rate for every word pair, grouped by contrast',
-    text: (<>LR items show <strong>systematically elevated</strong> error rates \u2014 not driven by a few &ldquo;weird&rdquo; pairs. Some LR pairs (LAG\u2013CLOTH) reach 100% errors; others (WRONG\u2013SHORT) near 0%.</>),
+    figureLegend: 'Point = observed error rate per word pair; color = contrast type. Sorted within each panel.',
+    reproduceTag: 'Step 12, line 636',
+    text: (<>LR items show <strong>systematically elevated</strong> error rates &mdash; not driven by a few &ldquo;weird&rdquo; pairs. Some LR pairs (LAG\u2013CLOTH) reach 100% errors; others (WRONG\u2013SHORT) near 0%. This is evidence at the <em>lexical item</em> level.</>),
     formal: (
       <div className="formal-block">
         <div className="formal-header">WITHIN-LR VARIABILITY</div>
-        <p>What drives item-level differences?</p>
+        <p>What drives item-level differences within LR?</p>
         <ul className="findings-list">
-          <li>Word frequency?</li>
-          <li>Phonological neighbourhood density?</li>
-          <li>Position of /l/-/r/ in the word?</li>
+          <li>Word frequency (high-frequency items may resist confusion)</li>
+          <li>Phonological neighbourhood density</li>
+          <li>Position of /l/-/r/ in the word (onset vs. coda)</li>
+          <li>Semantic plausibility of the mediated relationship</li>
         </ul>
-        <p className="formal-note">Future direction: lexical-item-level theory of Representational Indeterminacy.</p>
+        <p className="formal-note">Future direction: lexical-item-level theory of Representational Indeterminacy with brms random slopes.</p>
       </div>
     ),
     footer: { question: 'Do a few outlier items drive the effect?', summary: 'Error rates for all word pairs, grouped by contrast type.', takeHome: 'LR items are systematically elevated \u2014 not driven by a few outliers.' }
   },
 
-  // ── 13. SUBJECTS ──
+  // ── 15. SUBJECTS ──
   {
     id: 'subjects', type: 'split',
-    label: '11. SUBJECT-LEVEL UNIVERSALITY',
+    label: '12. SUBJECT-LEVEL UNIVERSALITY',
     title: 'Individual Differences',
+    repLevel: 'DEC',
+    showModelRecap: true,
     visualSrc: './assets/24_subject_caterpillar.png',
     visualCaption: 'Subject random intercepts (caterpillar plot)',
-    text: (<>The <Tooltip term="Caterpillar Plot">caterpillar plot</Tooltip> reveals variation in baseline accuracy, but <Tooltip term="Partial Pooling">partial pooling</Tooltip> pulls extremes toward the mean.</>),
+    figureLegend: 'Point = posterior mean random intercept; bar = 95% CrI. Ordered by magnitude. Dashed line = population mean.',
+    reproduceTag: 'Step 13c, line 1250',
+    text: (<>The <Tooltip term="Caterpillar Plot">caterpillar plot</Tooltip> reveals variation in baseline accuracy across subjects, but <Tooltip term="Partial Pooling">partial pooling</Tooltip> pulls extremes toward the mean. This is individual-level <em>decision</em> variation, not phonological variation.</>),
     formal: (
       <div className="formal-block">
         <div className="formal-header">RANDOM EFFECTS</div>
@@ -434,123 +819,177 @@ const slides = [
   ggplot(aes(y = reorder(subject, Estimate))) +
   geom_pointrange(aes(x = Estimate,
     xmin = Q2.5, xmax = Q97.5))`}</code></pre>
+        <p className="formal-note">Shrinkage is visible: extreme subjects pulled toward population mean, borrowing strength from the full sample.</p>
       </div>
     ),
     footer: { question: 'How much do individuals vary?', summary: 'Caterpillar plot of subject random intercepts with 95% CrIs.', takeHome: 'Individual differences exist but shrinkage pulls extremes toward the mean.' }
   },
 
-  // ── 14. ACCUMULATION ──
+  // ── 16. ACCUMULATION ──
   {
     id: 'accumulation', type: 'split',
-    label: '12. EVIDENCE ACCUMULATION',
+    label: '13. EVIDENCE ACCUMULATION',
     title: 'Effect Emerges Early, Stays Stable',
+    repLevel: 'STAT',
     visualSrc: './assets/37_evidence_accumulation.gif',
     visualCaption: 'Cumulative accuracy as subjects are added (1 \u2192 20)',
-    text: (<>By Subject 10 (halfway), the LR disadvantage is <strong>clearly established and stable</strong> \u2014 not a fragile artifact of a few extreme participants.</>),
+    figureLegend: 'Line = running mean accuracy per contrast; ribbon = running 95% CI. Subjects added one at a time.',
+    reproduceTag: 'Step 15, line 2050',
+    text: (<>By Subject 10 (halfway), the LR disadvantage is <strong>clearly established and stable</strong> &mdash; not a fragile artifact of a few extreme participants.</>),
     formal: (
       <div className="formal-block">
         <div className="formal-header">RELIABILITY CHECK</div>
         <ul className="findings-list">
-          <li>Effect size stabilizes early</li>
+          <li>Effect size stabilizes after ~10 subjects</li>
           <li>Adding more participants does not flip conclusions</li>
-          <li>Variance decreases monotonically</li>
+          <li>Variance decreases monotonically with N</li>
+          <li>Consistent with hierarchical model&rsquo;s partial pooling</li>
         </ul>
       </div>
     ),
     footer: { question: 'Is the effect robust to sample size?', summary: 'Cumulative accuracy stabilizing as participants are added.', takeHome: 'By Subject 10, the LR disadvantage is clearly established and stable.' }
   },
 
-  // ── 15. ROPE ──
+  // ── 17. ROPE ──
   {
     id: 'rope', type: 'split',
-    label: '13. PAIRWISE INFERENCE',
+    label: '14. PAIRWISE INFERENCE',
     title: 'Region of Practical Equivalence',
+    repLevel: 'STAT',
+    showModelRecap: true,
     visualSrc: './assets/33_lr_indeterminacy_zoom.gif',
     visualCaption: 'LR \u2248 H equivalence (ROPE)',
-    text: (<>The <Tooltip term="ROPE">ROPE</Tooltip> test (\u00B10.05 log-odds) shows <strong>LR and H are practically equivalent</strong>, while <strong>LR differs credibly from PB</strong>. <CodeLink label="ROPE" /></>),
-    formal: (
-      <div className="formal-block">
-        <div className="formal-header">R / BRMS</div>
-        <pre><code>{`hypothesis(model, "contrastTR_LR = 0",
+    figureLegend: 'Distribution = posterior of LR\u2013H difference; gray band = ROPE (\u00B10.05 log-odds). Overlap = practical equivalence.',
+    reproduceTag: 'Step 15, line 1560',
+    tiers: {
+      plain: (<p className="tier-text">LR and H produce <strong>practically identical</strong> error rates &mdash; the difference between them is negligibly small. This is the key test: if L1-absent contrasts truly collapse, they should behave like homophones.</p>),
+      technical: (
+        <div>
+          <p className="tier-text"><strong>ROPE test</strong> (&pm;0.05 log-odds): 42% of the LR&ndash;H posterior difference falls within the equivalence region. For LR&ndash;PB: the 95% CrI excludes both zero <em>and</em> the ROPE, confirming a credible difference.</p>
+          <p className="tier-text">This is Bayesian equivalence testing (Kruschke 2018), not just failure to reject.</p>
+        </div>
+      ),
+      full: (
+        <div className="formal-block">
+          <div className="formal-header">ROPE ANALYSIS</div>
+          <pre><code>{`hypothesis(model, "contrastTR_LR = 0",
   rope = c(-0.05, 0.05))
-# LR-H: 42% in ROPE → equivalent`}</code></pre>
-      </div>
-    ),
+# LR-H: 42% in ROPE → equivalent
+# LR-PB: 0% in ROPE → credibly different`}</code></pre>
+          <p className="formal-note">The ROPE approach goes beyond NHST: instead of asking &ldquo;is the difference non-zero?&rdquo; we ask &ldquo;is it negligibly small?&rdquo; This maps directly to the theoretical question about representational equivalence.</p>
+        </div>
+      )
+    },
+    text: (<>The <Tooltip term="ROPE">ROPE</Tooltip> test (&pm;0.05 log-odds) shows <strong>LR and H are practically equivalent</strong>, while <strong>LR differs credibly from PB</strong>. <CodeLink label="ROPE" /></>),
     footer: { question: 'Are LR and H truly equivalent?', summary: 'LR\u2013H difference falls within the ROPE band.', takeHome: 'LR and H are equivalent; LR and PB are credibly different.' }
   },
 
-  // ── 16. VALIDATION ──
+  // ── 18. VALIDATION ──
   {
     id: 'validation', type: 'split',
-    label: '14. BAYESIAN VALIDATION',
+    label: '15. BAYESIAN VALIDATION',
     title: 'Convergence, PPC, Sensitivity, LOO-CV',
+    repLevel: 'STAT',
     visualSrc: './assets/35_mcmc_posterior_sampling.gif',
     visualCaption: 'MCMC sampling from the posterior',
+    figureLegend: 'Animated MCMC traces: well-mixed chains explore the same region, indicating convergence.',
+    reproduceTag: 'Step 13c, line 1079',
+    tiers: {
+      plain: (<p className="tier-text">The model passes all four validation checks &mdash; we can trust these results. No numerical problems, good fit to data, insensitive to prior choice, and competitive with alternative models.</p>),
+      technical: (
+        <div>
+          <p className="tier-text"><strong>MCMC:</strong> R-hat &asymp; 1.00 for all parameters; zero divergent transitions; ESS &gt; 1,000.</p>
+          <p className="tier-text"><strong>PPC:</strong> Simulated data from the posterior overlap with observed data &mdash; the model generates realistic responses.</p>
+          <p className="tier-text"><strong>Sensitivity:</strong> Wider priors (<InlineMath math="\mathcal{N}(0,3.0)" />) yield identical posteriors. Results are data-driven.</p>
+          <p className="tier-text"><strong>LOO-CV:</strong> All three models achieve comparable ELPD. Distinctness model is remarkably competitive with a single predictor.</p>
+        </div>
+      ),
+      full: (
+        <div className="formal-block">
+          <div className="formal-header">MCMC DIAGNOSTICS</div>
+          <p>R-hat near 1.00 for all parameters (good convergence). No divergent transitions. Effective sample size &gt;1,000 for all parameters.</p>
+          <div className="formal-header" style={{ marginTop: '1rem' }}>POSTERIOR PREDICTIVE CHECK</div>
+          <pre><code>{`pp_check(model, ndraws = 100, type = "bars")
+# Observed proportions fall within posterior predictive intervals`}</code></pre>
+          <div className="formal-header" style={{ marginTop: '1rem' }}>SENSITIVITY</div>
+          <p>Wider priors (<InlineMath math="\mathcal{N}(0,3.0)" />) yield <strong>identical posteriors</strong>. Results are data-driven.</p>
+          <div className="formal-header" style={{ marginTop: '1rem' }}>LOO-CV</div>
+          <p>Comprehensive and Linguistic models perform comparably (&Delta;ELPD &lt; 1 SE). Distinctness model achieves competitive fit with a single predictor, supporting the gradient hypothesis.</p>
+        </div>
+      )
+    },
     text: (<>Four validation layers: <Tooltip term="MCMC">MCMC</Tooltip> diagnostics, <Tooltip term="PPC">posterior predictive checks</Tooltip>, prior sensitivity, and <Tooltip term="LOO-CV">LOO cross-validation</Tooltip>. <CodeLink label="Diagnostics" /></>),
-    formal: (
-      <div className="formal-block">
-        <div className="formal-header">MCMC DIAGNOSTICS</div>
-        <p>R-hat near 1.00 for all parameters (good convergence). No divergent transitions. Effective sample size &gt;400.</p>
-        <div className="formal-header" style={{ marginTop: '1rem' }}>SENSITIVITY</div>
-        <p>Wider priors (<InlineMath math="\mathcal{N}(0,3.0)" />) yield <strong>identical posteriors</strong>. Results are data-driven.</p>
-        <div className="formal-header" style={{ marginTop: '1rem' }}>LOO-CV</div>
-        <p>Comprehensive model and Linguistic model perform comparably. Distinctness model achieves competitive fit with a single predictor.</p>
-      </div>
-    ),
     footer: { question: 'Can we trust the model?', summary: 'MCMC diagnostics, PPC, sensitivity, and LOO-CV all pass.', takeHome: 'Good convergence, no divergences, prior-insensitive, competitive LOO-CV.' }
   },
 
-  // ── 17. SPECTRUM (NEW) ──
+  // ── 19. SPECTRUM ──
   {
     id: 'spectrum', type: 'split',
-    label: '15. WORD PAIR SPECTRUM',
+    label: '16. WORD PAIR SPECTRUM',
     title: 'All 258 Pairs, Ranked',
+    repLevel: 'LEX',
+    showModelRecap: true,
+    showContrastLegend: true,
     visualSrc: './assets/proto_A_ranked_dot_chart.png',
     visualCaption: 'All word pairs ranked by posterior error rate',
-    text: (<>Every word pair ranked by its posterior mean error rate. <strong>LR pairs cluster at the top</strong>, but within-category variability reveals item-level effects beyond contrast type.</>),
+    figureLegend: 'Dot = posterior mean error rate per item; color = contrast type. Horizontal position = error magnitude.',
+    reproduceTag: 'Step 15b, line 2350',
+    theoryCallout: 'LR items dominate the high-error region \u2014 L1-absent /l/-/r/ items behave like near-homophones at the item level, confirming lexical-level representational indeterminacy.',
+    text: (<>Every word pair ranked by its <Tooltip term="Posterior">posterior</Tooltip> mean error rate. <strong>LR pairs cluster at the top</strong>, but within-category variability reveals item-level effects beyond contrast type.</>),
     formal: (
       <div className="formal-block">
         <div className="formal-header">ITEM-LEVEL INSIGHTS</div>
         <ul className="findings-list">
-          <li>LR pairs dominate the high-error end</li>
+          <li>LR pairs dominate the high-error end (&gt;15%)</li>
           <li>Some LR pairs approach 100% error (e.g., LAG\u2013CLOTH)</li>
-          <li>F pairs consistently cluster near 0%</li>
-          <li>H pairs show moderate variability</li>
+          <li>F pairs consistently cluster near 0% (baseline confirmed)</li>
+          <li>H pairs show moderate variability (semantic plausibility varies)</li>
         </ul>
       </div>
     ),
-    footer: { question: 'How do individual word pairs rank?', summary: 'All 258 pairs ranked by posterior error, coloured by contrast.', takeHome: 'LR pairs cluster high; within-LR variability suggests item-level effects.' }
+    footer: { question: 'How do individual word pairs rank?', summary: 'All 258 pairs ranked by posterior error, colored by contrast.', takeHome: 'LR pairs cluster high; within-LR variability suggests item-level effects.' }
   },
 
-  // ── 18. HEATMAP (NEW) ──
+  // ── 20. HEATMAP ──
   {
     id: 'heatmap', type: 'split',
-    label: '16. SUBJECT \u00D7 CONTRAST',
+    label: '17. SUBJECT \u00D7 CONTRAST',
     title: 'Who Struggles With What?',
+    repLevel: 'DEC',
+    showModelRecap: true,
     visualSrc: './assets/38_subject_contrast_heatmap.png',
     visualCaption: 'Subject \u00D7 Contrast heatmap',
-    text: (<>The heatmap shows that <strong>LR difficulty is universal</strong> across all 20 subjects. No subgroup drives the effect \u2014 every participant shows elevated LR errors.</>),
+    figureLegend: 'Color = observed error rate per cell; darker = more errors. Rows = subjects; columns = contrast types.',
+    reproduceTag: 'Step 15, line 1470',
+    theoryCallout: 'Universal LR elevation across all 20 subjects confirms the effect is population-level \u2014 not driven by individual learning strategies or task approaches.',
+    text: (<>The heatmap shows that <strong>LR difficulty is universal</strong> across all 20 subjects. No subgroup drives the effect &mdash; every participant shows elevated LR errors. This is task-level (<em>decision</em>) evidence corroborating the lexical-level findings.</>),
     formal: (
       <div className="formal-block">
         <div className="formal-header">INTERACTION PATTERN</div>
         <ul className="findings-list">
-          <li>F column: uniformly light (low errors)</li>
-          <li>LR column: uniformly dark (high errors)</li>
-          <li>H column: moderate-to-dark</li>
-          <li>Rows vary in baseline, but the LR effect persists</li>
+          <li>F column: uniformly light (low errors across all subjects)</li>
+          <li>LR column: uniformly dark (high errors across all subjects)</li>
+          <li>H column: moderate-to-dark (expected for true homophones)</li>
+          <li>Subject rows vary in baseline, but the LR effect persists</li>
         </ul>
       </div>
     ),
     footer: { question: 'Is the LR effect driven by a few subjects?', summary: 'Heatmap of error rates by subject and contrast.', takeHome: 'Every participant shows elevated LR errors \u2014 population-level effect.' }
   },
 
-  // ── 19. PAIRWISE ROPE (NEW) ──
+  // ── 21. PAIRWISE ROPE ──
   {
     id: 'pairwise_rope', type: 'split',
-    label: '17. FULL PAIRWISE COMPARISONS',
+    label: '18. FULL PAIRWISE COMPARISONS',
     title: 'The Complete Inferential Hierarchy',
+    repLevel: 'STAT',
+    showModelRecap: true,
+    showContrastLegend: true,
     visualSrc: './assets/39_pairwise_contrast_rope.png',
     visualCaption: 'All 6 pairwise comparisons with ROPE',
+    figureLegend: 'Distribution = posterior pairwise difference; gray band = ROPE (\u00B10.05). Panels = all 6 contrasts.',
+    reproduceTag: 'Step 15, line 1560',
+    theoryCallout: 'LR \u2248 H equivalence is the critical test: if L1-absent = homophone in the lexicon, representational indeterminacy is confirmed.',
     text: (<>All six pairwise differences tested against the <Tooltip term="ROPE">ROPE</Tooltip>. The hierarchy is confirmed: <strong>LR and H are equivalent; both are much worse than PB and F</strong>.</>),
     formal: (
       <div className="formal-block">
@@ -560,40 +999,41 @@ const slides = [
           <div className="stat-item"><span className="stat-label">LR \u2212 PB</span><span className="stat-val">Credible</span></div>
           <div className="stat-item"><span className="stat-label">PB \u2212 F</span><span className="stat-val">Equivalent</span></div>
         </div>
-        <p className="formal-note">LR and H overlap within ROPE; LR and PB are credibly different. The L1-absent contrast collapses the distinction.</p>
+        <p className="formal-note">The four-level hierarchy collapses to two groups: {'{'}LR, H{'}'} vs. {'{'}PB, F{'}'}. This is the strongest evidence for representational indeterminacy: L1-absent contrasts produce homophone-level confusion.</p>
       </div>
     ),
     footer: { question: 'Which contrasts are distinguishable?', summary: 'All six pairwise posterior differences with ROPE bands.', takeHome: 'LR and H equivalent; both credibly worse than PB and F.' }
   },
 
-  // ── 20. SUMMARY (NEW) ──
+  // ── 22. SUMMARY ──
   {
     id: 'findings_summary', type: 'split',
-    label: '18. SUMMARY OF FINDINGS',
+    label: '19. SUMMARY OF FINDINGS',
     title: 'What We Found',
     visualContent: (
       <div className="summary-grid">
-        <div className="summary-card"><h3>Indeterminacy Confirmed</h3><p>L/R pairs produce <strong>~21% error rates</strong>, matching true homophones (~24%). The L1-absent contrast collapses in L2 storage.</p></div>
+        <div className="summary-card"><h3>Indeterminacy Confirmed</h3><p>L/R pairs produce <strong>~21% error rates</strong>, matching true homophones (~24%). The L1-absent contrast collapses in L2 lexical storage.</p></div>
         <div className="summary-card"><h3>Gradient, Not Binary</h3><p>Phonological distinctness is a <strong>continuous predictor</strong>. Each unit increase monotonically reduces confusion.</p></div>
-        <div className="summary-card"><h3>Universal Across Subjects</h3><p>All 20 participants show elevated LR errors. Hierarchical modeling confirms the effect <strong>generalizes</strong>.</p></div>
-        <div className="summary-card"><h3>Bayesian-Validated</h3><p>Good convergence, zero divergences, prior-insensitive, competitive LOO-CV. Results are robust.</p></div>
+        <div className="summary-card"><h3>Universal Across Subjects</h3><p>All 20 participants show elevated LR errors. Hierarchical modeling confirms the effect <strong>generalizes</strong> beyond this sample.</p></div>
+        <div className="summary-card"><h3>Bayesian-Validated</h3><p>Good convergence, zero divergences, prior-insensitive, competitive LOO-CV. Results are robust to methodological choices.</p></div>
       </div>
     ),
-    text: (<>Four key findings, each supported by multiple converging lines of evidence.</>),
+    text: (<>Four key findings, each supported by multiple converging lines of evidence across phonological, lexical, and statistical levels.</>),
     formal: (
       <div className="formal-block">
-        <div className="formal-header">EVIDENCE SUMMARY</div>
-        <p className="formal-note" style={{ marginBottom: '0.5rem' }}>Key hierarchy: LR and H are similar; both much worse than PB and F:</p>
+        <div className="formal-header">EVIDENCE HIERARCHY</div>
+        <p className="formal-note" style={{ marginBottom: '0.5rem' }}>The four contrast types collapse into two equivalence classes:</p>
         <BlockMath math="\text{LR} \approx \text{H} \gg \text{PB} \approx \text{F}" />
+        <p className="formal-note" style={{ marginTop: '0.75rem' }}>This is consistent with Ota et al.&rsquo;s structural filtering hypothesis and extends it with a gradient (continuous) formalization.</p>
       </div>
     ),
     footer: { question: 'What are the main takeaways?', summary: 'Four-box summary of the core findings.', takeHome: 'L1 phonology shapes L2 storage; the effect is gradient, universal, and validated.' }
   },
 
-  // ── 21. LIMITATIONS (NEW) ──
+  // ── 23. LIMITATIONS ──
   {
     id: 'limitations', type: 'split',
-    label: '19. LIMITATIONS & FUTURE',
+    label: '20. LIMITATIONS & FUTURE',
     title: 'Caveats and Next Steps',
     visualContent: (
       <div className="limitations-content">
@@ -601,35 +1041,35 @@ const slides = [
           <h3 className="limitation-heading">Limitations</h3>
           <ul className="limitations-list">
             <li><strong>Small N (20):</strong> Partial pooling mitigates but does not eliminate sample-size concerns.</li>
-            <li><strong>Single L1:</strong> Only Japanese speakers. Pattern may differ for Korean or Mandarin L1s.</li>
-            <li><strong>Visual-only task:</strong> Eliminates auditory confounds but limits ecological validity.</li>
+            <li><strong>Single L1:</strong> Only Japanese speakers. Pattern may differ for Korean or Mandarin L1s with different phonological inventories.</li>
+            <li><strong>Visual-only task:</strong> Eliminates auditory confounds but limits ecological validity for natural language processing.</li>
             <li><strong>Binary DV:</strong> Response times could add a continuous measure of processing difficulty.</li>
-            <li><strong>Item selection:</strong> Word frequency and neighbourhood density not controlled.</li>
+            <li><strong>Item selection:</strong> Word frequency and neighbourhood density not experimentally controlled.</li>
           </ul>
         </div>
         <div className="limitation-section">
           <h3 className="limitation-heading">Future Directions</h3>
           <ul className="limitations-list future-list">
-            <li>Cross-linguistic replication (Korean, Mandarin, Thai L1)</li>
-            <li>Item-level Bayesian models with lexical predictors</li>
-            <li>Response time analysis alongside accuracy</li>
-            <li>Longitudinal design tracking L2 proficiency</li>
+            <li>Cross-linguistic replication (Korean, Mandarin, Thai L1) to test generality of structural filtering</li>
+            <li>Item-level Bayesian models with lexical predictors (frequency, neighbourhood density)</li>
+            <li>Response time analysis alongside accuracy (drift-diffusion modeling)</li>
+            <li>Longitudinal design tracking how L2 proficiency modulates the effect</li>
           </ul>
         </div>
       </div>
     ),
-    text: (<>Every study has boundaries. Ours are clearly defined and suggest productive extensions.</>),
+    text: (<>Every study has boundaries. Ours are clearly defined and suggest productive extensions that could refine the theory of representational indeterminacy.</>),
     footer: { question: 'What should we be cautious about?', summary: 'Five limitations and four future directions.', takeHome: 'Small N and single L1 are real caveats; hierarchical modelling partly compensates.' }
   },
 
-  // ── 22. REFERENCES (NEW) ──
+  // ── 24. REFERENCES ──
   {
     id: 'references', type: 'split',
-    label: '20. REFERENCES',
+    label: '21. REFERENCES',
     title: 'Key References',
     visualContent: (
       <div className="references-list">
-        <div className="ref-item">B\u00FCrkner, P.-C. (2017). brms: An R Package for Bayesian Multilevel Models Using Stan. <em>Journal of Statistical Software, 80</em>(1), 1\u201328.</div>
+        <div className="ref-item">B&uuml;rkner, P.-C. (2017). brms: An R Package for Bayesian Multilevel Models Using Stan. <em>Journal of Statistical Software, 80</em>(1), 1\u201328.</div>
         <div className="ref-item">Jiao, L., et al. (2024). The role of orthography in nonnative phonological processing. <em>Language Learning</em>.</div>
         <div className="ref-item">Kruschke, J. K. (2018). Rejecting or Accepting Parameter Values in Bayesian Estimation. <em>AMPPS, 1</em>(2), 270\u2013280.</div>
         <div className="ref-item">McElreath, R. (2020). <em>Statistical Rethinking</em> (2nd ed.). CRC Press.</div>
@@ -640,7 +1080,7 @@ const slides = [
     text: (<>Selected references for the theoretical framework, statistical methodology, and implementation.</>),
   },
 
-  // ── 23. CONCLUSION ──
+  // ── 25. CONCLUSION ──
   {
     id: 'conclusion', type: 'hero',
     title: 'Structural. Gradient. Robust.',
@@ -658,6 +1098,7 @@ function App() {
   const [showFormal, setShowFormal] = useState(true);
   const [theme, setTheme] = useState('light');
   const [showOverview, setShowOverview] = useState(false);
+  const [showAppendix, setShowAppendix] = useState(false);
 
   const totalSlides = slides.length;
   const currentSlide = slides[currentIndex];
@@ -686,6 +1127,7 @@ function App() {
     if (index < 0 || index >= totalSlides) return;
     setIsTransitioning(true);
     setShowOverview(false);
+    setShowAppendix(false);
     setTimeout(() => { setCurrentIndex(index); setIsTransitioning(false); }, 300);
   }, [currentIndex, isTransitioning, totalSlides]);
 
@@ -694,16 +1136,21 @@ function App() {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (showOverview && e.key === 'Escape') { setShowOverview(false); return; }
+      if ((showOverview || showAppendix) && e.key === 'Escape') {
+        setShowOverview(false);
+        setShowAppendix(false);
+        return;
+      }
       if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goNext(); }
       if (e.key === 'ArrowLeft') { e.preventDefault(); goPrev(); }
       if (e.key === 'm' || e.key === 'M') setShowFormal(prev => !prev);
       if (e.key === 'o' || e.key === 'O') setShowOverview(prev => !prev);
       if (e.key === 'd' || e.key === 'D') toggleTheme();
+      if (e.key === 'a' || e.key === 'A') setShowAppendix(prev => !prev);
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [goNext, goPrev, showOverview, toggleTheme]);
+  }, [goNext, goPrev, showOverview, showAppendix, toggleTheme]);
 
   return (
     <div className="carousel-app">
@@ -756,18 +1203,39 @@ function App() {
         {currentSlide.type === 'split' && (
           <div className="slide slide-split" data-section={currentSlide.id}>
             <div className="split-left">
+              {/* Contrast Legend Strip (persistent reference) */}
+              {currentSlide.showContrastLegend && <ContrastLegendStrip />}
+
               <div className="visual-frame">
                 {currentSlide.visualSrc ? <img src={currentSlide.visualSrc} className="visual-img" alt="Evidence" /> : currentSlide.visualContent}
                 {currentSlide.visualCaption && <div className="visual-caption">{currentSlide.visualCaption}</div>}
+                {/* Figure legend: explains what visual elements mean */}
+                {currentSlide.figureLegend && <FigureLegend text={currentSlide.figureLegend} />}
+                {/* Reproduce tag: links to R script */}
+                {currentSlide.reproduceTag && <ReproduceTag scriptRef={currentSlide.reproduceTag} />}
               </div>
+
+              {/* Model Recap Box */}
+              {currentSlide.showModelRecap && showFormal && <ModelRecap />}
             </div>
             <div className="split-right">
               <div className="content-header">
-                <span className="slide-label">{currentSlide.label}</span>
+                <div className="content-header-top">
+                  <span className="slide-label">{currentSlide.label}</span>
+                  {currentSlide.repLevel && <RepLevelTag level={currentSlide.repLevel} />}
+                </div>
                 <h2 className="content-title">{currentSlide.title}</h2>
               </div>
               <div className="narrative-text">{currentSlide.text}</div>
-              {showFormal && currentSlide.formal}
+
+              {/* Theory Callout */}
+              {currentSlide.theoryCallout && showFormal && (
+                <TheoryCallout text={currentSlide.theoryCallout} />
+              )}
+
+              {/* Progressive Disclosure OR standard formal block */}
+              {showFormal && currentSlide.tiers && <TieredContent tiers={currentSlide.tiers} />}
+              {showFormal && !currentSlide.tiers && currentSlide.formal}
             </div>
             {currentSlide.footer && <ThreeLineFooter footer={currentSlide.footer} />}
           </div>
@@ -796,14 +1264,21 @@ function App() {
         <button className="bottom-btn math-toggle" onClick={() => setShowFormal(!showFormal)} title="Toggle math (M)">
           {showFormal ? '\u2212 Math' : '+ Math'}
         </button>
+        <button className="bottom-btn appendix-btn" onClick={() => setShowAppendix(true)} title="Technical Appendix (A)">
+          Appendix
+        </button>
+        <div className="bottom-divider"></div>
+        <a className="bottom-btn resource-link" href="https://github.com/sandriatran/qml-2025" target="_blank" rel="noopener noreferrer" title="GitHub Repository">
+          GitHub
+        </a>
+        <a className="bottom-btn resource-link" href="https://doi.org/10.1016/j.cognition.2008.12.007" target="_blank" rel="noopener noreferrer" title="Ota et al. (2009) \u2014 Original paper">
+          Ota 2009
+        </a>
       </nav>
 
       {/* ── Keyboard hint (first slide only) ── */}
       {currentIndex === 0 && (
-        <div className="keyboard-hint">&larr; &rarr; navigate &middot; M math &middot; D theme</div>
-      )}
-      {currentIndex > 0 && (
-        <div className="keyboard-hint">{currentIndex + 1} / {totalSlides}</div>
+        <div className="keyboard-hint">&larr; &rarr; navigate &middot; M math &middot; D theme &middot; A appendix</div>
       )}
 
       {/* ── Overview modal ── */}
@@ -814,6 +1289,11 @@ function App() {
           onSelect={(idx) => { goToSlide(idx); setShowOverview(false); }}
           onClose={() => setShowOverview(false)}
         />
+      )}
+
+      {/* ── Technical Appendix modal ── */}
+      {showAppendix && (
+        <TechnicalAppendix onClose={() => setShowAppendix(false)} />
       )}
     </div>
   );

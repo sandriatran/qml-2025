@@ -46,6 +46,8 @@ const SLIDE_TERMS = {
   'summary': ['False Positive', 'ROPE', 'Posterior', 'Credible Interval'],
   'theory': ['Phoneme', 'L1', 'L2', 'Representational Indeterminacy', 'Phonological Contrast'],
   'design': ['False Positive', 'Homophone', 'Near-Homophone', 'L1-Absent', 'L1-Present'],
+  'coin_flip': ['Bernoulli', 'Log-Odds', 'Random Effects'],
+  'logit_link': ['GLMM', 'Partial Pooling', 'Random Effects', 'Log-Odds', 'brms'],
   'model': ['GLMM', 'Bernoulli', 'Partial Pooling', 'Random Effects', 'brms', 'Log-Odds'],
   'priors': ['Prior', 'Weakly Informative', 'Log-Odds'],
   'forest': ['Posterior', 'Credible Interval', 'Log-Odds', 'Odds Ratio'],
