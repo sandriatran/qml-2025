@@ -45,15 +45,15 @@ const GLOSSARY = {
 };
 
 // ============================================================
-// SECTION MAP (updated for 25 slides with Math Spine)
+// SECTION MAP (updated for 26 slides)
 // ============================================================
 const SECTIONS = [
-  { id: 'intro', label: 'Introduction', startIndex: 0, endIndex: 3 },
-  { id: 'model', label: 'Model', startIndex: 4, endIndex: 7 },
-  { id: 'results', label: 'Results', startIndex: 8, endIndex: 12 },
-  { id: 'evidence', label: 'Evidence', startIndex: 13, endIndex: 17 },
-  { id: 'deep', label: 'Deep Dive', startIndex: 18, endIndex: 20 },
-  { id: 'synthesis', label: 'Synthesis', startIndex: 21, endIndex: 24 },
+  { id: 'intro', label: 'Introduction', startIndex: 0, endIndex: 4 },
+  { id: 'model', label: 'Model', startIndex: 5, endIndex: 8 },
+  { id: 'results', label: 'Results', startIndex: 9, endIndex: 13 },
+  { id: 'evidence', label: 'Evidence', startIndex: 14, endIndex: 18 },
+  { id: 'deep', label: 'Deep Dive', startIndex: 19, endIndex: 21 },
+  { id: 'synthesis', label: 'Synthesis', startIndex: 22, endIndex: 25 },
 ];
 
 // ============================================================
@@ -338,7 +338,7 @@ const OverviewModal = ({ slides, currentIndex, onSelect, onClose }) => (
 );
 
 // ============================================================
-// SLIDE DATA (25 slides)
+// SLIDE DATA (26 slides)
 // ============================================================
 const slides = [
   // ── 1. TITLE ──
@@ -346,6 +346,7 @@ const slides = [
     id: 'title', type: 'hero',
     title: 'The Key to the Rock',
     subtitle: 'A Bayesian re-analysis of representational indeterminacy in non-native word recognition',
+    tagline: 'Structural. Gradient. Robust.',
     meta: 'Final Project \u00B7 Bayesian Re-analysis of Ota, Hartsuiker & Haywood (2009)',
     credit: 'V. Manson & S. Tran',
   },
@@ -369,25 +370,59 @@ const slides = [
     formal: (
       <div className="formal-block">
         <div className="formal-header">CORE HYPOTHESIS</div>
-        <p>When a phonological contrast is absent from a speaker&rsquo;s L1, L2 word pairs differing by that contrast become <strong>near-homophones</strong>.</p>
-        <div className="ipa-chain">
-          <span className="ipa-word">ROCK</span>
-          <span className="ipa-sep">&harr;</span>
-          <span className="ipa-form">/&#x0279;&#x0251;k/</span>
-          <span className="ipa-sep">&asymp;</span>
-          <span className="ipa-form">/l&#x0251;k/</span>
-          <span className="ipa-sep">&harr;</span>
-          <span className="ipa-word">LOCK</span>
-          <span className="ipa-sep">&rarr;</span>
-          <span className="ipa-word">KEY</span>
-        </div>
-        <p className="formal-note">For Japanese speakers, ROCK and LOCK map to the same phonological form and both trigger KEY.</p>
+        <p>When a phonological contrast is absent from a speaker&rsquo;s L1, L2 word pairs differing by that contrast become <strong>near-homophones</strong> &mdash; stored under a single representation.</p>
+        <p className="formal-note">The five findings above converge on this conclusion from phonological, lexical, and statistical levels of analysis.</p>
       </div>
     ),
     footer: { question: 'What are the key findings?', summary: 'Five numbered results from the Bayesian re-analysis.', takeHome: 'L/R confusion matches homophones; the effect is gradient, robust, and generalizable.' }
   },
 
-  // ── 3. THEORY ──
+  // ── 3. PHONOLOGICAL CHAIN ──
+  {
+    id: 'phonological', type: 'split',
+    label: 'THE PHENOMENON',
+    title: 'From Sound to Meaning',
+    repLevel: 'PHON',
+    visualContent: (
+      <div className="phon-chain-visual">
+        <div className="ipa-chain-large">
+          <div className="chain-step">
+            <span className="chain-word">ROCK</span>
+            <span className="chain-ipa">/&#x0279;&#x0251;k/</span>
+          </div>
+          <span className="chain-arrow">&rarr;</span>
+          <div className="chain-merge">
+            <span className="chain-label">L1 Filter</span>
+            <span className="chain-ipa-merged">/&#x0251;k/</span>
+          </div>
+          <span className="chain-arrow">&larr;</span>
+          <div className="chain-step">
+            <span className="chain-word">LOCK</span>
+            <span className="chain-ipa">/l&#x0251;k/</span>
+          </div>
+        </div>
+        <div className="chain-result">
+          <span className="chain-arrow-down">&darr;</span>
+          <div className="chain-step chain-step-key">
+            <span className="chain-word">KEY</span>
+            <span className="chain-note">Semantic associate activated</span>
+          </div>
+        </div>
+        <p className="chain-caption">For Japanese L1 speakers, /l/ and /&#x0279;/ collapse to one phoneme. ROCK and LOCK share a single lexical entry, both triggering KEY.</p>
+      </div>
+    ),
+    text: (<>The /l/&ndash;/r/ distinction does not exist in Japanese phonology. When Japanese speakers store English words, ROCK and LOCK map to the <strong>same phonological form</strong>, creating representational indeterminacy.</>),
+    formal: (
+      <div className="formal-block">
+        <div className="formal-header">STRUCTURAL FILTERING MECHANISM</div>
+        <p>If Japanese lacks /l/&ndash;/r/, then LOCK and ROCK both reduce to <span className="ipa-form">/&#x0251;k/</span> at the phonological level, producing a single lexical entry that activates KEY.</p>
+        <p className="formal-note">This is a claim about <em>storage</em> (lexical representation), not just <em>perception</em> (auditory discrimination). The visual task eliminates auditory confounds entirely.</p>
+      </div>
+    ),
+    footer: { question: 'How does L1 phonology create near-homophones?', summary: 'The /l/-/r/ contrast collapses in Japanese L1 speakers.', takeHome: 'ROCK and LOCK become indistinguishable in storage, both triggering KEY.' }
+  },
+
+  // ── 4. THEORY ──
   {
     id: 'theory', type: 'split',
     label: '1. THEORETICAL FOUNDATIONS',
@@ -492,6 +527,7 @@ const slides = [
         <p className="coin-caption">Each contrast type has a different &ldquo;bias&rdquo; &mdash; the probability of a correct response.</p>
       </div>
     ),
+    theoryCallout: 'Each coin\u2019s bias reflects the L1 phonological filter: L1-absent contrasts (/l/-/r/) produce coins biased toward errors because the contrast collapses in storage.',
     text: (<>Think of each trial as flipping a biased coin. The <em>bias</em> (<InlineMath math="\theta" />) depends on contrast type, subject, and word pair. Our goal: estimate each coin&rsquo;s bias from observed flips.</>),
     formal: (
       <div className="formal-block">
@@ -576,23 +612,31 @@ const slides = [
     figureLegend: 'Traceplot: each line is an MCMC chain; convergence = chains mixing over the same region.',
     reproduceTag: 'Step 13c, line 1079',
     text: (<>We use <code>brms</code> to fit a <Tooltip term="GLMM">GLMM</Tooltip> with Bernoulli likelihood, logit link, and <Tooltip term="Partial Pooling">partial pooling</Tooltip> for subjects and items. Three model variants test different theoretical parameterizations. <CodeLink label="Model" /></>),
-    formal: (
-      <div className="formal-block">
-        <div className="formal-header">MATHEMATICAL FORMULATION</div>
-        <div className="equation-stack">
-          <BlockMath math="y_{ijk} \sim \text{Bernoulli}(\theta_{ijk})" />
-          <BlockMath math="\text{logit}(\theta_{ijk}) = \beta_0 + \beta_j \cdot \mathbf{X}_j + u_i + w_k" />
-          <BlockMath math="u_i \sim \mathcal{N}(0, \sigma_u), \quad w_k \sim \mathcal{N}(0, \sigma_w)" />
+    tiers: {
+      plain: (<p className="tier-text">The model accounts for both <strong>individual differences</strong> (some people are better at the task) and <strong>contrast effects</strong> (some sound pairs are harder). It borrows strength across participants and items to make better estimates.</p>),
+      technical: (
+        <div>
+          <div className="equation-stack">
+            <BlockMath math="y_{ijk} \sim \text{Bernoulli}(\theta_{ijk})" />
+            <BlockMath math="\text{logit}(\theta_{ijk}) = \beta_0 + \beta_j \cdot \mathbf{X}_j + u_i + w_k" />
+            <BlockMath math="u_i \sim \mathcal{N}(0, \sigma_u), \quad w_k \sim \mathcal{N}(0, \sigma_w)" />
+          </div>
+          <p className="tier-text">Random intercepts for subjects and items implement <strong>partial pooling</strong> &mdash; extreme estimates shrink toward the group mean.</p>
         </div>
-        <div className="formal-header" style={{ marginTop: '1rem' }}>R / BRMS SYNTAX</div>
-        <pre><code>{`model <- brm(
-  accuracy ~ contrast_type + (1|subject_id) + (1|item_id),
-  family = bernoulli(link = "logit"),
-  prior = c(prior(normal(0, 1.5), class = Intercept),
-            prior(normal(0, 1.5), class = b)),
-  iter = 2000, chains = 4, seed = 2025)`}</code></pre>
-      </div>
-    ),
+      ),
+      full: (
+        <div className="formal-block">
+          <div className="formal-header">MATHEMATICAL FORMULATION</div>
+          <div className="equation-stack">
+            <BlockMath math="y_{ijk} \sim \text{Bernoulli}(\theta_{ijk})" />
+            <BlockMath math="\text{logit}(\theta_{ijk}) = \beta_0 + \beta_j \cdot \mathbf{X}_j + u_i + w_k" />
+            <BlockMath math="u_i \sim \mathcal{N}(0, \sigma_u), \quad w_k \sim \mathcal{N}(0, \sigma_w)" />
+          </div>
+          <div className="formal-header" style={{ marginTop: '1rem' }}>R / BRMS SYNTAX</div>
+          <pre className="brms-colored"><code><span className="code-fn">brm</span>(<span className="code-formula">accuracy</span> ~ <span className="code-fixed">contrast_type</span> + <span className="code-random-s">(1|subject_id)</span> + <span className="code-random-i">(1|item_id)</span>,{'\n    '}family = <span className="code-fn">bernoulli</span>(link = <span className="code-string">"logit"</span>),{'\n    '}prior = c(prior(<span className="code-fixed">normal(0, 1.5)</span>, class = Intercept),{'\n              '}prior(<span className="code-fixed">normal(0, 1.5)</span>, class = b)),{'\n    '}iter = 2000, chains = 4, seed = 2025)</code></pre>
+        </div>
+      )
+    },
     footer: { question: 'What statistical model captures this?', summary: 'Bernoulli GLMM with partial pooling via brms.', takeHome: 'Hierarchical logistic regression captures binary accuracy with individual variation.' }
   },
 
@@ -610,7 +654,7 @@ const slides = [
       plain: (<p className="tier-text">Weakly informative priors let the data speak &mdash; they rule out absurd parameter values without biasing results in any direction.</p>),
       technical: (
         <div>
-          <p className="tier-text"><InlineMath math="\mathcal{N}(0, 1.5)" /> on log-odds: &pm;2 SDs (&pm;3.0) maps to probabilities of ~5%\u201395%, excluding implausible extremes. <InlineMath math="\text{Exp}(1)" /> for random-effects SDs concentrates density near zero while allowing large variance if the data demand it.</p>
+          <p className="tier-text"><InlineMath math="\mathcal{N}(0, 1.5)" /> on log-odds: &plusmn;2 SDs (&plusmn;3.0) maps to probabilities of ~5%\u201395%, excluding implausible extremes. <InlineMath math="\text{Exp}(1)" /> for random-effects SDs concentrates density near zero while allowing large variance if the data demand it.</p>
           <p className="tier-text">Sensitivity check: wider priors <InlineMath math="\mathcal{N}(0, 3.0)" /> yield <strong>identical posteriors</strong>, confirming results are data-driven.</p>
         </div>
       ),
@@ -618,15 +662,11 @@ const slides = [
         <div className="formal-block">
           <div className="formal-header">PRIOR SPECIFICATION</div>
           <BlockMath math="\beta_0, \beta_j \sim \mathcal{N}(0, 1.5)" />
-          <p>On log-odds scale, &pm;2 SDs (&pm;3.0) map to probabilities of about 5% to 95%. This rules out implausible extremes without biasing direction.</p>
+          <p>On log-odds scale, &plusmn;2 SDs (&plusmn;3.0) map to probabilities of about 5% to 95%. This rules out implausible extremes without biasing direction.</p>
           <BlockMath math="\sigma_u, \sigma_w \sim \text{Exp}(1)" />
           <p className="formal-note">Highest density near zero; allows large variance if data demand. This is the brms default and follows Gelman et al. (2008) recommendations for hierarchical models.</p>
           <div className="formal-header" style={{ marginTop: '1rem' }}>SENSITIVITY ANALYSIS</div>
-          <pre><code>{`model_weak <- brm(
-  accuracy ~ contrast_type + (1|subject_id) + (1|item_id),
-  prior = c(prior(normal(0, 3.0), class = Intercept),
-            prior(normal(0, 3.0), class = b)),
-  ...)  # identical posteriors`}</code></pre>
+          <pre className="brms-colored"><code><span className="code-fn">brm</span>(<span className="code-formula">accuracy</span> ~ <span className="code-fixed">contrast_type</span> + <span className="code-random-s">(1|subject_id)</span> + <span className="code-random-i">(1|item_id)</span>,{'\n    '}prior = c(prior(<span className="code-fixed">normal(0, 3.0)</span>, class = Intercept),{'\n              '}prior(<span className="code-fixed">normal(0, 3.0)</span>, class = b)),{'\n    '}...)  <span className="code-fn"># identical posteriors</span></code></pre>
         </div>
       )
     },
@@ -704,13 +744,24 @@ const slides = [
     reproduceTag: 'Step 12, line 700',
     theoryCallout: 'The key dimension is L1 phonological status, not specific contrast identity \u2014 supporting Ota\u2019s phonological constraint hypothesis over Jiao\u2019s orthographic account.',
     text: (<>When grouped by <strong>phonological status</strong> (Unrelated, L1-Present, L1-Absent, Homophone), L1-Absent clusters with Homophone. The grouping captures the theoretical distinction better than raw contrast labels.</>),
-    formal: (
-      <div className="formal-block">
-        <div className="formal-header">THEORETICAL ORDERING</div>
-        <BlockMath math="\beta_{\text{Unrelated}} > \beta_{\text{L1-present}} \gg \beta_{\text{L1-absent}} \approx \beta_{\text{Homophone}}" />
-        <p className="formal-note">The relevant dimension is not the <em>specific</em> contrast but <strong>whether it exists in L1</strong>. This is evidence about phonological representations constraining lexical activation.</p>
-      </div>
-    ),
+    tiers: {
+      plain: (<p className="tier-text">The key is <strong>whether the contrast exists in L1</strong>, not which specific sounds are involved. L1-absent contrasts behave like homophones because both lack a distinction in the speaker&rsquo;s phonological inventory.</p>),
+      technical: (
+        <div>
+          <BlockMath math="\beta_{\text{Unrelated}} > \beta_{\text{L1-present}} \gg \beta_{\text{L1-absent}} \approx \beta_{\text{Homophone}}" />
+          <p className="tier-text">The ordering collapses to two groups: <span style={{ color: 'var(--color-lavender)' }}>{'{'}F, PB{'}'}</span> vs. <span style={{ color: 'var(--color-hot-pink)' }}>{'{'}LR, H{'}'}</span>. The boundary aligns with L1 phonological status.</p>
+        </div>
+      ),
+      full: (
+        <div className="formal-block">
+          <div className="formal-header">THEORETICAL ORDERING</div>
+          <BlockMath math="\beta_{\text{Unrelated}} > \beta_{\text{L1-present}} \gg \beta_{\text{L1-absent}} \approx \beta_{\text{Homophone}}" />
+          <p>The relevant dimension is not the <em>specific</em> contrast but <strong>whether it exists in L1</strong>.</p>
+          <div className="formal-header" style={{ marginTop: '1rem' }}>PHONOLOGICAL STATUS THEORY</div>
+          <p className="formal-note">This is evidence about phonological representations constraining lexical activation. The Linguistic model recodes the four contrasts by L1 status, achieving comparable LOO-CV fit &mdash; theoretical parsimony without predictive loss.</p>
+        </div>
+      )
+    },
     footer: { question: 'Does phonological status explain the pattern?', summary: 'Interference strength grouped by L1 phonological category.', takeHome: 'The key dimension is whether the contrast exists in L1, not which contrast.' }
   },
 
@@ -727,19 +778,25 @@ const slides = [
     reproduceTag: 'Step 12, line 760',
     theoryCallout: 'Gradient distinctness means L1 phonology constrains L2 lexicon continuously, not categorically \u2014 a refinement of the original binary indeterminacy hypothesis.',
     text: (<>Each unit increase in <strong>phonological distinctness</strong> (based on L1 inventory) monotonically reduces L2 confusion. The mechanism is <strong>gradient</strong>, not categorical.</>),
-    formal: (
-      <div className="formal-block">
-        <div className="formal-header">DISTINCTNESS MODEL</div>
-        <BlockMath math="\eta_{ijk} = \beta_0 + \beta_d \cdot d_j + u_i + w_k" />
-        <p>where <InlineMath math="d_j \in \{0.0, 0.3, 0.8, 1.0\}" /> maps each contrast to its distinctness score</p>
-        <div className="formal-header" style={{ marginTop: '1rem' }}>R / BRMS</div>
-        <pre><code>{`model_dist <- brm(
-  accuracy ~ phon_distinctness_scaled +
-    (1|subject_id) + (1|item_id),
-  family = bernoulli(link = "logit"))`}</code></pre>
-        <p className="formal-note">Competitive LOO-CV fit with a <em>single predictor</em> &mdash; parsimony favors this parameterization.</p>
-      </div>
-    ),
+    tiers: {
+      plain: (<p className="tier-text">Think of phonological distinctness as a dial, not a switch. As sounds become more similar in the speaker&rsquo;s L1, confusion <strong>gradually increases</strong> &mdash; it&rsquo;s not all-or-nothing.</p>),
+      technical: (
+        <div>
+          <BlockMath math="\eta_{ijk} = \beta_0 + \beta_d \cdot d_j + u_i + w_k" />
+          <p className="tier-text">where <InlineMath math="d_j \in \{0.0, 0.3, 0.8, 1.0\}" /> maps each contrast to its distinctness score. A <strong>single continuous predictor</strong> captures the full contrast hierarchy.</p>
+        </div>
+      ),
+      full: (
+        <div className="formal-block">
+          <div className="formal-header">DISTINCTNESS MODEL</div>
+          <BlockMath math="\eta_{ijk} = \beta_0 + \beta_d \cdot d_j + u_i + w_k" />
+          <p>where <InlineMath math="d_j \in \{0.0, 0.3, 0.8, 1.0\}" /> maps each contrast to its distinctness score</p>
+          <div className="formal-header" style={{ marginTop: '1rem' }}>R / BRMS</div>
+          <pre className="brms-colored"><code><span className="code-fn">brm</span>(<span className="code-formula">accuracy</span> ~ <span className="code-fixed">phon_distinctness_scaled</span> +{'\n    '}<span className="code-random-s">(1|subject_id)</span> + <span className="code-random-i">(1|item_id)</span>,{'\n    '}family = <span className="code-fn">bernoulli</span>(link = <span className="code-string">"logit"</span>))</code></pre>
+          <p className="formal-note">Competitive LOO-CV fit with a <em>single predictor</em> &mdash; parsimony favors this parameterization. &Delta;ELPD = &minus;3.3 (within 1 SE of the full model).</p>
+        </div>
+      )
+    },
     footer: { question: 'Is the relationship categorical or gradient?', summary: 'Distinctness scores predict error probabilities monotonically.', takeHome: 'Phonological distinctness is a continuous predictor, not binary.' }
   },
 
@@ -811,17 +868,22 @@ const slides = [
     figureLegend: 'Point = posterior mean random intercept; bar = 95% CrI. Ordered by magnitude. Dashed line = population mean.',
     reproduceTag: 'Step 13c, line 1250',
     text: (<>The <Tooltip term="Caterpillar Plot">caterpillar plot</Tooltip> reveals variation in baseline accuracy across subjects, but <Tooltip term="Partial Pooling">partial pooling</Tooltip> pulls extremes toward the mean. This is individual-level <em>decision</em> variation, not phonological variation.</>),
-    formal: (
-      <div className="formal-block">
-        <div className="formal-header">RANDOM EFFECTS</div>
-        <pre><code>{`ranef(model)$subject_id |>
-  as_tibble(rownames = "subject") |>
-  ggplot(aes(y = reorder(subject, Estimate))) +
-  geom_pointrange(aes(x = Estimate,
-    xmin = Q2.5, xmax = Q97.5))`}</code></pre>
-        <p className="formal-note">Shrinkage is visible: extreme subjects pulled toward population mean, borrowing strength from the full sample.</p>
-      </div>
-    ),
+    tiers: {
+      plain: (<p className="tier-text">Individuals vary in overall accuracy, but the <strong>LR effect is universal</strong> &mdash; every participant shows the same pattern. The model accounts for individual differences without letting them mask the contrast effect.</p>),
+      technical: (
+        <div>
+          <p className="tier-text"><strong>Random intercepts</strong> (<InlineMath math="u_i \sim \mathcal{N}(0, \sigma_u)" />) capture subject-level variation in baseline accuracy. Partial pooling shrinks extreme estimates toward the population mean, reducing overfitting with N=20.</p>
+          <p className="tier-text">Shrinkage is visible in the caterpillar plot: subjects near the extremes are pulled inward.</p>
+        </div>
+      ),
+      full: (
+        <div className="formal-block">
+          <div className="formal-header">RANDOM EFFECTS</div>
+          <pre className="brms-colored"><code><span className="code-fn">ranef</span>(model)$subject_id |&gt;{'\n  '}<span className="code-fn">as_tibble</span>(rownames = <span className="code-string">"subject"</span>) |&gt;{'\n  '}<span className="code-fn">ggplot</span>(<span className="code-fn">aes</span>(y = <span className="code-fn">reorder</span>(subject, Estimate))) +{'\n  '}<span className="code-fn">geom_pointrange</span>(<span className="code-fn">aes</span>(x = Estimate,{'\n    '}xmin = Q2.5, xmax = Q97.5))</code></pre>
+          <p className="formal-note">Shrinkage is visible: extreme subjects pulled toward population mean, borrowing strength from the full sample.</p>
+        </div>
+      )
+    },
     footer: { question: 'How much do individuals vary?', summary: 'Caterpillar plot of subject random intercepts with 95% CrIs.', takeHome: 'Individual differences exist but shrinkage pulls extremes toward the mean.' }
   },
 
@@ -831,6 +893,7 @@ const slides = [
     label: '13. EVIDENCE ACCUMULATION',
     title: 'Effect Emerges Early, Stays Stable',
     repLevel: 'STAT',
+    theoryCallout: 'The early stabilization suggests L1 phonological filtering is a population-level structural property, not an individual learning strategy.',
     visualSrc: './assets/37_evidence_accumulation.gif',
     visualCaption: 'Cumulative accuracy as subjects are added (1 \u2192 20)',
     figureLegend: 'Line = running mean accuracy per contrast; ribbon = running 95% CI. Subjects added one at a time.',
@@ -865,7 +928,7 @@ const slides = [
       plain: (<p className="tier-text">LR and H produce <strong>practically identical</strong> error rates &mdash; the difference between them is negligibly small. This is the key test: if L1-absent contrasts truly collapse, they should behave like homophones.</p>),
       technical: (
         <div>
-          <p className="tier-text"><strong>ROPE test</strong> (&pm;0.05 log-odds): 42% of the LR&ndash;H posterior difference falls within the equivalence region. For LR&ndash;PB: the 95% CrI excludes both zero <em>and</em> the ROPE, confirming a credible difference.</p>
+          <p className="tier-text"><strong>ROPE test</strong> (&plusmn;0.05 log-odds): 42% of the LR&ndash;H posterior difference falls within the equivalence region. For LR&ndash;PB: the 95% CrI excludes both zero <em>and</em> the ROPE, confirming a credible difference.</p>
           <p className="tier-text">This is Bayesian equivalence testing (Kruschke 2018), not just failure to reject.</p>
         </div>
       ),
@@ -880,7 +943,7 @@ const slides = [
         </div>
       )
     },
-    text: (<>The <Tooltip term="ROPE">ROPE</Tooltip> test (&pm;0.05 log-odds) shows <strong>LR and H are practically equivalent</strong>, while <strong>LR differs credibly from PB</strong>. <CodeLink label="ROPE" /></>),
+    text: (<>The <Tooltip term="ROPE">ROPE</Tooltip> test (&plusmn;0.05 log-odds) shows <strong>LR and H are practically equivalent</strong>, while <strong>LR differs credibly from PB</strong>. <CodeLink label="ROPE" /></>),
     footer: { question: 'Are LR and H truly equivalent?', summary: 'LR\u2013H difference falls within the ROPE band.', takeHome: 'LR and H are equivalent; LR and PB are credibly different.' }
   },
 
@@ -890,6 +953,7 @@ const slides = [
     label: '15. BAYESIAN VALIDATION',
     title: 'Convergence, PPC, Sensitivity, LOO-CV',
     repLevel: 'STAT',
+    theoryCallout: 'Validation confirms that the phonological constraint hypothesis is not an artifact of modeling choices.',
     visualSrc: './assets/35_mcmc_posterior_sampling.gif',
     visualCaption: 'MCMC sampling from the posterior',
     figureLegend: 'Animated MCMC traces: well-mixed chains explore the same region, indicating convergence.',
@@ -1050,7 +1114,7 @@ const slides = [
         <div className="limitation-section">
           <h3 className="limitation-heading">Future Directions</h3>
           <ul className="limitations-list future-list">
-            <li>Cross-linguistic replication (Korean, Mandarin, Thai L1) to test generality of structural filtering</li>
+            <li>Cross-linguistic replication (Korean, Mandarin, Thai, Vietnamese L1) to test generality of structural filtering</li>
             <li>Item-level Bayesian models with lexical predictors (frequency, neighbourhood density)</li>
             <li>Response time analysis alongside accuracy (drift-diffusion modeling)</li>
             <li>Longitudinal design tracking how L2 proficiency modulates the effect</li>
@@ -1080,12 +1144,52 @@ const slides = [
     text: (<>Selected references for the theoretical framework, statistical methodology, and implementation.</>),
   },
 
-  // ── 25. CONCLUSION ──
+  // ── 26. CONCLUSION ──
   {
-    id: 'conclusion', type: 'hero',
-    title: 'Structural. Gradient. Robust.',
-    subtitle: 'The L1 phonological inventory shapes the L2 lexicon. The \u201CKey\u201D to the \u201CRock\u201D is indeed the \u201CLock.\u201D',
-    credit: 'R + brms + ggdist + tidyverse \u00B7 React + KaTeX \u00B7 github.com/sandriatran/qml-2025',
+    id: 'conclusion', type: 'split',
+    label: 'SYNTHESIS',
+    title: 'Synthesis & Future Directions',
+    visualContent: (
+      <div className="synthesis-diagram">
+        <div className="synthesis-chain">
+          <div className="synthesis-node synthesis-node-phon">
+            <span className="synthesis-node-label">Phonology</span>
+            <span className="synthesis-node-text">/l/&ndash;/r/ absent in L1</span>
+          </div>
+          <span className="synthesis-arrow">&darr;</span>
+          <div className="synthesis-node synthesis-node-lex">
+            <span className="synthesis-node-label">Lexicon</span>
+            <span className="synthesis-node-text">ROCK &asymp; LOCK in storage</span>
+          </div>
+          <span className="synthesis-arrow">&darr;</span>
+          <div className="synthesis-node synthesis-node-dec">
+            <span className="synthesis-node-label">Decision</span>
+            <span className="synthesis-node-text">~21% false positives</span>
+          </div>
+          <span className="synthesis-arrow">&darr;</span>
+          <div className="synthesis-node synthesis-node-stat">
+            <span className="synthesis-node-label">Statistics</span>
+            <span className="synthesis-node-text">LR &asymp; H &#x226B; PB &asymp; F</span>
+          </div>
+        </div>
+        <p className="synthesis-caption">The evidence chain: from L1 phonology to Bayesian inference, every level converges on representational indeterminacy.</p>
+      </div>
+    ),
+    text: (<>Four levels of evidence &mdash; phonological, lexical, decision, and statistical &mdash; converge on the same conclusion: <strong>L1 phonology structurally constrains L2 lexical storage</strong>. The &ldquo;Key&rdquo; to the &ldquo;Rock&rdquo; is indeed the &ldquo;Lock.&rdquo;</>),
+    formal: (
+      <div className="formal-block">
+        <div className="formal-header">FUTURE DIRECTIONS</div>
+        <ul className="findings-list">
+          <li><strong>Vietnamese L1:</strong> Tonal contrasts (e.g., m&aacute; vs. m&agrave;) as a new test case &mdash; does representational indeterminacy extend to suprasegmental features?</li>
+          <li><strong>Cross-linguistic replication:</strong> Korean, Mandarin, Thai, Vietnamese L1 speakers with different phonological gaps</li>
+          <li><strong>Item-level models:</strong> Bayesian random slopes for word frequency and neighbourhood density</li>
+          <li><strong>Response time:</strong> Drift-diffusion modeling for a continuous processing measure</li>
+          <li><strong>Longitudinal design:</strong> How does L2 proficiency modulate the phonological filter over time?</li>
+        </ul>
+        <p className="formal-note">The gradient distinctness framework generalizes naturally to any L1&ndash;L2 contrast mismatch, making it a strong candidate for cross-linguistic extension.</p>
+      </div>
+    ),
+    footer: { question: 'What does this all mean?', summary: 'Evidence from phonology to statistics converges on structural filtering.', takeHome: 'L1 phonology shapes L2 storage; the effect is structural, gradient, and robust.' }
   }
 ];
 
@@ -1185,6 +1289,7 @@ function App() {
               <h1 className="hero-title">{currentSlide.title}</h1>
               <div className="hero-divider"></div>
               <p className="hero-subtitle">{currentSlide.subtitle}</p>
+              {currentSlide.tagline && <p className="hero-tagline">{currentSlide.tagline}</p>}
               {currentSlide.id === 'title' && (
                 <>
                   <button className="hero-cta" onClick={() => goToSlide(1)}>See Key Findings &rarr;</button>

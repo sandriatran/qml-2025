@@ -44,6 +44,7 @@ const GLOSSARY = {
 const SLIDE_TERMS = {
   'title': [],
   'summary': ['False Positive', 'ROPE', 'Posterior', 'Credible Interval'],
+  'phonological': ['Phoneme', 'L1', 'L2', 'Representational Indeterminacy', 'Near-Homophone'],
   'theory': ['Phoneme', 'L1', 'L2', 'Representational Indeterminacy', 'Phonological Contrast'],
   'design': ['False Positive', 'Homophone', 'Near-Homophone', 'L1-Absent', 'L1-Present'],
   'coin_flip': ['Bernoulli', 'Log-Odds', 'Random Effects'],

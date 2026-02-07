@@ -46,6 +46,10 @@
   pointer-events: none;
 }
 
+[data-theme="dark"] .noise-overlay {
+  opacity: 0.015;
+}
+
 /* =========================================
    CAROUSEL CONTAINER
    ========================================= */
@@ -2097,4 +2101,197 @@
 .resource-link:hover {
   color: var(--color-indigo);
   border-color: var(--color-indigo);
+}
+
+/* =========================================
+   PHONOLOGICAL CHAIN VISUAL
+   ========================================= */
+.phon-chain-visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.ipa-chain-large {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.chain-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  background: var(--bg-elevated);
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.chain-word {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--text);
+  letter-spacing: 0.05em;
+}
+
+.chain-ipa {
+  font-family: var(--font-ipa);
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.chain-arrow {
+  font-size: 1.5rem;
+  color: var(--color-hot-pink);
+  font-weight: 300;
+}
+
+.chain-merge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(230, 87, 199, 0.08);
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--color-hot-pink);
+  box-shadow: 0 4px 15px rgba(230, 87, 199, 0.15);
+}
+
+.chain-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-hot-pink);
+}
+
+.chain-ipa-merged {
+  font-family: var(--font-ipa);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--color-hot-pink);
+}
+
+.chain-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.chain-arrow-down {
+  font-size: 1.5rem;
+  color: var(--color-indigo);
+}
+
+.chain-step-key {
+  border-color: var(--color-indigo);
+  background: rgba(108, 101, 252, 0.06);
+}
+
+.chain-note {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.chain-caption {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
+  max-width: 45ch;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+/* =========================================
+   HERO TAGLINE
+   ========================================= */
+.hero-tagline {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-hot-pink);
+  margin-top: 0.5rem;
+}
+
+/* =========================================
+   SYNTHESIS DIAGRAM (Conclusion)
+   ========================================= */
+.synthesis-diagram {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.synthesis-chain {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.synthesis-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.8rem 2rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  min-width: 200px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.synthesis-node-label {
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.synthesis-node-text {
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.synthesis-node-phon { border-color: var(--color-hot-pink); }
+.synthesis-node-phon .synthesis-node-label { color: var(--color-hot-pink); }
+
+.synthesis-node-lex { border-color: var(--color-indigo); }
+.synthesis-node-lex .synthesis-node-label { color: var(--color-indigo); }
+
+.synthesis-node-dec { border-color: var(--color-purple); }
+.synthesis-node-dec .synthesis-node-label { color: var(--color-purple); }
+
+.synthesis-node-stat { border-color: var(--text-muted); }
+.synthesis-node-stat .synthesis-node-label { color: var(--text-muted); }
+
+.synthesis-arrow {
+  font-size: 1.2rem;
+  color: var(--text-caption);
+  line-height: 1;
+}
+
+.synthesis-caption {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
+  max-width: 45ch;
+  line-height: 1.5;
+  font-style: italic;
 }

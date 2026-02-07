@@ -65,8 +65,8 @@
   --bg-alt: #13141f;
   --bg-surface: rgba(18, 19, 30, 0.85);
   --bg-elevated: #1a1b2e;
-  --text: #eeeef8;
-  --text-secondary: #a0a0b8;
+  --text: #f2f2ff;
+  --text-secondary: #b0b0c8;
   --text-muted: #606078;
   --text-caption: #484860;
   --border: rgba(255, 255, 255, 0.08);
@@ -74,7 +74,7 @@
   --shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
 
-  --glass-bg: rgba(18, 19, 30, 0.6);
+  --glass-bg: rgba(18, 19, 30, 0.7);
   --glass-border: rgba(108, 101, 252, 0.25);
 
   /* Lighten accents for dark backgrounds */
@@ -84,9 +84,9 @@
   --color-lavender: #b8b2f0;
 
   --aurora-a: #0a0b14;
-  --aurora-b: #0f1028;
-  --aurora-c: #1a1538;
-  --aurora-d: #1f1028;
+  --aurora-b: #0d0e1e;
+  --aurora-c: #13102a;
+  --aurora-d: #160e22;
   --aurora-e: #0a0b14;
 }
 
