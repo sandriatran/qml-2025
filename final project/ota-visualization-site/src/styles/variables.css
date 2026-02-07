@@ -1,0 +1,113 @@
+/* =========================================
+   Design System: "Opulent Precision"
+   Light / Dark theme via CSS variables
+   ========================================= */
+
+:root {
+  /* ── Palette (invariant accent colors for data encoding) ── */
+  --palette-indigo: #6c65fc;
+  --palette-hot-pink: #e657c7;
+  --palette-purple: #c674ff;
+  --palette-lavender: #a7a0e6;
+  --palette-light-blue: #d8e6ff;
+  --palette-light-pink: #ffd6ff;
+  --palette-pink: #f79cee;
+
+  /* ── Theme-dependent semantic tokens (Light default) ── */
+  --bg: #ffffff;
+  --bg-alt: #f4f4fa;
+  --bg-surface: rgba(255, 255, 255, 0.65);
+  --bg-elevated: #ffffff;
+  --text: #000000;
+  --text-secondary: #555555;
+  --text-muted: #888888;
+  --text-caption: #aaaaaa;
+  --border: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.15);
+  --shadow: 0 30px 60px rgba(0, 0, 0, 0.08);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  /* Glass materials */
+  --glass-bg: rgba(255, 255, 255, 0.4);
+  --glass-border: rgba(167, 160, 230, 0.25);
+  --glass-blur: 20px;
+
+  /* Active accent aliases (may shift in dark mode) */
+  --color-indigo: var(--palette-indigo);
+  --color-hot-pink: var(--palette-hot-pink);
+  --color-purple: var(--palette-purple);
+  --color-lavender: var(--palette-lavender);
+
+  /* Aurora background */
+  --aurora-a: #ffffff;
+  --aurora-b: #d8e6ff;
+  --aurora-c: #a7a0e6;
+  --aurora-d: #ffd6ff;
+  --aurora-e: #fdfcf5;
+
+  /* ── Typography ── */
+  --font-stack: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-ipa: 'Noto Sans', 'DejaVu Sans', 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  --tracking-wide: 0.15em;
+
+  /* ── Spacing ── */
+  --panel-gap: 8rem;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-pill: 100px;
+}
+
+/* ── Dark Theme ── */
+[data-theme="dark"] {
+  --bg: #0a0b14;
+  --bg-alt: #13141f;
+  --bg-surface: rgba(18, 19, 30, 0.85);
+  --bg-elevated: #1a1b2e;
+  --text: #eeeef8;
+  --text-secondary: #a0a0b8;
+  --text-muted: #606078;
+  --text-caption: #484860;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.15);
+  --shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+  --glass-bg: rgba(18, 19, 30, 0.6);
+  --glass-border: rgba(108, 101, 252, 0.25);
+
+  /* Lighten accents for dark backgrounds */
+  --color-indigo: #8480ff;
+  --color-hot-pink: #f06dd8;
+  --color-purple: #d18aff;
+  --color-lavender: #b8b2f0;
+
+  --aurora-a: #0a0b14;
+  --aurora-b: #0f1028;
+  --aurora-c: #1a1538;
+  --aurora-d: #1f1028;
+  --aurora-e: #0a0b14;
+}
+
+/* ── Base reset ── */
+body {
+  margin: 0;
+  font-family: var(--font-stack);
+  background-color: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+h1, h2, h3 {
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+/* ── Utilities ── */
+.text-indigo { color: var(--color-indigo); }
+.text-pink { color: var(--color-hot-pink); }
+.text-purple { color: var(--color-purple); }

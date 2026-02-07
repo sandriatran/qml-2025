@@ -1,0 +1,52 @@
+=== LOO-CV MODEL COMPARISON ===
+
+                   elpd_diff se_diff
+model_all            0.0       0.0  
+model_linguistic    -0.1       0.1  
+model_distinctness -10.1       4.8  
+
+
+Comprehensive model LOO:
+
+Computed from 4000 by 2368 log-likelihood matrix.
+
+         Estimate   SE
+elpd_loo   -603.4 27.5
+p_loo        40.1  2.5
+looic      1206.9 55.0
+------
+MCSE of elpd_loo is 0.1.
+MCSE and ESS estimates assume MCMC draws (r_eff in [0.5, 2.0]).
+
+All Pareto k estimates are good (k < 0.7).
+See help('pareto-k-diagnostic') for details.
+
+Linguistic model LOO:
+
+Computed from 4000 by 2368 log-likelihood matrix.
+
+         Estimate   SE
+elpd_loo   -603.5 27.5
+p_loo        40.2  2.5
+looic      1207.1 55.1
+------
+MCSE of elpd_loo is 0.1.
+MCSE and ESS estimates assume MCMC draws (r_eff in [0.5, 2.0]).
+
+All Pareto k estimates are good (k < 0.7).
+See help('pareto-k-diagnostic') for details.
+
+Distinctness model LOO:
+
+Computed from 4000 by 2368 log-likelihood matrix.
+
+         Estimate   SE
+elpd_loo   -613.6 27.8
+p_loo        38.8  2.3
+looic      1227.1 55.5
+------
+MCSE of elpd_loo is 0.1.
+MCSE and ESS estimates assume MCMC draws (r_eff in [0.6, 2.0]).
+
+All Pareto k estimates are good (k < 0.7).
+See help('pareto-k-diagnostic') for details.

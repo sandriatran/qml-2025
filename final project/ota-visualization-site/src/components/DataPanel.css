@@ -1,0 +1,166 @@
+.data-panel {
+    /* CRYSTAL GLASS EFFECT */
+    background: var(--glass-surface);
+    backdrop-filter: blur(25px) saturate(140%);
+    -webkit-backdrop-filter: blur(25px) saturate(140%);
+
+    /* Dimensions & Layout */
+    min-width: 85vw;
+    /* Wider for academic content */
+    height: 80vh;
+    padding: 64px;
+    display: flex;
+    flex-direction: column;
+
+    border: 1px solid var(--glass-border);
+    border-top: 1px solid var(--glass-highlight);
+    border-left: 1px solid var(--glass-highlight);
+    border-radius: 4px;
+
+    box-shadow:
+        0 20px 50px -10px rgba(0, 0, 0, 0.1),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.data-panel:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+/* Header */
+.panel-header {
+    margin-bottom: 40px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding-bottom: 24px;
+}
+
+.panel-label {
+    font-family: var(--font-stack);
+    font-size: 0.8rem;
+    letter-spacing: 0.2rem;
+    text-transform: uppercase;
+    color: var(--color-hot-pink);
+    /* Highlighting the Part Number */
+    font-weight: 700;
+    opacity: 0.9;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.panel-title {
+    font-size: 3rem;
+    font-weight: 300;
+    line-height: 1.1;
+    color: #000;
+    letter-spacing: -0.02em;
+}
+
+/* Body Layout */
+.panel-body {
+    display: flex;
+    flex: 1;
+    gap: 64px;
+    overflow: hidden;
+}
+
+.layout-split .panel-text {
+    flex: 0 0 40%;
+    /* Wider text area for academic explanation */
+    padding-right: 24px;
+    padding-top: 0;
+    overflow-y: auto;
+    /* Allow internal scroll for dense academic text */
+    padding-bottom: 20px;
+    /* Space for scroll */
+}
+
+/* Custom Scrollbar for Text Panel */
+.panel-text::-webkit-scrollbar {
+    width: 4px;
+}
+
+.panel-text::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.panel-text::-webkit-scrollbar-thumb {
+    background: var(--color-lavender);
+    border-radius: 4px;
+}
+
+
+.layout-split .panel-visual {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 2px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    padding: 32px;
+}
+
+/* Text Styling */
+.panel-text p {
+    font-size: 1.1rem;
+    /* Slightly smaller for density */
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+    color: #111;
+    font-weight: 300;
+}
+
+.panel-text strong {
+    font-weight: 600;
+    color: var(--color-indigo);
+}
+
+.panel-text sup {
+    font-size: 0.7em;
+    vertical-align: super;
+}
+
+/* Code Snippet Styles */
+.code-block {
+    margin-top: 2rem;
+    background: #fdfcf5;
+    /* Pearl */
+    border: 1px solid var(--color-grid);
+    border-radius: 4px;
+    padding: 0;
+    font-family: 'JetBrains Mono', monospace;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    position: relative;
+}
+
+.code-header {
+    background: #f0f0f0;
+    color: #666;
+    font-size: 0.7rem;
+    padding: 4px 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.code-block pre {
+    margin: 0;
+    padding: 16px;
+    overflow-x: auto;
+}
+
+.code-block code {
+    font-size: 0.85rem;
+    color: #333;
+    line-height: 1.5;
+}
+
+/* Visual Styling */
+.visual-asset {
+    max-width: 100%;
+    max-height: 90%;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.05));
+}

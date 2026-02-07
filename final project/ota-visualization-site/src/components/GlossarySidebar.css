@@ -1,0 +1,117 @@
+.glossary-sidebar {
+  position: fixed;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  z-index: 100;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: flex-start;
+}
+
+.glossary-toggle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50% 0 0 50%;
+  border: 1px solid var(--glass-border);
+  border-right: none;
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  color: var(--color-indigo);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.glossary-toggle:hover {
+  background: var(--color-indigo);
+  color: white;
+}
+
+.glossary-toggle-icon {
+  line-height: 1;
+}
+
+.glossary-panel {
+  width: 280px;
+  max-height: 60vh;
+  overflow-y: auto;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-right: none;
+  border-radius: 8px 0 0 8px;
+  padding: 1rem;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.08);
+}
+
+.glossary-panel::-webkit-scrollbar {
+  width: 4px;
+}
+
+.glossary-panel::-webkit-scrollbar-thumb {
+  background: rgba(108, 101, 252, 0.3);
+  border-radius: 2px;
+}
+
+.glossary-panel-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-indigo);
+  margin: 0 0 0.75rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--glass-border);
+}
+
+.glossary-definitions {
+  margin: 0;
+  padding: 0;
+}
+
+.glossary-entry {
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.glossary-entry:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.glossary-entry dt {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.glossary-entry dd {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.glossary-empty {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0;
+}
+
+/* Hide on mobile */
+@media (max-width: 768px) {
+  .glossary-sidebar {
+    display: none;
+  }
+}

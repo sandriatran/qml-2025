@@ -1,0 +1,109 @@
+.word-pair-fader-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.fading-word-pair {
+    position: absolute;
+    font-family: var(--font-stack);
+    letter-spacing: 0.05em;
+    opacity: 0;
+    animation: floatFade 7s ease-in-out forwards;
+    pointer-events: auto;
+    cursor: help;
+    transition: transform 0.3s ease;
+    white-space: nowrap;
+}
+
+.fading-word-pair:hover {
+    transform: scale(1.1);
+    z-index: 1000;
+    animation-play-state: paused;
+}
+
+/* TOOLTIP STYLING */
+.fader-tooltip {
+    position: absolute;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: var(--bg-elevated);
+    color: var(--text);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    font-size: 0.75rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid var(--border);
+    min-width: 150px;
+    text-align: center;
+    z-index: 1001;
+}
+
+.fader-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--bg-elevated) transparent transparent transparent;
+}
+
+.fading-word-pair:hover .fader-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+.tooltip-cat {
+    font-weight: 700;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+}
+
+.tooltip-stat {
+    font-weight: 700;
+    color: var(--text);
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+}
+
+.tooltip-desc {
+    font-style: italic;
+    color: var(--text-muted);
+}
+
+@keyframes floatFade {
+    0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.9);
+    }
+
+    20% {
+        opacity: 0.6;
+        transform: translateY(0) scale(1);
+    }
+
+    80% {
+        opacity: 0.4;
+        transform: translateY(-10px);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-40px) scale(0.95);
+    }
+}
