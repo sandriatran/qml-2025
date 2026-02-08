@@ -2614,8 +2614,8 @@ function CelestialIntro({ onComplete }) {
     <div className={`celestial-intro phase-${phase}${dissolving ? ' dissolving' : ''}`}>
       <div className="celestial-glow celestial-glow-a" />
       <div className="celestial-glow celestial-glow-b" />
-      <img src="/assets/intro_key.png" alt="Key" className="celestial-key-img" draggable="false" />
-      <img src="/assets/intro_rock.png" alt="Rock" className="celestial-crystal-img" draggable="false" />
+      <img src="./assets/intro_key.png" alt="Key" className="celestial-key-img" draggable="false" />
+      <img src="./assets/intro_rock.png" alt="Rock" className="celestial-crystal-img" draggable="false" />
       <div className="celestial-title-group">
         <h1 className="celestial-title">The Key to the Rock</h1>
         <p className="celestial-subtitle">A Bayesian Replication of Ota, Hartsuiker &amp; Haywood (2009)</p>
