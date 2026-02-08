@@ -1858,7 +1858,7 @@ function App() {
                   </div>
 
                   <p className="hero-footer-meta">Violet Manson &amp; Sandria Tran &middot; Bayesian Re-analysis of <a href="https://doi.org/10.1016/j.cognition.2008.12.007" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none', borderBottom: '1px dotted var(--text-muted)' }}>Ota, Hartsuiker &amp; Haywood (2009)</a></p>
-                  <p className="hero-footer-tech">Interactive research deck by S. Tran: React/Vite glassmorphic UI, R Bayesian pipeline, dual-theme accessibility.</p>
+                  <p className="hero-footer-tech">Interactive research deck by Sandria Tran: React/Vite glassmorphic UI, R Bayesian pipeline, dual-theme accessibility.</p>
                 </>
               )}
             </div>
