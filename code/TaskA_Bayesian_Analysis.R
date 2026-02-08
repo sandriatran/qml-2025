@@ -25,6 +25,50 @@ library(here)                # File path management
 library(ggplot2)             # Advanced graphics
 library(glue)                # String interpolation for reports
 
+# (1b) Dark mode theme + dual-save helper ----
+# Dark palette matching the website's [data-theme="dark"]
+palette_dark <- list(
+  bg          = "#0a0b14",
+  bg_surface  = "#13141f",
+  grid        = "#1e1f35",
+  text        = "#f2f2ff",
+  text_secondary = "#b0b0c8",
+  text_muted  = "#606078"
+)
+
+# Dark mode via theme() merge — preserves per-plot axis.text.x/y overrides
+# (angle, face, size) while only changing colors. Do NOT use %+replace% here
+# as it wipes all per-plot theme customizations.
+to_dark <- function(p) {
+  p + theme(
+    plot.background    = element_rect(fill = palette_dark$bg, color = NA),
+    panel.background   = element_rect(fill = palette_dark$bg, color = NA),
+    panel.grid.major   = element_line(color = palette_dark$grid, linewidth = 0.3),
+    panel.grid.minor   = element_blank(),
+    plot.title         = element_text(color = palette_dark$text),
+    plot.subtitle      = element_text(color = palette_dark$text_secondary),
+    plot.caption       = element_text(color = palette_dark$text_muted),
+    axis.title         = element_text(color = palette_dark$text),
+    axis.text          = element_text(color = palette_dark$text),
+    legend.text        = element_text(color = palette_dark$text),
+    legend.title       = element_text(color = palette_dark$text),
+    legend.background  = element_rect(fill = palette_dark$bg, color = NA),
+    legend.key         = element_rect(fill = palette_dark$bg, color = NA),
+    strip.text         = element_text(color = palette_dark$text),
+    strip.background   = element_rect(fill = palette_dark$bg_surface, color = NA)
+  )
+}
+
+# Save plot in both light and dark mode
+save_dual <- function(p, filename, out_dir, width = 9, height = 6, dpi = 300) {
+  ggsave(file.path(out_dir, filename), p, width = width, height = height, dpi = dpi)
+  dark_dir <- file.path(out_dir, "dark_mode")
+  if (!dir.exists(dark_dir)) dir.create(dark_dir, recursive = TRUE)
+  p_dark <- to_dark(p)
+  ggsave(file.path(dark_dir, filename), p_dark, width = width, height = height, dpi = dpi)
+  cat(sprintf("Saved: %s (light + dark)\n", filename))
+}
+
 # (2) Read the ota2009/key-rock.csv data ----
 data_path <- here("data/ota2009/key-rock.csv")
 raw_data <- read_csv(data_path, show_col_types = FALSE)
@@ -195,9 +239,7 @@ p_raw <- data_model %>%
   )
 
 print(p_raw)
-ggsave(file.path(output_dir, "01_raw_false_positive_rates.png"),
-       p_raw, width = 9, height = 6, dpi = 300)
-cat("Saved: 01_raw_false_positive_rates.png\n")
+save_dual(p_raw, "01_raw_false_positive_rates.png", output_dir)
 
 # Plot 2: Point estimates with raw proportions
 p_props <- data_model %>%
@@ -239,9 +281,7 @@ p_props <- data_model %>%
   )
 
 print(p_props)
-ggsave(file.path(output_dir, "02_raw_proportions_with_ci.png"),
-       p_props, width = 9, height = 6, dpi = 300)
-cat("Saved: 02_raw_proportions_with_ci.png\n")
+save_dual(p_props, "02_raw_proportions_with_ci.png", output_dir)
 
 # (5) Fit Bernoulli regression model with brms ----
 cat("\n\n")
@@ -356,9 +396,7 @@ p_intercept <- posterior_df %>%
   )
 
 print(p_intercept)
-ggsave(file.path(output_dir, "03_posterior_intercept.png"),
-       p_intercept, width = 9, height = 6, dpi = 300)
-cat("\nSaved: 03_posterior_intercept.png\n")
+save_dual(p_intercept, "03_posterior_intercept.png", output_dir)
 
 # (6b) Plot 2: Posterior distribution of Slope
 p_slope <- posterior_df %>%
@@ -385,9 +423,7 @@ p_slope <- posterior_df %>%
   )
 
 print(p_slope)
-ggsave(file.path(output_dir, "04_posterior_slope.png"),
-       p_slope, width = 9, height = 6, dpi = 300)
-cat("Saved: 04_posterior_slope.png\n")
+save_dual(p_slope, "04_posterior_slope.png", output_dir)
 
 # (6c) Plot 3: Joint posterior (2D visualization)
 p_joint <- posterior_df %>%
@@ -405,9 +441,7 @@ p_joint <- posterior_df %>%
   theme(plot.title = element_text(face = "bold"))
 
 print(p_joint)
-ggsave(file.path(output_dir, "05_posterior_joint.png"),
-       p_joint, width = 9, height = 6, dpi = 300)
-cat("Saved: 05_posterior_joint.png\n")
+save_dual(p_joint, "05_posterior_joint.png", output_dir)
 
 # (6d) Plot 4: Posterior Predictive Check
 cat("\n\nGenerating Posterior Predictive Check...\n")
@@ -419,9 +453,7 @@ p_ppc <- pp_check(model_bernoull, ndraws = 100) +
   theme_minimal(base_size = 12) +
   theme(plot.title = element_text(face = "bold"))
 
-ggsave(file.path(output_dir, "06_posterior_predictive_check.png"),
-       p_ppc, width = 9, height = 6, dpi = 300)
-cat("Saved: 06_posterior_predictive_check.png\n")
+save_dual(p_ppc, "06_posterior_predictive_check.png", output_dir)
 
 # (8-11) Generate predictions and credible intervals ----
 cat("\n\n")
@@ -508,9 +540,7 @@ p_predictions <- preds_epred %>%
   )
 
 print(p_predictions)
-ggsave(file.path(output_dir, "07_posterior_predictions.png"),
-       p_predictions, width = 9, height = 6, dpi = 300)
-cat("Saved: 07_posterior_predictions.png\n")
+save_dual(p_predictions, "07_posterior_predictions.png", output_dir)
 
 # (12) Save summary statistics ----
 cat("\n\n")
@@ -744,7 +774,7 @@ cat(paste(rep("=", 80), collapse=""), "\n")
 cat("\nAll output files saved to:\n")
 cat(output_dir, "\n\n")
 cat("Generated files:\n")
-cat("  VISUALIZATIONS:\n")
+cat("  VISUALIZATIONS (light mode):\n")
 cat("    - 01_raw_false_positive_rates.png\n")
 cat("    - 02_raw_proportions_with_ci.png\n")
 cat("    - 03_posterior_intercept.png\n")
@@ -752,6 +782,14 @@ cat("    - 04_posterior_slope.png\n")
 cat("    - 05_posterior_joint.png\n")
 cat("    - 06_posterior_predictive_check.png\n")
 cat("    - 07_posterior_predictions.png\n")
+cat("  VISUALIZATIONS (dark mode):\n")
+cat("    - dark_mode/01_raw_false_positive_rates.png\n")
+cat("    - dark_mode/02_raw_proportions_with_ci.png\n")
+cat("    - dark_mode/03_posterior_intercept.png\n")
+cat("    - dark_mode/04_posterior_slope.png\n")
+cat("    - dark_mode/05_posterior_joint.png\n")
+cat("    - dark_mode/06_posterior_predictive_check.png\n")
+cat("    - dark_mode/07_posterior_predictions.png\n")
 cat("  DATA & REPORTS:\n")
 cat("    - posterior_draws_fixed_effects.csv (4000 posterior samples)\n")
 cat("    - predicted_error_rates_summary.csv\n")

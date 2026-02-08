@@ -139,12 +139,19 @@ $$
 \eta_{ijk} = \beta_0 + \beta_{\text{LR}} \cdot \mathbf{1}[\text{LR}]_j + \beta_{\text{H}} \cdot \mathbf{1}[\text{H}]_j + \beta_{\text{PB}} \cdot \mathbf{1}[\text{PB}]_j + u_i + w_k
 $$ {#eq-model1}
 
+**Linguistic Model (Model 2):**
+$$
+\eta_{ijk} = \beta_0 + \beta_{\text{L1-pres}} \cdot \mathbf{1}[\text{L1-present}]_j + \beta_{\text{L1-abs}} \cdot \mathbf{1}[\text{L1-absent}]_j + \beta_{\text{Homo}} \cdot \mathbf{1}[\text{Homophone}]_j + u_i + w_k
+$$ {#eq-model2}
+
+This model re-codes the four contrast types by their **phonological status** (Unrelated as reference, L1-present, L1-absent, Homophone), grouping contrasts by theoretical category rather than experimental label.
+
 **Distinctness Model (Model 3):**
 $$
-\eta_{ijk} = \beta_0 + \beta_d \cdot d_j + u_i + w_k
+\eta_{ijk} = \beta_0 + \beta_d \cdot \tilde{d}_j + u_i + w_k
 $$ {#eq-model3}
 
-where $d_j \in \{0.0, 0.3, 0.8, 1.0\}$ is the phonological distinctness score, and the random effects are:
+where $\tilde{d}_j$ is the z-scored phonological distinctness score (raw values $d_j \in \{0.0, 0.3, 0.8, 1.0\}$, then standardized to mean 0 and SD 1), and the random effects are:
 $$
 u_i \sim \text{Normal}(0, \sigma_u), \quad w_k \sim \text{Normal}(0, \sigma_w)
 $$
@@ -173,7 +180,8 @@ model_all <- brm(
   accuracy ~ contrast_type + (1 | subject_id) + (1 | item_id),
   data = data_clean, family = bernoulli(link = "logit"),
   prior = c(prior(normal(0, 1.5), class = Intercept),
-            prior(normal(0, 1.5), class = b)),
+            prior(normal(0, 1.5), class = b),
+            prior(exponential(1), class = sd)),
   iter = 2000, chains = 4, cores = 4, seed = 2025)
 
 # MODEL 2: Linguistic — Do L1-absent contrasts cluster with homophones?
@@ -181,7 +189,8 @@ model_linguistic <- brm(
   accuracy ~ phonological_status + (1 | subject_id) + (1 | item_id),
   data = data_clean, family = bernoulli(link = "logit"),
   prior = c(prior(normal(0, 1.5), class = Intercept),
-            prior(normal(0, 1.5), class = b)),
+            prior(normal(0, 1.5), class = b),
+            prior(exponential(1), class = sd)),
   iter = 2000, chains = 4, cores = 4, seed = 2025)
 
 # MODEL 3: Distinctness — Is the mechanism gradient or categorical?
@@ -189,11 +198,12 @@ model_distinctness <- brm(
   accuracy ~ phonological_distinctness_scaled + (1 | subject_id) + (1 | item_id),
   data = data_clean, family = bernoulli(link = "logit"),
   prior = c(prior(normal(0, 1.5), class = Intercept),
-            prior(normal(0, 1.5), class = b)),
+            prior(normal(0, 1.5), class = b),
+            prior(exponential(1), class = sd)),
   iter = 2000, chains = 4, cores = 4, seed = 2025)
 ```
 
-All models include random intercepts for both **subjects** (capturing individual differences in baseline accuracy) and **items** (capturing word-specific difficulty), following the maximal random-effects structure warranted by the crossed repeated-measures design. The reference level for the Comprehensive Model is **F (Spelling Control)**, so each coefficient ($\beta_{\text{LR}}, \beta_{\text{H}}, \beta_{\text{PB}}$) represents the *change* in log-odds of correct response relative to this baseline.
+All models include random intercepts for both **subjects** (capturing individual differences in baseline accuracy) and **items** (capturing word-specific difficulty), following the crossed repeated-measures design. We use intercepts-only (not random slopes) to balance model complexity with sample size; see Limitations for discussion. The reference level for the Comprehensive Model is **F (Spelling Control)**, so each coefficient ($\beta_{\text{LR}}, \beta_{\text{H}}, \beta_{\text{PB}}$) represents the *change* in log-odds of correct response relative to this baseline.
 
 ## MCMC Sampling Configuration
 
@@ -247,7 +257,7 @@ We fitted the Linguistic Model to test whether the L1-Absent condition clusters 
 
 ## Part 3: The Mechanism (Distinctness)
 
-Finally, we modeled accuracy as a function of the **Phonological Distinctness Scale** ($d \in \{0.0, 0.3, 0.8, 1.0\}$) to test whether the mechanism is gradient or categorical.
+Finally, we modeled accuracy as a function of the **Phonological Distinctness Scale** (raw $d \in \{0.0, 0.3, 0.8, 1.0\}$, z-scored for model fitting) to test whether the mechanism is gradient or categorical.
 
 **Figure 5 Interpretation (Distinctness Gradient):**
 
@@ -357,7 +367,7 @@ The weaker prior doubles the standard deviation, effectively quadrupling the pri
 **Figure 14 Interpretation (Caterpillar Plot):**
 
 *   **Technical**: Each row represents one participant's estimated random intercept (deviation from the population mean baseline accuracy), with 95% credible intervals. The substantial spread---from the most accurate participants (positive intercepts, few errors overall) to the least accurate (negative intercepts, more errors across all conditions)---confirms meaningful between-subject heterogeneity.
-*   **Theoretical**: The spread of random intercepts justifies our hierarchical modeling choice. Some participants are highly accurate across all conditions, while others show generally lower performance. The **intraclass correlation** (ICC) derived from the subject and item variance components indicates that individual differences account for a non-trivial proportion of the total variance. Ignoring this variability (as a fixed-effects model would) would inflate Type I error rates and produce overconfident credible intervals.
+*   **Theoretical**: The spread of random intercepts justifies our hierarchical modeling choice. Some participants are highly accurate across all conditions, while others show generally lower performance. The variance in random intercepts confirms meaningful between-subject heterogeneity that would be masked by a fixed-effects model, justifying the hierarchical specification.
 
 ![**Figure 14:** Subject-level random effects (caterpillar plot). Each row is one participant; the point is the posterior median random intercept, and the bar is the 95% CrI. The spread confirms individual differences that justify the hierarchical model.](outputs/24_subject_caterpillar.png)
 
@@ -405,6 +415,14 @@ Beyond static figures, our analysis script produces interactive and animated out
 *   `36_word_pair_confusion_spectrum.gif` --- The confusion spectrum (Figure 8) animated: contrast rows reveal progressively from F (near white) through PB to H and LR (spreading dark red), building the narrative of increasing phonological interference
 *   `37_evidence_accumulation.gif` --- Cumulative accuracy as participants are added one by one; the LR disadvantage is established by subject 10 and remains stable
 
+**Deep analytical animations** (42--46): Animated reveal sequences for key analytical plots, designed for presentation walkthroughs:
+
+*   `42_subject_heatmap_reveal.gif` --- Subject × Contrast Heatmap (Figure 9) with columns revealing F → PB → H → LR
+*   `43_pairwise_rope_reveal.gif` --- Pairwise ROPE comparisons (Figure 2) revealing bottom to top
+*   `44_ranked_dotchart_reveal.gif` --- All-pairs ranked dot chart with one contrast facet at a time
+*   `45_strip_plot_accumulate.gif` --- Word-pair confusion dots accumulating by contrast
+*   `46_caterpillar_reveal.gif` --- Subject random effects revealing one by one, worst to best
+
 **Animation showcase** (27--35): Nine distinct animation styles applied to key results---posterior fade-in, error bar slide-up, horizontal interval expansion, vertical growth, camera pan (tilt up/down), focus zoom into the LR posterior, prior-posterior collision, and progressive MCMC trace reveal. These are designed for presentation contexts where sequential visual storytelling enhances comprehension.
 
 **Portfolio GIF** (`00_portfolio_cumulative.gif`): All key visualizations---including the deep analytical plots (Figures 2 and 9)---combined into a single looping narrative arc, with static frames held between animated sequences. Aspect ratios are preserved via white letterboxing to prevent distortion.
@@ -417,7 +435,7 @@ Our Bayesian re-analysis of @ota2009 yields four principal conclusions:
 
 1. **Replication with precision.** The Comprehensive Model confirms that the /l/-/r/ contrast elicits a 21.1% false positive error rate [95% CrI: 14.2, 30.2] in Japanese speakers---functionally indistinguishable from true homophones (H). In terms of effect magnitude, the odds of a correct response are reduced by roughly 78% for LR pairs relative to spelling controls. The PB contrast, present in the Japanese L1 inventory, shows no credible effect relative to spelling controls. This directly replicates the original study's central finding using a modern probabilistic framework.
 
-2. **The mechanism is gradient, not categorical.** The Distinctness Model reveals a significant linear relationship between phonological distinctness (operationalized via L1 inventory constraints) and error rates. This supports @ota2009's structural filtering account: representational indeterminacy is not an all-or-nothing phenomenon but scales with the degree of L1-L2 phonological mismatch. The raw data confirm this gradient: error rates increase monotonically as distinctness decreases (F: 2% $\to$ PB: 6% $\to$ H: 24% $\to$ LR: 31%).
+2. **The mechanism is gradient, not categorical.** The Distinctness Model reveals a significant linear relationship between phonological distinctness (operationalized via L1 inventory constraints) and error rates. This supports @ota2009's structural filtering account: representational indeterminacy is not an all-or-nothing phenomenon but scales with the degree of L1-L2 phonological mismatch. The raw observed error rates confirm this gradient, increasing monotonically as distinctness decreases (F: 2% $\to$ PB: 6% $\to$ H: 24% $\to$ LR: 31%). Note that raw rates differ from model-estimated rates (e.g., LR: 31% raw vs. 21.1% model-estimated) because the hierarchical model adjusts for subject- and item-level variability.
 
 3. **Results are robust across multiple dimensions.** We validated our findings through seven complementary checks:
     a. *Sensitivity analysis*: Doubling the prior variance produces near-identical posteriors (Figure 11)
