@@ -1943,7 +1943,7 @@ function App() {
         <div className="bar-divider" />
         <div className="bar-section bar-links">
           <a className="bar-link" href="https://github.com/sandriatran/qml-2025" target="_blank" rel="noopener noreferrer">GitHub</a>
-          <a className="bar-link bar-link-placeholder" href="#" onClick={e => e.preventDefault()} title="Coming soon">Final Report</a>
+          <a className="bar-link" href="https://github.com/sandriatran/qml-2025/blob/main/final%20project/Re-Analyzing-Ota%2C-Hartsuiker-and-Haywood--2009----A-Bayesian-Approach-to-Representational-Indeterminacy.pdf" target="_blank" rel="noopener noreferrer">Final Report</a>
           <a className="bar-link" href="https://doi.org/10.1016/j.cognition.2008.12.007" target="_blank" rel="noopener noreferrer">Ota 2009</a>
         </div>
       </nav>
