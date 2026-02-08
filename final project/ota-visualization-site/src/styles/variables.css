@@ -47,6 +47,7 @@
 
   /* ── Typography ── */
   --font-stack: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Georgia', 'Times New Roman', serif;
   --font-ipa: 'Noto Sans', 'DejaVu Sans', 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
   --tracking-wide: 0.15em;
@@ -105,6 +106,15 @@ h1, h2, h3 {
   font-weight: 300;
   letter-spacing: -0.02em;
   margin: 0;
+}
+
+/* ── Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* ── Utilities ── */

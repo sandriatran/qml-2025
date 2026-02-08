@@ -2469,7 +2469,7 @@ p_heatmap_anim <- heatmap_anim_data %>%
   ) +
   scale_x_discrete(drop = FALSE) +
   labs(
-    title = "Who Struggles With What? — {closest_state}",
+    title = "Who Struggles With What? — {current_frame}",
     subtitle = "Columns reveal from easiest (F) to hardest (LR) contrast",
     x = "Contrast Type", y = "Subject",
     caption = "Data: Ota et al. (2009) | 20 Japanese\u2013English bilinguals"
@@ -2482,8 +2482,7 @@ p_heatmap_anim <- heatmap_anim_data %>%
     legend.position = "right",
     legend.key.height = unit(2, "cm")
   ) +
-  transition_states(frame_label, transition_length = 1, state_length = 2) +
-  enter_fade()
+  transition_manual(frame_label)
 
 anim_heatmap <- animate(p_heatmap_anim, nframes = 60, fps = 8,
                         width = 700, height = 800, renderer = gifski_renderer())
@@ -2944,3 +2943,453 @@ cat("  Interactive:   17-19 (.html) - open in browser\n")
 cat("  Animated:      20-22, 27-37, 42-46 (.gif)\n")
 cat("  Deep analysis: 38 (subject heatmap), 39 (ROPE)\n")
 cat("  Model files:   model_comprehensive_summary.txt, model_comparison_loo.txt\n")
+
+# =============================================================================
+# DARK MODE: Re-render all visualizations with dark theme
+# =============================================================================
+# Generates dark counterparts of all PNGs and GIFs into outputs/dark_mode/
+# Matches website [data-theme="dark"] CSS variables
+# =============================================================================
+
+cat("\n\n")
+cat("=============================================================\n")
+cat("  DARK MODE RENDERING\n")
+cat("=============================================================\n\n")
+
+# -----------------------------------------------------------------------------
+# Dark palette (matches website [data-theme="dark"] in variables.css)
+# -----------------------------------------------------------------------------
+palette_dark <- list(
+  indigo      = "#8480ff",
+  hot_pink    = "#f06dd8",
+  purple      = "#d18aff",
+  lavender    = "#b8b2f0",
+  bg          = "#0a0b14",
+  bg_surface  = "#13141f",
+  bg_elevated = "#1a1b2e",
+  grid        = "#1e1f35",
+  text        = "#f2f2ff",
+  text_secondary = "#b0b0c8",
+  text_muted  = "#606078",
+  pink        = "#f79cee",
+  light_blue  = "#2a3555",
+  light_pink  = "#4a2545"
+)
+
+# Dark ggplot theme
+theme_ota_dark <- function(base_size = 14) {
+  theme_minimal(base_size = base_size) %+replace%
+    theme(
+      plot.background    = element_rect(fill = palette_dark$bg, color = NA),
+      panel.background   = element_rect(fill = palette_dark$bg, color = NA),
+      panel.grid.major   = element_line(color = palette_dark$grid, linewidth = 0.3),
+      panel.grid.minor   = element_blank(),
+      plot.title         = element_text(color = palette_dark$text, face = "bold", size = base_size + 2),
+      plot.subtitle      = element_text(color = palette_dark$text_secondary, face = "italic", size = base_size - 1),
+      plot.caption       = element_text(color = palette_dark$text_muted, size = base_size - 3),
+      axis.title         = element_text(color = palette_dark$text),
+      axis.text          = element_text(color = palette_dark$text),
+      legend.background  = element_rect(fill = palette_dark$bg, color = NA),
+      legend.key         = element_rect(fill = palette_dark$bg, color = NA),
+      legend.text        = element_text(color = palette_dark$text),
+      legend.title       = element_text(color = palette_dark$text, face = "bold"),
+      strip.text         = element_text(color = palette_dark$text),
+      strip.background   = element_rect(fill = palette_dark$bg_surface, color = NA)
+    )
+}
+
+# Dark fill scales
+contrast_fills_dark <- c(
+  "F (Spelling Control)" = palette_dark$lavender,
+  "LR (/l/-/r/)"         = palette_dark$indigo,
+  "H (Homophones)"       = palette_dark$hot_pink,
+  "PB (/p/-/b/)"         = palette_dark$purple
+)
+contrast_fills_short_dark <- c(
+  "F"  = palette_dark$lavender,
+  "LR" = palette_dark$indigo,
+  "H"  = palette_dark$hot_pink,
+  "PB" = palette_dark$purple
+)
+chain_colors_dark <- c(
+  "1" = palette_dark$indigo, "2" = palette_dark$hot_pink,
+  "3" = palette_dark$purple, "4" = palette_dark$lavender
+)
+
+# Dark gradient for heatmap / spectrum plots
+spectrum_colors_dark <- c(palette_dark$bg_elevated, "#4a2030", "#7a2040", "#c43050", "#ff4040")
+spectrum_values_dark <- scales::rescale(c(0, 0.08, 0.25, 0.50, 1.00))
+heatmap_colors_dark  <- c(palette_dark$bg_elevated, palette_dark$lavender, palette_dark$purple, palette_dark$hot_pink, "#ff3030")
+
+# Smart to_dark: applies dark colors via partial theme() so that
+# per-plot overrides (custom text sizes, grid styles, etc.) are preserved.
+# A complete theme (%+replace%) would wipe those — theme() merges instead.
+# NOTE: We intentionally do NOT set axis.text.x or axis.text.y here.
+# ggplot2's theme() REPLACES the entire element_text() — not just the color.
+# Setting axis.text.x = element_text(color = ...) would wipe per-plot
+# properties like angle, hjust, face, and size. The parent axis.text
+# already sets the color, which child elements (axis.text.x/y) inherit.
+to_dark <- function(p) {
+  p <- p + theme(
+    plot.background    = element_rect(fill = palette_dark$bg, color = NA),
+    panel.background   = element_rect(fill = palette_dark$bg, color = NA),
+    panel.grid.major   = element_line(color = palette_dark$grid),
+    panel.grid.minor   = element_blank(),
+    plot.title         = element_text(color = palette_dark$text),
+    plot.subtitle      = element_text(color = palette_dark$text_secondary),
+    plot.caption       = element_text(color = palette_dark$text_muted),
+    axis.title         = element_text(color = palette_dark$text),
+    axis.text          = element_text(color = palette_dark$text),
+    legend.background  = element_rect(fill = palette_dark$bg, color = NA),
+    legend.key         = element_rect(fill = palette_dark$bg, color = NA),
+    legend.text        = element_text(color = palette_dark$text),
+    legend.title       = element_text(color = palette_dark$text),
+    strip.text         = element_text(color = palette_dark$text),
+    strip.background   = element_rect(fill = palette_dark$bg_surface, color = NA)
+  )
+  # Patch common hardcoded light-mode colors in geom layers
+  for (i in seq_along(p$layers)) {
+    params <- tryCatch(p$layers[[i]]$aes_params, error = function(e) NULL)
+    if (is.null(params) || length(params) == 0) next
+    col <- params$colour
+    if (!is.null(col)) {
+      if (col %in% c("#000000", "black", "gray10", "gray20"))
+        p$layers[[i]]$aes_params$colour <- palette_dark$text
+      else if (col %in% c("gray30", "gray40"))
+        p$layers[[i]]$aes_params$colour <- palette_dark$text_secondary
+      else if (col == "gray50")
+        p$layers[[i]]$aes_params$colour <- palette_dark$text_muted
+      else if (col == "gray70")
+        p$layers[[i]]$aes_params$colour <- "#2a2a3a"
+    }
+    fl <- params$fill
+    if (!is.null(fl)) {
+      if (fl == "white")
+        p$layers[[i]]$aes_params$fill <- palette_dark$bg_elevated
+      else if (fl == "#d8e6ff")
+        p$layers[[i]]$aes_params$fill <- palette_dark$light_blue
+      else if (fl == "#ffd6ff")
+        p$layers[[i]]$aes_params$fill <- palette_dark$light_pink
+    }
+  }
+  p
+}
+
+dark_dir <- file.path(output_dir, "dark_mode")
+dir.create(dark_dir, showWarnings = FALSE, recursive = TRUE)
+
+# -----------------------------------------------------------------------------
+# DARK MODE: Static PNGs (16 plots)
+# -----------------------------------------------------------------------------
+cat("--- Dark Mode: Static PNGs ---\n")
+
+cat("  09_forest_plot_all_contrasts.png\n")
+ggsave(file.path(dark_dir, "09_forest_plot_all_contrasts.png"),
+  to_dark(p_forest), width = 11, height = 6, dpi = 300)
+
+cat("  10_error_rates_all_contrasts.png\n")
+ggsave(file.path(dark_dir, "10_error_rates_all_contrasts.png"),
+  to_dark(p_error_rates), width = 10, height = 6, dpi = 300)
+
+cat("  11_posterior_predictive_check.png\n")
+# pp_check requires re-generation with dark bayesplot color scheme
+bayesplot::color_scheme_set(c(
+  palette_dark$light_blue, palette_dark$lavender, palette_dark$indigo,
+  palette_dark$purple, palette_dark$hot_pink, palette_dark$pink
+))
+pp_dark <- pp_check(model_all, ndraws = 100) +
+  labs(
+    title = "Posterior Predictive Check",
+    subtitle = "Dark line = observed data | Light lines = 100 simulated datasets from the fitted model"
+  ) +
+  theme_ota_dark(base_size = 12)
+ggsave(file.path(dark_dir, "11_posterior_predictive_check.png"),
+  pp_dark, width = 10, height = 6, dpi = 300)
+# Restore light bayesplot color scheme
+bayesplot::color_scheme_set(c(
+  palette$light_blue, palette$lavender, palette$indigo,
+  palette$purple, palette$hot_pink, palette$pink
+))
+
+cat("  12_item_level_robustness.png\n")
+ggsave(file.path(dark_dir, "12_item_level_robustness.png"),
+  to_dark(p_items), width = 10, height = 6, dpi = 300)
+
+cat("  13_linguistic_model_effects.png\n")
+ggsave(file.path(dark_dir, "13_linguistic_model_effects.png"),
+  to_dark(p_linguistic), width = 11, height = 6, dpi = 300)
+
+cat("  14_representational_distinctness_mechanism.png\n")
+ggsave(file.path(dark_dir, "14_representational_distinctness_mechanism.png"),
+  to_dark(p_distinctness), width = 12, height = 6.5, dpi = 300)
+
+cat("  15_gradient_posterior_forest.png\n")
+ggsave(file.path(dark_dir, "15_gradient_posterior_forest.png"),
+  to_dark(p_gradient_forest), width = 11, height = 6, dpi = 300)
+
+cat("  16_gradient_halfeye_posteriors.png\n")
+ggsave(file.path(dark_dir, "16_gradient_halfeye_posteriors.png"),
+  to_dark(p_gradient_halfeye), width = 11, height = 6, dpi = 300)
+
+cat("  23_prior_vs_posterior.png\n")
+ggsave(file.path(dark_dir, "23_prior_vs_posterior.png"),
+  to_dark(p_prior_posterior), width = 11, height = 6, dpi = 300)
+
+cat("  24_subject_caterpillar.png\n")
+ggsave(file.path(dark_dir, "24_subject_caterpillar.png"),
+  to_dark(p_caterpillar), width = 10, height = 7, dpi = 300)
+
+cat("  25_sensitivity_visual.png\n")
+ggsave(file.path(dark_dir, "25_sensitivity_visual.png"),
+  to_dark(p_sensitivity), width = 11, height = 6, dpi = 300)
+
+cat("  26_raincloud_subject_errors.png\n")
+ggsave(file.path(dark_dir, "26_raincloud_subject_errors.png"),
+  to_dark(p_raincloud), width = 11, height = 7, dpi = 300)
+
+# Heatmap: override gradient scale for dark bg
+cat("  36_word_pair_confusion_heatmap.png\n")
+p_spectrum_static_dark <- to_dark(p_spectrum_static) +
+  scale_fill_gradientn(
+    colors = spectrum_colors_dark, values = spectrum_values_dark,
+    limits = c(0, 1), name = "Error Rate",
+    labels = scales::percent, na.value = "transparent"
+  )
+ggsave(file.path(dark_dir, "36_word_pair_confusion_heatmap.png"),
+  p_spectrum_static_dark, width = 14, height = 10, dpi = 300)
+
+# Subject heatmap: override gradient + text color scale
+cat("  38_subject_contrast_heatmap.png\n")
+p_subj_heatmap_dark <- to_dark(p_subj_heatmap) +
+  scale_fill_gradientn(
+    colors = heatmap_colors_dark,
+    values = scales::rescale(c(0, 0.1, 0.25, 0.45, 0.80)),
+    limits = c(0, 0.80), name = "Error Rate",
+    labels = scales::percent, oob = scales::squish
+  ) +
+  scale_color_manual(values = c(light = "white", dark = palette_dark$text))
+ggsave(file.path(dark_dir, "38_subject_contrast_heatmap.png"),
+  p_subj_heatmap_dark, width = 9, height = 10, dpi = 300)
+
+cat("  39_pairwise_contrast_rope.png\n")
+ggsave(file.path(dark_dir, "39_pairwise_contrast_rope.png"),
+  to_dark(p_pairwise), width = 14, height = 8, dpi = 300)
+
+# Ranked dot chart: override gradient scale
+cat("  proto_A_ranked_dot_chart.png\n")
+p_all_pairs_dark <- to_dark(p_all_pairs) +
+  scale_fill_gradientn(
+    colors = spectrum_colors_dark, values = spectrum_values_dark,
+    limits = c(0, 1), name = "Error Rate",
+    labels = scales::percent, na.value = "transparent"
+  )
+ggsave(file.path(dark_dir, "proto_A_ranked_dot_chart.png"),
+  p_all_pairs_dark, width = 16, height = 18, dpi = 300)
+
+cat("  Static PNGs complete\n\n")
+
+# -----------------------------------------------------------------------------
+# DARK MODE: Animated GIFs (19 animations)
+# -----------------------------------------------------------------------------
+cat("--- Dark Mode: Animated GIFs ---\n")
+
+cat("  20_credible_interval_buildup.gif\n")
+anim_dark <- animate(to_dark(p_animated_ci),
+  nframes = 80, fps = 10, width = 800, height = 500, renderer = gifski_renderer())
+anim_save(file.path(dark_dir, "20_credible_interval_buildup.gif"), animation = anim_dark)
+
+cat("  21_error_rate_accumulation.gif\n")
+anim_dark <- animate(to_dark(p_animated_bars),
+  nframes = 40, fps = 4, width = 800, height = 500, renderer = gifski_renderer())
+anim_save(file.path(dark_dir, "21_error_rate_accumulation.gif"), animation = anim_dark)
+
+cat("  22_mcmc_convergence_lr.gif\n")
+anim_dark <- animate(to_dark(p_animated_chains),
+  nframes = 120, fps = 15, width = 900, height = 500, renderer = gifski_renderer())
+anim_save(file.path(dark_dir, "22_mcmc_convergence_lr.gif"), animation = anim_dark)
+
+cat("  27_posterior_densities_by_contrast.gif\n")
+anim_dark <- animate(to_dark(p_fade),
+  nframes = 60, fps = 10, width = 800, height = 500, renderer = gifski_renderer())
+anim_save(file.path(dark_dir, "27_posterior_densities_by_contrast.gif"), animation = anim_dark)
+
+cat("  28_error_rates_by_l1_status.gif\n")
+anim_dark <- animate(to_dark(p_slide),
+  nframes = 60, fps = 8, width = 800, height = 500, renderer = gifski_renderer())
+anim_save(file.path(dark_dir, "28_error_rates_by_l1_status.gif"), animation = anim_dark)
+
+cat("  29_contrast_effect_intervals.gif\n")
+anim_dark <- animate(to_dark(p_hclip),
+  nframes = 40, fps = 8, width = 800, height = 500, renderer = gifski_renderer())
+anim_save(file.path(dark_dir, "29_contrast_effect_intervals.gif"), animation = anim_dark)
+
+cat("  30_error_growth_by_contrast.gif\n")
+anim_dark <- animate(to_dark(p_vclip),
+  nframes = 40, fps = 8, width = 800, height = 500, renderer = gifski_renderer())
+anim_save(file.path(dark_dir, "30_error_growth_by_contrast.gif"), animation = anim_dark)
+
+cat("  31_distinctness_predicts_errors.gif\n")
+anim_dark <- animate(to_dark(p_tilt_up),
+  nframes = 40, fps = 6, width = 800, height = 500, renderer = gifski_renderer())
+anim_save(file.path(dark_dir, "31_distinctness_predicts_errors.gif"), animation = anim_dark)
+
+cat("  32_posterior_interference_strength.gif\n")
+anim_dark <- animate(to_dark(p_tilt_down),
+  nframes = 40, fps = 6, width = 800, height = 500, renderer = gifski_renderer())
+anim_save(file.path(dark_dir, "32_posterior_interference_strength.gif"), animation = anim_dark)
+
+cat("  33_lr_indeterminacy_zoom.gif\n")
+anim_dark <- animate(to_dark(p_focus),
+  nframes = 50, fps = 8, width = 800, height = 500, renderer = gifski_renderer())
+anim_save(file.path(dark_dir, "33_lr_indeterminacy_zoom.gif"), animation = anim_dark)
+
+cat("  34_prior_to_posterior_updating.gif\n")
+anim_dark <- animate(to_dark(p_collide),
+  nframes = 40, fps = 6, width = 800, height = 500, renderer = gifski_renderer())
+anim_save(file.path(dark_dir, "34_prior_to_posterior_updating.gif"), animation = anim_dark)
+
+cat("  35_mcmc_posterior_sampling.gif\n")
+anim_dark <- animate(to_dark(p_reveal),
+  nframes = 100, fps = 15, width = 900, height = 500, renderer = gifski_renderer())
+anim_save(file.path(dark_dir, "35_mcmc_posterior_sampling.gif"), animation = anim_dark)
+
+# Spectrum GIF: override gradient scale
+cat("  36_word_pair_confusion_spectrum.gif\n")
+p_spectrum_dark <- to_dark(p_spectrum) +
+  scale_fill_gradientn(
+    colors = spectrum_colors_dark, values = spectrum_values_dark,
+    limits = c(0, 1), name = "Error Rate",
+    labels = scales::percent, na.value = "transparent"
+  )
+anim_dark <- animate(p_spectrum_dark,
+  nframes = 20, fps = 2, width = 1200, height = 800, renderer = gifski_renderer())
+anim_save(file.path(dark_dir, "36_word_pair_confusion_spectrum.gif"), animation = anim_dark)
+
+cat("  37_evidence_accumulation.gif\n")
+anim_dark <- animate(to_dark(p_accumulate),
+  nframes = 60, fps = 6, width = 900, height = 550, renderer = gifski_renderer())
+anim_save(file.path(dark_dir, "37_evidence_accumulation.gif"), animation = anim_dark)
+
+# Heatmap GIF: override gradient scale
+cat("  42_subject_heatmap_reveal.gif\n")
+p_heatmap_anim_dark <- to_dark(p_heatmap_anim) +
+  scale_fill_gradientn(
+    colors = heatmap_colors_dark,
+    values = scales::rescale(c(0, 0.1, 0.25, 0.45, 0.80)),
+    limits = c(0, 0.80), name = "Error Rate",
+    labels = scales::percent, oob = scales::squish
+  )
+anim_dark <- animate(p_heatmap_anim_dark,
+  nframes = 60, fps = 8, width = 700, height = 800, renderer = gifski_renderer())
+anim_save(file.path(dark_dir, "42_subject_heatmap_reveal.gif"), animation = anim_dark)
+
+cat("  43_pairwise_rope_reveal.gif\n")
+anim_dark <- animate(to_dark(p_rope_anim),
+  nframes = 80, fps = 8, width = 900, height = 550, renderer = gifski_renderer())
+anim_save(file.path(dark_dir, "43_pairwise_rope_reveal.gif"), animation = anim_dark)
+
+# Dot chart GIF: override gradient scale
+cat("  44_ranked_dotchart_reveal.gif\n")
+p_dotchart_anim_dark <- to_dark(p_dotchart_anim) +
+  scale_fill_gradientn(
+    colors = spectrum_colors_dark, values = spectrum_values_dark,
+    limits = c(0, 1), name = "Error Rate",
+    labels = scales::percent, na.value = "transparent"
+  )
+anim_dark <- animate(p_dotchart_anim_dark,
+  nframes = 40, fps = 4, width = 1000, height = 900, renderer = gifski_renderer())
+anim_save(file.path(dark_dir, "44_ranked_dotchart_reveal.gif"), animation = anim_dark)
+
+# Strip plot GIF: override gradient scale
+cat("  45_strip_plot_accumulate.gif\n")
+p_strip_anim_dark <- to_dark(p_strip_anim) +
+  scale_fill_gradientn(
+    colors = spectrum_colors_dark, values = spectrum_values_dark,
+    limits = c(0, 1), name = "Error Rate",
+    labels = scales::percent, na.value = "transparent"
+  )
+anim_dark <- animate(p_strip_anim_dark,
+  nframes = 60, fps = 8, width = 900, height = 500, renderer = gifski_renderer())
+anim_save(file.path(dark_dir, "45_strip_plot_accumulate.gif"), animation = anim_dark)
+
+cat("  46_caterpillar_reveal.gif\n")
+anim_dark <- animate(to_dark(p_caterpillar_anim),
+  nframes = 80, fps = 6, width = 800, height = 600, renderer = gifski_renderer())
+anim_save(file.path(dark_dir, "46_caterpillar_reveal.gif"), animation = anim_dark)
+
+cat("  Animated GIFs complete\n\n")
+
+# -----------------------------------------------------------------------------
+# DARK MODE: Portfolio Cumulative GIF
+# -----------------------------------------------------------------------------
+cat("--- Dark Mode: Portfolio GIF ---\n")
+
+fit_to_canvas_dark <- function(img) {
+  img <- image_resize(img, paste0(portfolio_w, "x", portfolio_h))
+  image_extent(img, paste0(portfolio_w, "x", portfolio_h),
+    gravity = "center", color = palette_dark$bg
+  )
+}
+
+hold_png_dark <- function(png_file, hold_sec = 3, fps = 5) {
+  path <- file.path(dark_dir, png_file)
+  if (!file.exists(path)) { cat("  [skip]", png_file, "\n"); return(NULL) }
+  img <- image_read(path)
+  img <- fit_to_canvas_dark(img)
+  n <- round(hold_sec * fps)
+  cat("  [PNG] ", png_file, " (", n, " frames)\n", sep = "")
+  rep(img, n)
+}
+
+load_gif_dark <- function(gif_file) {
+  path <- file.path(dark_dir, gif_file)
+  if (!file.exists(path)) { cat("  [skip]", gif_file, "\n"); return(NULL) }
+  frames <- image_read(path)
+  frames <- do.call(c, lapply(seq_along(frames), function(i) fit_to_canvas_dark(frames[i])))
+  cat("  [GIF] ", gif_file, " (", length(frames), " frames)\n", sep = "")
+  frames
+}
+
+cat("Assembling dark portfolio ...\n")
+dark_sections <- list(
+  hold_png_dark("10_error_rates_all_contrasts.png", 3.5, portfolio_fps),
+  load_gif_dark("36_word_pair_confusion_spectrum.gif"),
+  hold_png_dark("36_word_pair_confusion_heatmap.png", 4, portfolio_fps),
+  load_gif_dark("42_subject_heatmap_reveal.gif"),
+  load_gif_dark("44_ranked_dotchart_reveal.gif"),
+  load_gif_dark("37_evidence_accumulation.gif"),
+  hold_png_dark("09_forest_plot_all_contrasts.png", 3.5, portfolio_fps),
+  load_gif_dark("43_pairwise_rope_reveal.gif"),
+  load_gif_dark("20_credible_interval_buildup.gif"),
+  load_gif_dark("21_error_rate_accumulation.gif"),
+  hold_png_dark("14_representational_distinctness_mechanism.png", 4, portfolio_fps),
+  load_gif_dark("29_contrast_effect_intervals.gif"),
+  load_gif_dark("31_distinctness_predicts_errors.gif"),
+  hold_png_dark("15_gradient_posterior_forest.png", 3.5, portfolio_fps),
+  load_gif_dark("27_posterior_densities_by_contrast.gif"),
+  load_gif_dark("33_lr_indeterminacy_zoom.gif"),
+  load_gif_dark("34_prior_to_posterior_updating.gif"),
+  load_gif_dark("22_mcmc_convergence_lr.gif"),
+  load_gif_dark("45_strip_plot_accumulate.gif"),
+  load_gif_dark("46_caterpillar_reveal.gif")
+)
+
+dark_sections <- dark_sections[!sapply(dark_sections, is.null)]
+all_dark_frames <- do.call(c, dark_sections)
+
+cat("Total dark portfolio frames: ", length(all_dark_frames), "\n")
+cat("Writing dark portfolio GIF ...\n")
+
+dark_portfolio <- image_animate(all_dark_frames, delay = round(100 / portfolio_fps), loop = 0)
+dark_portfolio_path <- file.path(dark_dir, "00_portfolio_cumulative.gif")
+image_write(dark_portfolio, path = dark_portfolio_path)
+
+dark_mb <- round(file.info(dark_portfolio_path)$size / 1024^2, 1)
+cat("  Saved: dark_mode/00_portfolio_cumulative.gif (", dark_mb, " MB)\n\n", sep = "")
+
+# -----------------------------------------------------------------------------
+cat("=== ALL DARK MODE RENDERING COMPLETE ===\n")
+cat("Dark outputs saved to:", dark_dir, "\n")
+cat("  Portfolio:     dark_mode/00_portfolio_cumulative.gif\n")
+cat("  Static (16):   09-16, 23-26, 36, 38-39, proto_A (.png)\n")
+cat("  Animated (19): 20-22, 27-37, 42-46 (.gif)\n")

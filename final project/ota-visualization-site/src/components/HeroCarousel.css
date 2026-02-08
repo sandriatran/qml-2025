@@ -1,0 +1,597 @@
+/* =========================================
+   HERO CAROUSEL — Dynamic Landing Preview
+   ========================================= */
+
+/* ── Container ── */
+.hero-carousel-wrap {
+  margin: 1.5rem 0 0.5rem;
+  width: 100%;
+  max-width: 680px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-carousel-frame {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  background: var(--bg-surface);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.35s ease, transform 0.35s ease, box-shadow 0.2s ease;
+}
+
+.hero-carousel-frame:hover {
+  box-shadow: 0 4px 24px rgba(108, 101, 252, 0.12);
+  border-color: var(--color-indigo);
+}
+
+.hero-carousel-frame.hc-fade-in {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.hero-carousel-frame.hc-fade-out {
+  opacity: 0;
+  transform: scale(0.97);
+}
+
+/* ── Footer: label + dots ── */
+.hero-carousel-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.6rem;
+}
+
+.hero-carousel-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.hero-carousel-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.hero-carousel-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1.5px solid var(--text-muted);
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.hero-carousel-dot:hover {
+  border-color: var(--color-indigo);
+  background: rgba(108, 101, 252, 0.2);
+}
+
+.hero-carousel-dot.active {
+  background: var(--color-indigo);
+  border-color: var(--color-indigo);
+  transform: scale(1.3);
+}
+
+/* =========================================
+   FRAME 1: L1 Filter Mechanism
+   ========================================= */
+.cf-filter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem 1rem;
+  width: 100%;
+}
+
+.cf-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: nowrap;
+}
+
+.cf-filter-node {
+  padding: 0.35rem 0.6rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+  opacity: 0;
+  animation: cf-pop-in 0.4s ease forwards;
+}
+
+.cf-node-word {
+  background: var(--glass-bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.cf-node-phon {
+  background: rgba(108, 101, 252, 0.08);
+  border: 1px solid rgba(108, 101, 252, 0.25);
+  color: var(--color-indigo);
+}
+
+.cf-node-key {
+  background: rgba(230, 87, 199, 0.1);
+  border: 1px solid rgba(230, 87, 199, 0.3);
+  color: var(--color-hot-pink);
+  font-weight: 700;
+}
+
+.cf-ipa {
+  font-family: var(--font-ipa);
+  font-style: italic;
+}
+
+.cf-filter-arrow {
+  font-size: 1rem;
+  color: var(--text-muted);
+  opacity: 0;
+  animation: cf-pop-in 0.3s ease forwards;
+}
+
+.cf-filter-collapse {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  opacity: 0;
+  animation: cf-pop-in 0.3s ease forwards;
+}
+
+.cf-collapse-label {
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-hot-pink);
+}
+
+.cf-collapse-arrows {
+  font-size: 1.1rem;
+  color: var(--color-hot-pink);
+  animation: cf-pulse 2s ease-in-out infinite;
+}
+
+.cf-filter-caption {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-align: center;
+  max-width: 420px;
+  opacity: 0;
+  animation: cf-pop-in 0.5s ease forwards;
+}
+
+/* Staggered entrance delays */
+.cf-anim-1  { animation-delay: 0.1s; }
+.cf-anim-2  { animation-delay: 0.25s; }
+.cf-anim-3  { animation-delay: 0.4s; }
+.cf-anim-4  { animation-delay: 0.6s; }
+.cf-anim-5  { animation-delay: 0.8s; }
+.cf-anim-6  { animation-delay: 1.0s; }
+.cf-anim-7  { animation-delay: 1.15s; }
+.cf-anim-8  { animation-delay: 1.3s; }
+.cf-anim-9  { animation-delay: 1.45s; }
+.cf-anim-10 { animation-delay: 1.8s; }
+
+/* =========================================
+   FRAME 2: Gradient Spectrum
+   ========================================= */
+.cf-gradient {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2rem 2.5rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.cf-gradient-bar {
+  position: relative;
+  width: 100%;
+  height: 28px;
+  border-radius: 14px;
+  background: var(--border);
+  overflow: visible;
+}
+
+.cf-gradient-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background: linear-gradient(
+    90deg,
+    var(--color-lavender) 0%,
+    var(--color-purple) 30%,
+    var(--color-hot-pink) 70%,
+    var(--color-indigo) 100%
+  );
+  animation: cf-gradient-grow 1.2s ease forwards;
+  transform-origin: left center;
+}
+
+.cf-gradient-markers {
+  position: absolute;
+  inset: 0;
+}
+
+.cf-gm {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  opacity: 0;
+  animation: cf-pop-in 0.4s ease forwards;
+}
+
+.cf-gm-f  { animation-delay: 0.6s; }
+.cf-gm-pb { animation-delay: 0.8s; }
+.cf-gm-h  { animation-delay: 1.0s; }
+.cf-gm-lr { animation-delay: 1.2s; }
+
+.cf-gm-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--bg);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.15);
+}
+
+.cf-gm-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-top: 0.6rem;
+}
+
+.cf-gm-val {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.cf-gradient-labels {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* =========================================
+   FRAME 3: Coin Bias Model
+   ========================================= */
+.cf-coins {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2rem;
+  padding: 1.5rem 1rem 1rem;
+  position: relative;
+  width: 100%;
+}
+
+.cf-coin-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  opacity: 0;
+  animation: cf-pop-in 0.4s ease forwards;
+}
+
+.cf-coin {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 2.5px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-surface);
+  animation: cf-coin-flip 0.8s ease forwards;
+  transform: rotateY(90deg);
+}
+
+.cf-coin-code {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.cf-coin-pct {
+  font-size: 1.1rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  animation: cf-pop-in 0.3s ease forwards;
+}
+
+.cf-coin-desc {
+  font-size: 0.55rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.cf-coins-formula {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  animation: cf-pop-in 0.5s ease 1.2s forwards;
+}
+
+.cf-coins-formula-text {
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+/* =========================================
+   FRAME 4: Forest Plot
+   ========================================= */
+.cf-forest {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.5rem 2rem 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.cf-forest-zero {
+  position: absolute;
+  top: 1rem;
+  bottom: 2.5rem;
+  width: 1px;
+  z-index: 1;
+}
+
+.cf-forest-zero-line {
+  position: absolute;
+  inset: 0;
+  width: 1px;
+  background: var(--text-muted);
+  opacity: 0.4;
+}
+
+.cf-forest-zero-label {
+  position: absolute;
+  bottom: -1.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.cf-forest-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  opacity: 0;
+  animation: cf-slide-in 0.5s ease forwards;
+}
+
+.cf-forest-label {
+  width: 24px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.cf-forest-track {
+  flex: 1;
+  height: 28px;
+  position: relative;
+  background: var(--border);
+  border-radius: 4px;
+}
+
+.cf-forest-interval {
+  position: absolute;
+  top: 50%;
+  height: 6px;
+  transform: translateY(-50%);
+  border-radius: 3px;
+  opacity: 0.5;
+  animation: cf-grow-width 0.6s ease forwards;
+  transform-origin: left center;
+}
+
+.cf-forest-point {
+  position: absolute;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  animation: cf-point-pop 0.3s ease forwards;
+  z-index: 2;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+}
+
+.cf-forest-axis-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.55rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  margin-top: 0.25rem;
+}
+
+/* =========================================
+   FRAME 5: Error Rate Bars
+   ========================================= */
+.cf-errors {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1.5rem 2rem 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.cf-error-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.cf-error-label {
+  width: 24px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.cf-error-track {
+  flex: 1;
+  height: 24px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.cf-error-bar {
+  height: 100%;
+  width: 0;
+  border-radius: 4px;
+  animation: cf-bar-grow 0.8s ease forwards;
+}
+
+.cf-error-pct {
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  min-width: 3rem;
+  opacity: 0;
+  animation: cf-pop-in 0.3s ease forwards;
+}
+
+.cf-errors-caption {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  text-align: center;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-top: 0.25rem;
+}
+
+/* =========================================
+   KEYFRAME ANIMATIONS
+   ========================================= */
+@keyframes cf-pop-in {
+  from { opacity: 0; transform: translateY(6px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes cf-slide-in {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes cf-pulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.15); }
+}
+
+@keyframes cf-gradient-grow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+@keyframes cf-coin-flip {
+  0%   { transform: rotateY(90deg); }
+  100% { transform: rotateY(0deg); }
+}
+
+@keyframes cf-bar-grow {
+  from { width: 0; }
+  to   { width: var(--bar-width); }
+}
+
+@keyframes cf-grow-width {
+  from { transform: translateY(-50%) scaleX(0); }
+  to   { transform: translateY(-50%) scaleX(1); }
+}
+
+@keyframes cf-point-pop {
+  from { transform: translate(-50%, -50%) scale(0); }
+  to   { transform: translate(-50%, -50%) scale(1); }
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+@media (max-width: 768px) {
+  .hero-carousel-frame {
+    height: 180px;
+  }
+
+  .cf-filter-row {
+    gap: 0.2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .cf-filter-node {
+    font-size: 0.65rem;
+    padding: 0.25rem 0.4rem;
+  }
+
+  .cf-coins {
+    gap: 1rem;
+  }
+
+  .cf-coin {
+    width: 44px;
+    height: 44px;
+  }
+
+  .cf-coin-pct {
+    font-size: 0.9rem;
+  }
+
+  .cf-gradient {
+    padding: 2rem 1.5rem;
+  }
+
+  .cf-forest,
+  .cf-errors {
+    padding: 1.5rem 1rem 1rem;
+  }
+}
