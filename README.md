@@ -12,6 +12,8 @@
 
 **⋆. 𐙚 ˚ Project Output Links ⋆. 𐙚 ˚** 
 
+- 🌐 Website: [https://sandriatran.github.io/qml-2025/]( https://sandriatran.github.io/qml-2025/)
+
 - 📄 Final Report: [The KEY to the ROCK: A Bayesian Re-analysis of Representational Indeterminacy](https://github.com/sandriatran/qml-2025/blob/main/final%20project/Re-Analyzing-Ota%2C-Hartsuiker-and-Haywood--2009----A-Bayesian-Approach-to-Representational-Indeterminacy.pdf)
 
 - 💻 Code:  [R Script Repository](https://github.com/sandriatran/qml-2025/blob/main/final%20project/Re-Analyzing%20Ota%20-%20%20%20A%20Bayesian%20Approach%20to%20Representational%20Indeterminacy.r)
