@@ -49,6 +49,7 @@ const GLOSSARY = {
   'Phonological': 'Related to the sound system of a language \u2014 how speech sounds are organized and distinguished.',
   'Lexical': 'Related to the mental dictionary \u2014 how words are stored and accessed in the brain.',
   'Distinctness': 'How perceptually separable two sounds are. Ranges from 0 (identical) to 1 (completely different).',
+  'Dependent Variable': 'The outcome measured in an experiment. Here: accuracy on each trial (1 = correct rejection, 0 = false positive).',
 };
 
 const SLIDE_TERMS = {

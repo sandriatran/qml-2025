@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
 import GlossarySidebar from './components/GlossarySidebar';
@@ -54,6 +55,11 @@ const GLOSSARY = {
   'Distinctness': 'How perceptually separable two sounds are. Ranges from 0 (identical) to 1 (completely different).',
   'Dependent Variable': 'The outcome you model or predict in the analysis (here, accuracy on each trial).',
   'DV': 'Dependent Variable: the outcome you model or predict in the analysis (here, accuracy on each trial).',
+  'Language Phonology': 'The sound system of a language — how speech sounds are organized, stored, and distinguished by speakers.',
+  'Visual Word Recognition': 'The cognitive process of identifying a written word, involving orthographic, phonological, and semantic activation.',
+  'Lexical Representation': 'The mental entry for a word in the brain\u2019s dictionary, including its sound form, spelling, and meaning.',
+  'Bilingualism': 'The ability to use two languages. In this study, Japanese\u2013English bilinguals whose L1 phonology influences L2 word storage.',
+  'Psycholinguistics': 'The study of how people acquire, produce, and comprehend language, bridging psychology and linguistics.',
 };
 
 // ============================================================
@@ -260,7 +266,8 @@ const ExperimentModal = ({ onClose }) => {
               <p className="exp-speed-note">
                 Respond <strong>quickly</strong> &mdash; trust your first instinct!
                 <br />
-                Use <kbd>R</kbd> for Related and <kbd>U</kbd> for Unrelated, or click the buttons.
+                <span className="exp-keyboard-hint">Use <kbd>R</kbd> for Related and <kbd>U</kbd> for Unrelated, or click the buttons.</span>
+                <span className="exp-touch-hint">Tap the buttons below to respond.</span>
               </p>
               <p className="exp-trial-count">20 trials &middot; ~30 seconds</p>
               <button className="exp-start-btn" onClick={startGame}>Start Experiment</button>
@@ -383,6 +390,216 @@ const ExperimentModal = ({ onClose }) => {
 };
 
 // ============================================================
+// SPOTLIGHT SEARCH
+// ============================================================
+const buildSearchIndex = () => {
+  const entries = [];
+  // Glossary terms
+  Object.entries(GLOSSARY).forEach(([term, def]) => {
+    entries.push({ type: 'glossary', label: term, description: def, searchText: `${term} ${def}`.toLowerCase() });
+  });
+  // Slides
+  slides.forEach((s, i) => {
+    if (s.title) {
+      const section = SECTIONS.find(sec => i >= sec.startIndex && i <= sec.endIndex);
+      entries.push({
+        type: 'slide', label: s.title, description: `${section?.label || ''} \u2014 Slide ${i + 1}`,
+        slideIndex: i, searchText: `${s.title} ${s.label || ''} ${section?.label || ''}`.toLowerCase()
+      });
+    }
+  });
+  return entries;
+};
+
+const fuzzyMatch = (query, text) => {
+  const q = query.toLowerCase();
+  const t = text.toLowerCase();
+  // exact substring match scores highest
+  if (t.includes(q)) return 2;
+  // fuzzy: all query chars appear in order
+  let qi = 0;
+  for (let ti = 0; ti < t.length && qi < q.length; ti++) {
+    if (t[ti] === q[qi]) qi++;
+  }
+  return qi === q.length ? 1 : 0;
+};
+
+const SpotlightSearch = ({ onClose, onNavigate }) => {
+  const [query, setQuery] = useState('');
+  const [selected, setSelected] = useState(0);
+  const [expanded, setExpanded] = useState(null);
+  const inputRef = useRef(null);
+  const indexRef = useRef(null);
+  if (!indexRef.current) indexRef.current = buildSearchIndex();
+
+  useEffect(() => { inputRef.current?.focus(); }, []);
+
+  const DEFAULT_TERMS = ['Representational Indeterminacy', 'L1', 'LX', 'False Positive', 'Posterior', 'ROPE'];
+  const DEFAULT_SLIDES = [0, 1, 5, 9, 22];
+
+  const defaults = indexRef.current.filter(e =>
+    (e.type === 'glossary' && DEFAULT_TERMS.includes(e.label)) ||
+    (e.type === 'slide' && DEFAULT_SLIDES.includes(e.slideIndex))
+  );
+
+  const results = query.length > 0
+    ? indexRef.current
+        .map(entry => ({ ...entry, score: fuzzyMatch(query, entry.searchText) }))
+        .filter(e => e.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 6)
+    : defaults;
+
+  useEffect(() => { setSelected(0); setExpanded(null); }, [query]);
+
+  const activate = (r, i) => {
+    if (r.type === 'slide' && r.slideIndex !== undefined) {
+      onNavigate(r.slideIndex);
+      onClose();
+    } else {
+      setExpanded(expanded === i ? null : i);
+    }
+  };
+
+  const handleKey = (e) => {
+    if (e.key === 'Escape') { onClose(); return; }
+    if (e.key === 'ArrowDown') { e.preventDefault(); setSelected(s => Math.min(s + 1, results.length - 1)); }
+    if (e.key === 'ArrowUp') { e.preventDefault(); setSelected(s => Math.max(s - 1, 0)); }
+    if (e.key === 'Enter' && results[selected]) { activate(results[selected], selected); }
+  };
+
+  return (
+    <div className="spotlight-backdrop" onClick={onClose}>
+      <div className="spotlight-modal" onClick={e => e.stopPropagation()}>
+        <div className="spotlight-input-row">
+          <svg className="spotlight-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="6.5" cy="6.5" r="5" /><line x1="10" y1="10" x2="15" y2="15" /></svg>
+          <input
+            ref={inputRef}
+            className="spotlight-input"
+            placeholder="Search glossary, slides, concepts..."
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            onKeyDown={handleKey}
+          />
+          <kbd className="spotlight-esc">Esc</kbd>
+        </div>
+        {results.length > 0 && (
+          <ul className="spotlight-results">
+            {results.map((r, i) => (
+              <li
+                key={`${r.type}-${r.label}-${i}`}
+                className={`spotlight-result ${i === selected ? 'selected' : ''} ${expanded === i ? 'expanded' : ''}`}
+                onMouseEnter={() => setSelected(i)}
+                onClick={() => activate(r, i)}
+              >
+                <span className={`spotlight-tag ${r.type}`}>{r.type === 'glossary' ? 'DEF' : 'SLIDE'}</span>
+                <div className="spotlight-result-text">
+                  <span className="spotlight-label">{r.label}</span>
+                  <span className={`spotlight-desc${expanded === i ? ' spotlight-desc-full' : ''}`}>{r.description}</span>
+                  {r.type === 'slide' && <span className="spotlight-action">Go to slide &rarr;</span>}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+        {query.length > 0 && results.length === 0 && (
+          <div className="spotlight-empty">No results for &ldquo;{query}&rdquo;</div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ============================================================
+// CUSTOM CURSOR
+// ============================================================
+const CursorAura = ({ enabled }) => {
+  const followerRef = useRef(null);
+  const dotRef = useRef(null);
+  const mouse = useRef({ x: 0, y: 0 });
+  const followerPos = useRef({ x: 0, y: 0 });
+  const raf = useRef(null);
+  const visible = useRef(false);
+
+  useEffect(() => {
+    if (!enabled || window.matchMedia('(hover: none)').matches) return;
+    const follower = followerRef.current;
+    const dot = dotRef.current;
+    if (!follower || !dot) return;
+
+    const onMove = (e) => {
+      mouse.current.x = e.clientX;
+      mouse.current.y = e.clientY;
+      dot.style.left = e.clientX + 'px';
+      dot.style.top = e.clientY + 'px';
+      if (!visible.current) {
+        follower.style.opacity = '1';
+        dot.style.opacity = '1';
+        visible.current = true;
+      }
+    };
+
+    const onLeave = () => {
+      follower.style.opacity = '0';
+      dot.style.opacity = '0';
+      visible.current = false;
+    };
+
+    const onEnterInteractive = () => {
+      follower.classList.add('hovering');
+      dot.classList.add('hovering');
+    };
+    const onLeaveInteractive = () => {
+      follower.classList.remove('hovering');
+      dot.classList.remove('hovering');
+    };
+
+    const animate = () => {
+      followerPos.current.x += (mouse.current.x - followerPos.current.x) * 0.15;
+      followerPos.current.y += (mouse.current.y - followerPos.current.y) * 0.15;
+      follower.style.left = followerPos.current.x + 'px';
+      follower.style.top = followerPos.current.y + 'px';
+      raf.current = requestAnimationFrame(animate);
+    };
+
+    const selector = 'a, button, kbd, .nav-btn, .theme-toggle, .overview-card, .appendix-tab, .tiered-toggle-btn, .slide-card';
+    const addHoverListeners = () => {
+      document.querySelectorAll(selector).forEach(el => {
+        el.addEventListener('mouseenter', onEnterInteractive);
+        el.addEventListener('mouseleave', onLeaveInteractive);
+      });
+    };
+
+    window.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseleave', onLeave);
+    raf.current = requestAnimationFrame(animate);
+    addHoverListeners();
+    const observer = new MutationObserver(addHoverListeners);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseleave', onLeave);
+      cancelAnimationFrame(raf.current);
+      observer.disconnect();
+      document.querySelectorAll(selector).forEach(el => {
+        el.removeEventListener('mouseenter', onEnterInteractive);
+        el.removeEventListener('mouseleave', onLeaveInteractive);
+      });
+    };
+  }, [enabled]);
+
+  if (!enabled) return null;
+
+  return (
+    <>
+      <div ref={followerRef} className="cursor-follower" />
+      <div ref={dotRef} className="cursor-dot" />
+    </>
+  );
+};
+
+// ============================================================
 // SMALL COMPONENTS
 // ============================================================
 const Tooltip = ({ term, children }) => {
@@ -390,35 +607,103 @@ const Tooltip = ({ term, children }) => {
   const ref = useRef(null);
   const [pos, setPos] = useState({ top: 0, left: 0 });
   const def = GLOSSARY[term];
-  const handleEnter = () => {
+  const updatePos = () => {
     if (ref.current) {
       const r = ref.current.getBoundingClientRect();
-      setPos({ top: r.top, left: r.left + r.width / 2 });
+      const left = Math.max(180, Math.min(r.left + r.width / 2, window.innerWidth - 180));
+      const top = Math.max(60, r.top);
+      setPos({ top, left });
     }
-    setShow(true);
   };
+  const handleEnter = () => { updatePos(); setShow(true); };
+  const handleTap = (e) => { e.stopPropagation(); updatePos(); setShow(s => !s); };
+  useEffect(() => {
+    if (!show) return;
+    const dismiss = () => setShow(false);
+    document.addEventListener('touchstart', dismiss);
+    return () => document.removeEventListener('touchstart', dismiss);
+  }, [show]);
   return (
-    <span className="glossary-term" ref={ref} onMouseEnter={handleEnter} onMouseLeave={() => setShow(false)}>
+    <span className="glossary-term" ref={ref} onMouseEnter={handleEnter} onMouseLeave={() => setShow(false)} onClick={handleTap}>
       {children}
-      {show && def && <span className="tooltip-popup" style={{ position: 'fixed', bottom: 'auto', top: pos.top - 8, left: pos.left, transform: 'translate(-50%, -100%)' }}>{def}</span>}
+      {show && def && createPortal(
+        <span className="tooltip-popup" style={{ position: 'fixed', bottom: 'auto', top: pos.top - 8, left: pos.left, transform: 'translate(-50%, -100%)' }}>{def}</span>,
+        document.body
+      )}
     </span>
   );
 };
 
-const CodeLink = ({ label }) => (
-  <a className="code-link-badge" href="https://github.com/sandriatran/qml-2025" target="_blank" rel="noopener noreferrer">
-    {'</>'} {label || 'Code'}
-  </a>
-);
+
 
 const ThreeLineFooter = ({ footer }) => {
+  const [expanded, setExpanded] = useState(false);
   if (!footer) return null;
   return (
-    <div className="three-line-footer">
-      <div className="footer-line"><span className="footer-label">Q</span>{footer.question}</div>
-      <div className="footer-line"><span className="footer-label">V</span>{footer.summary}</div>
-      <div className="footer-line footer-takehome"><span className="footer-label">&rarr;</span>{footer.takeHome}</div>
+    <div className={`three-line-footer ${expanded ? 'footer-expanded' : ''}`}>
+      <div className="footer-line footer-q-line" onClick={() => setExpanded(!expanded)} role="button" tabIndex={0}>
+        <span className="footer-label">Q</span>
+        <span>{footer.question}</span>
+        <span className="footer-chevron">{expanded ? '\u25B2' : '\u25BC'}</span>
+      </div>
+      <div className="footer-answer-lines">
+        <div className="footer-line"><span className="footer-label">V</span>{footer.summary}</div>
+        <div className="footer-line footer-takehome"><span className="footer-label">&rarr;</span>{footer.takeHome}</div>
+      </div>
     </div>
+  );
+};
+
+// ── Mobile Bottom Sheet Navigation ──
+const MobileNav = ({ currentIndex, totalSlides, goToSlide, theme, toggleTheme, showFormal, setShowFormal, setShowOverview, setShowAppendix, setShowExperiment }) => {
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const progress = ((currentIndex + 1) / totalSlides) * 100;
+  const currentSection = SECTIONS.find(s => currentIndex >= s.startIndex && currentIndex <= s.endIndex);
+  return (
+    <>
+      <nav className="mobile-nav" aria-label="Slide navigation">
+        <button className="mobile-nav-progress" onClick={() => setSheetOpen(true)} aria-label={`Slide ${currentIndex + 1} of ${totalSlides}`}>
+          <span className="mobile-nav-current">{currentIndex + 1}</span>
+          <div className="mobile-nav-track">
+            <div className="mobile-nav-bar" style={{ width: `${progress}%` }} />
+          </div>
+        </button>
+        <button className="mobile-nav-section" onClick={() => setSheetOpen(true)} aria-expanded={sheetOpen} aria-controls="mobile-sheet">
+          {currentSection?.label || 'Navigate'} &#x25B2;
+        </button>
+      </nav>
+      {sheetOpen && <div className="mobile-sheet-backdrop" onClick={() => setSheetOpen(false)} />}
+      <section id="mobile-sheet" className={`mobile-sheet ${sheetOpen ? 'mobile-sheet-open' : ''}`} role="dialog" aria-label="Choose section and slide">
+        <header className="mobile-sheet-header">
+          <h2>Go to</h2>
+          <button onClick={() => setSheetOpen(false)} aria-label="Close navigation">&times;</button>
+        </header>
+        <div className="mobile-sheet-body">
+          {SECTIONS.map(section => (
+            <div key={section.id} className="mobile-sheet-group">
+              <div className="mobile-sheet-label">
+                {section.label}
+                <span className="mobile-sheet-range">{section.startIndex + 1}&ndash;{section.endIndex + 1}</span>
+              </div>
+              <div className="mobile-sheet-chips">
+                {Array.from({ length: section.endIndex - section.startIndex + 1 }, (_, i) => section.startIndex + i).map(idx => (
+                  <button key={idx} className={`mobile-sheet-chip ${idx === currentIndex ? 'mobile-sheet-chip-active' : ''}`} onClick={() => { goToSlide(idx); setSheetOpen(false); }}>
+                    {idx + 1}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+          <div className="mobile-sheet-utils">
+            <button className="mobile-sheet-util" onClick={() => { toggleTheme(); }}>{theme === 'dark' ? '\u2600' : '\u263E'} Theme</button>
+            <button className="mobile-sheet-util" onClick={() => { setShowFormal(!showFormal); setSheetOpen(false); }}>{showFormal ? '\u2212M' : '+M'} Math</button>
+            <button className="mobile-sheet-util" onClick={() => { setShowOverview(true); setSheetOpen(false); }}>{'\u25A6'} Overview</button>
+            <button className="mobile-sheet-util" onClick={() => { setShowAppendix(true); setSheetOpen(false); }}>A Appendix</button>
+            <button className="mobile-sheet-util" onClick={() => { setShowExperiment(true); setSheetOpen(false); }}>E Experiment</button>
+          </div>
+        </div>
+      </section>
+    </>
   );
 };
 
@@ -439,16 +724,6 @@ const CONTRAST_SHORT = [
   { code: 'H', short: 'Homophones', color: 'var(--color-hot-pink)', tip: 'Homophones — Identical pronunciation (e.g., SUN–SON)' },
   { code: 'LR', short: '/l/\u2013/r/', color: 'var(--color-indigo)', tip: '/l/–/r/ (L1-absent) — Absent in Japanese' },
 ];
-const ContrastLegendStrip = () => (
-  <div className="contrast-legend-strip">
-    {CONTRAST_SHORT.map(c => (
-      <div key={c.code} className="contrast-legend-chip" title={c.tip}>
-        <span className="contrast-dot" style={{ background: c.color }}></span>
-        <span className="contrast-chip-label">{c.code} &middot; {c.short}</span>
-      </div>
-    ))}
-  </div>
-);
 
 // ── Representation Level Tag ──
 const RepLevelTag = ({ level }) => {
@@ -463,16 +738,19 @@ const RepLevelTag = ({ level }) => {
 
 // ── Figure Legend ──
 // Small annotation under each visualization explaining what the visual elements mean
-const FigureLegend = ({ text }) => (
-  <div className="figure-legend">{text}</div>
-);
-
-// ── Reproduce Tag ──
-// Links visualization to the R script section that generated it
-const ReproduceTag = ({ scriptRef }) => (
-  <a className="reproduce-tag" href="https://github.com/sandriatran/qml-2025" target="_blank" rel="noopener noreferrer">
-    {'</>'} {scriptRef}
-  </a>
+const FigureLegend = ({ text, showContrasts }) => (
+  <div className="figure-legend">
+    {text}
+    {showContrasts && (
+      <span className="figure-legend-colors">
+        {CONTRAST_SHORT.map(c => (
+          <span key={c.code} className="fig-color-key" title={c.tip}>
+            <span className="fig-color-dot" style={{ background: c.color }} />{c.code}
+          </span>
+        ))}
+      </span>
+    )}
+  </div>
 );
 
 // ── Theory Callout ──
@@ -504,6 +782,461 @@ const TieredContent = ({ tiers }) => {
   );
 };
 
+// ── Mobile Accordion (Summary slide — Strategy A) ──
+const FINDING_SUMMARIES = [
+  <>L1-Absent contrasts (/l/-/r/) produce <strong>~21% false-positive error rates</strong>, functionally equivalent to true homophones.</>,
+  <>Pairwise ROPE analysis confirms the hierarchy: <strong>LR and H are similar; both much worse than PB and F</strong>.</>,
+  <>Phonological distinctness is a <strong>gradient constraint</strong>, not binary.</>,
+  <>Effect generalizes across <strong>258 word pairs</strong> and <strong>20 participants</strong>.</>,
+  <>Bayesian validation: R-hat near 1.00 for all parameters, no divergences, robust to prior choice.</>,
+];
+
+const FINDING_DETAILS = {
+  plain: [
+    <>Japanese speakers confuse words like ROCK/LOCK because the /l/-/r/ sound difference doesn&rsquo;t exist in their language. They mistake these pairs at the same rate as actual identical-sounding words (homophones like SUN/SON).</>,
+    <>The more similar two sounds are in your first language, the more you confuse them in English &mdash; it&rsquo;s gradual, not all-or-nothing.</>,
+    <>Phonological distinctness operates on a continuous scale from 0 to 1, predicting error rates gradually rather than in discrete categories.</>,
+    <>All 20 participants showed the same pattern &mdash; this isn&rsquo;t driven by a few outliers. The effect holds across 258 word pairs.</>,
+    <>Multiple validation checks confirm the model works correctly: convergence diagnostics pass, no sampling pathologies, and results are robust to different prior specifications.</>,
+  ],
+  technical: [
+    <><span style={{ color: 'var(--color-indigo)', fontWeight: 700 }}>LR</span> false-positive rate (~21%) is statistically indistinguishable from <span style={{ color: 'var(--color-hot-pink)', fontWeight: 700 }}>H</span> (~24%) via ROPE analysis. Both fall outside ROPE.</>,
+    <>Pairwise contrasts confirm: <span style={{ color: 'var(--color-indigo)', fontWeight: 700 }}>LR</span> &asymp; <span style={{ color: 'var(--color-hot-pink)', fontWeight: 700 }}>H</span> {'\u226B'} <span style={{ color: 'var(--color-purple)', fontWeight: 700 }}>PB</span> &asymp; <span style={{ color: 'var(--color-lavender)', fontWeight: 700 }}>F</span></>,
+    <>Phonological distinctness (<InlineMath math="d_j \in [0, 1]" />) is a continuous predictor of log-odds accuracy &mdash; gradient, not categorical.</>,
+    <>Partial pooling via hierarchical random effects. Caterpillar plots show shrinkage toward group mean across subjects and items.</>,
+    <>R-hat &asymp; 1.00, ESS &gt; 1,000, zero divergences, LOO-CV comparable across 3 models.</>,
+  ],
+};
+
+const AccordionSummary = ({ slide, showFormal }) => {
+  const [expanded, setExpanded] = useState(null);
+  const [tier, setTier] = useState(1);
+  const tierKey = tier === 1 ? 'plain' : 'technical';
+
+  return (
+    <div className="slide slide-accordion" data-section="summary">
+      <div className="accordion-header">
+        <div className="content-header">
+          <div className="content-header-top">
+            <span className="slide-label">{slide.label}</span>
+            {slide.repLevel && <RepLevelTag level={slide.repLevel} />}
+          </div>
+          <h2 className="content-title">{slide.title}</h2>
+        </div>
+        <p className="narrative-text">{slide.text}</p>
+      </div>
+
+      {showFormal && (
+        <div className="accordion-tier-controls tier-controls">
+          <button className={`tier-btn ${tier === 1 ? 'active' : ''}`} onClick={() => setTier(1)}>Intuitive</button>
+          <button className={`tier-btn ${tier === 2 ? 'active' : ''}`} onClick={() => setTier(2)}>Technical</button>
+        </div>
+      )}
+
+      <div className="findings-accordion">
+        {FINDING_SUMMARIES.map((text, i) => (
+          <div key={i} className={`finding-accordion-item ${expanded === i ? 'expanded' : ''}`}>
+            <button
+              className="finding-accordion-summary"
+              onClick={() => setExpanded(expanded === i ? null : i)}
+              aria-expanded={expanded === i}
+            >
+              <span className="finding-num">{i + 1}</span>
+              <p>{text}</p>
+              <span className="finding-expand-icon">{expanded === i ? '\u25B2' : '\u25BC'}</span>
+            </button>
+            {expanded === i && showFormal && (
+              <div className="finding-accordion-detail">
+                <p className="tier-text">{FINDING_DETAILS[tierKey][i]}</p>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {slide.footer && <ThreeLineFooter footer={slide.footer} />}
+    </div>
+  );
+};
+
+// ── Mobile Card Flip (Theoretical Foundations — "Han vs. Ota") ──
+const TheoryCardMobile = ({ slide, showFormal }) => {
+  const [flipped, setFlipped] = useState(false);
+  return (
+    <div className="slide slide-theory-mobile" data-section="theory">
+      <div className="theory-mobile-header">
+        <div className="content-header">
+          <div className="content-header-top">
+            <span className="slide-label">{slide.label}</span>
+            {slide.repLevel && <RepLevelTag level={slide.repLevel} />}
+          </div>
+          <h2 className="content-title">{slide.title}</h2>
+        </div>
+      </div>
+
+      <div className="theory-card-hint">
+        <span className="theory-card-hint-icon">&#x27F2;</span>
+        <span>Tap to compare theories</span>
+      </div>
+
+      <div className="theory-card-container">
+        <div className={`theory-card ${flipped ? 'flipped' : ''}`}>
+          <div className="theory-card-face theory-face-han">
+            <div className="theory-card-face-header">
+              <h3><a href="https://doi.org/10.1007/s10936-020-09725-4" target="_blank" rel="noopener noreferrer">HAN ET AL. (2021)</a></h3>
+              <button className="theory-flip-btn" onClick={() => setFlipped(true)} aria-label="Show Ota theory">Show Ota &rarr;</button>
+            </div>
+            <div className="theory-card-face-body">
+              <h4>Orthography-First</h4>
+              <p>Orthography shapes L2 phonological processing; orthographic information can lead lexical processing.</p>
+              <p className="theory-card-method">Method: Cross-modal priming</p>
+            </div>
+          </div>
+          <div className="theory-card-face theory-face-ota">
+            <div className="theory-card-face-header">
+              <button className="theory-flip-btn" onClick={() => setFlipped(false)} aria-label="Show Han theory">&larr; Show Han</button>
+              <h3><a href="https://doi.org/10.1016/j.cognition.2008.12.007" target="_blank" rel="noopener noreferrer">OTA ET AL. (2009)</a></h3>
+            </div>
+            <div className="theory-card-face-body">
+              <h4>Phonological Constraint</h4>
+              <p>L1 phonology <strong>constrains</strong> L2 storage. When /l/-/r/ is absent from L1, it becomes indeterminate in L2.</p>
+              <p className="theory-card-method">Method: Visual semantic task</p>
+            </div>
+          </div>
+        </div>
+        <div className="theory-card-indicator">
+          <span>Currently showing: <strong>{flipped ? 'Ota' : 'Han'}</strong></span>
+        </div>
+      </div>
+
+      <div className="theory-verdict">
+        <div className="theory-verdict-label">OUR VERDICT</div>
+        <p><strong>Our data:</strong> LR error rates (&gt;20%) match Homophones, which supports <strong>structural filtering</strong> (Ota) over orthographic triggering (Han).</p>
+        {showFormal && (
+          <div className="theory-verdict-mechanism">
+            <div className="formal-header">STRUCTURAL FILTERING</div>
+            <p>If Japanese lacks /l/-/r/, LOCK and ROCK both reduce to <span className="ipa-form">/&#x0251;k/</span>, producing a single lexical entry that activates KEY. This is a claim about <em>storage</em>, not just <em>perception</em>.</p>
+          </div>
+        )}
+      </div>
+
+      {slide.footer && <ThreeLineFooter footer={slide.footer} />}
+    </div>
+  );
+};
+
+// ── Mobile Interactive Coins (Coin-Flip Metaphor — "3a. The Intuition") ──
+const COIN_CARDS = [
+  { code: 'F', label: 'Spelling Control', accuracy: '98%', errorRate: '2%', className: 'contrast-f',
+    pair: 'COUGH \u2013 WALL', expected: 'Low (baseline)',
+    why: 'Phonemes clearly distinct (COUGH\u2013WALL) \u2192 accurate rejection',
+    detail: 'This is the control condition. Multiple phonemes differ, so participants easily identify the pair as unrelated. Low error rates establish the baseline.' },
+  { code: 'PB', label: '/p/-/b/ Contrast', accuracy: '94%', errorRate: '6%', className: 'contrast-pb',
+    pair: 'BALL \u2013 PAT', expected: 'Low',
+    why: 'Contrast exists in L1 (/p/-/b/ in Japanese) \u2192 mostly accurate',
+    detail: 'Japanese speakers CAN distinguish /p/ and /b/, so BALL and PAT remain distinct. Error rates are similar to the F baseline.' },
+  { code: 'H', label: 'Homophone', accuracy: '76%', errorRate: '24%', className: 'contrast-h',
+    pair: 'SON \u2013 SUN', expected: 'High (universal)',
+    why: 'Same sound (SON\u2013SUN) \u2192 shared lexical entry causes errors',
+    detail: 'SON and SUN sound identical (/s\u028Cn/) to everyone, so they activate the same phonological representation. High error rates are universal, regardless of L1.' },
+  { code: 'LR', label: '/l/-/r/ Contrast', accuracy: '79%', errorRate: '21%', className: 'contrast-lr', highlight: true,
+    pair: 'KEY \u2013 ROCK', expected: 'High (L1-specific)',
+    why: '/l/-/r/ collapses in Japanese \u2192 ROCK\u2192LOCK\u2192KEY confusion',
+    detail: 'This matches H (homophone) error rates, supporting structural filtering: the sounds collapse in lexical storage, not just perception. This is our core hypothesis.' },
+];
+
+const CoinFlipMobile = ({ slide, showFormal }) => {
+  const [expanded, setExpanded] = useState(null);
+  return (
+    <div className="slide slide-coinflip-mobile" data-section="coin_flip">
+      <div className="coinflip-mobile-header">
+        <span className="content-label">{slide.label}</span>
+        <h2 className="content-title">{slide.title}</h2>
+      </div>
+
+      <div className="coinflip-mobile-explanation">
+        <p>In each trial, participants see two words and decide whether they are semantically related. For test pairs, the correct answer is always <strong>&ldquo;unrelated.&rdquo;</strong></p>
+        <p>Think of each decision as a biased coin flip: <strong>heads = correct, tails = error</strong>, with the coin&rsquo;s bias (<InlineMath math="\theta" />) varying by contrast type, subject, and word pair.</p>
+      </div>
+
+      <div className="coinflip-tap-hint">
+        <span>Tap any contrast to see details</span>
+      </div>
+
+      <div className="coinflip-grid">
+        {COIN_CARDS.map((c, i) => (
+          <article key={c.code} className={`coinflip-card ${c.className} ${c.highlight ? 'coinflip-card-highlight' : ''} ${expanded === i ? 'coinflip-card-active' : ''}`}>
+            <button className="coinflip-card-trigger" onClick={() => setExpanded(expanded === i ? null : i)} aria-expanded={expanded === i}>
+              <span className={`coinflip-badge ${c.className}`}>{c.code}</span>
+              <span className="coinflip-accuracy">{c.accuracy}</span>
+              <span className="coinflip-correct-label">correct</span>
+            </button>
+          </article>
+        ))}
+      </div>
+
+      {expanded !== null && (
+        <div className="coinflip-detail">
+          <div className="coinflip-detail-header">
+            <h3><span className={`coinflip-badge-sm ${COIN_CARDS[expanded].className}`}>{COIN_CARDS[expanded].code}</span> {COIN_CARDS[expanded].label}</h3>
+            <button className="coinflip-detail-close" onClick={() => setExpanded(null)} aria-label="Close details">&times;</button>
+          </div>
+          <div className="coinflip-detail-body">
+            <div className="coinflip-detail-pair">
+              <span className="coinflip-detail-word">{COIN_CARDS[expanded].pair.split(' \u2013 ')[0]}</span>
+              <span className="coinflip-detail-sep">&ndash;</span>
+              <span className="coinflip-detail-word">{COIN_CARDS[expanded].pair.split(' \u2013 ')[1]}</span>
+            </div>
+            <dl className="coinflip-detail-info">
+              <dt>Accuracy:</dt>
+              <dd><strong>{COIN_CARDS[expanded].accuracy} correct</strong> ({COIN_CARDS[expanded].errorRate} false positive)</dd>
+              <dt>Why?</dt>
+              <dd>{COIN_CARDS[expanded].why}</dd>
+              <dt>Expected:</dt>
+              <dd>{COIN_CARDS[expanded].expected}</dd>
+              <dt>Interpretation:</dt>
+              <dd>{COIN_CARDS[expanded].detail}</dd>
+            </dl>
+          </div>
+        </div>
+      )}
+
+      {showFormal && (
+        <div className="coinflip-mobile-formal">
+          <div className="formal-header">FROM COINS TO BERNOULLI</div>
+          <BlockMath math="y_{ijk} \sim \text{Bernoulli}(\theta_{ijk})" />
+          <div className="equation-annotation">
+            <span className="eq-term"><InlineMath math="y_{ijk}" /></span> = response (1 = correct, 0 = error)
+          </div>
+          <div className="equation-annotation">
+            <span className="eq-term"><InlineMath math="\theta_{ijk}" /></span> = probability of correct response (the coin&rsquo;s bias)
+          </div>
+          <p className="formal-note">Binary outcomes require a Bernoulli likelihood &mdash; the statistical formalization of a coin flip.</p>
+        </div>
+      )}
+
+      {slide.footer && <ThreeLineFooter footer={slide.footer} />}
+    </div>
+  );
+};
+
+// ── Mobile Data/Explain View (Model — "Bayesian Hierarchical Logistic Regression") ──
+const ModelMobile = ({ slide, showFormal }) => {
+  const [view, setView] = useState('data');
+  return (
+    <div className="slide slide-model-mobile" data-section="model">
+      <div className="model-mobile-header">
+        {showFormal && <ModelRecap />}
+        <span className="content-label">{slide.label}</span>
+        <h2 className="content-title">{slide.title}</h2>
+      </div>
+
+      <div className="model-view-toggle" role="tablist" aria-label="View mode">
+        <button role="tab" aria-selected={view === 'data'} className={`model-view-tab ${view === 'data' ? 'active' : ''}`} onClick={() => setView('data')}>
+          Data
+        </button>
+        <button role="tab" aria-selected={view === 'explain'} className={`model-view-tab ${view === 'explain' ? 'active' : ''}`} onClick={() => setView('explain')}>
+          Explain
+        </button>
+      </div>
+
+      {view === 'data' && (
+        <div className="model-data-panel" role="tabpanel">
+          <figure className="model-fullscreen-viz">
+            <div className="visual-img-pair">
+              <img src={slide.visualSrc} className="visual-img visual-img-light model-zoomable" alt="MCMC convergence traceplot" />
+              <img src={slide.visualSrc.replace('./assets/', './assets/dark_mode/')} className="visual-img visual-img-dark model-zoomable" alt="MCMC convergence traceplot" />
+            </div>
+            {slide.visualCaption && <figcaption className="model-viz-caption">{slide.visualCaption}</figcaption>}
+          </figure>
+          {slide.figureLegend && <div className="model-viz-legend">{slide.figureLegend}</div>}
+        </div>
+      )}
+
+      {view === 'explain' && (
+        <div className="model-explain-panel" role="tabpanel">
+          <div className="model-explain-text">
+            <p>{slide.text}</p>
+          </div>
+          {showFormal && slide.tiers && <TieredContent tiers={slide.tiers} />}
+          {showFormal && !slide.tiers && slide.formal}
+          {slide.theoryCallout && showFormal && (
+            <TheoryCallout text={slide.theoryCallout} />
+          )}
+        </div>
+      )}
+
+      {slide.footer && <ThreeLineFooter footer={slide.footer} />}
+    </div>
+  );
+};
+
+// ── Mobile Card Stack (Experimental Design — "Four Contrast Types") ──
+const CONTRAST_CARDS = [
+  { code: 'F', label: 'Spelling', pair: 'COUGH \u2013 WALL', expected: 'Low (baseline)', className: 'contrast-f',
+    phonology: 'Multiple phonemes differ',
+    why: 'This is the control condition. COUGH and WALL share no phonological or orthographic similarity, so participants should easily reject them as unrelated. Low error rates here establish the baseline.' },
+  { code: 'PB', label: '/p/-/b/', pair: 'BALL \u2013 PAT', expected: 'Low', className: 'contrast-pb',
+    phonology: '/p/-/b/ contrast (present in Japanese)',
+    why: 'Japanese speakers CAN distinguish /p/ and /b/, so BALL and PAT should remain distinct in their lexical storage. Error rates should be similar to the F baseline.' },
+  { code: 'H', label: 'Homophones', pair: 'SON \u2013 SUN', expected: 'High (universal)', className: 'contrast-h',
+    phonology: 'Homophone (identical sound)',
+    why: 'SON and SUN sound identical (/s\u028Cn/) to everyone, so they activate the same phonological representation. High error rates are expected for all participants, regardless of L1.' },
+  { code: 'LR', label: '/l/-/r/', pair: 'KEY \u2013 ROCK', expected: 'High (L1-specific)', className: 'contrast-lr', highlight: true,
+    phonology: '/l/-/r/ contrast (absent in Japanese)',
+    why: 'This is our core hypothesis: If Japanese lacks /l/-/r/, then LOCK/ROCK should behave like homophones for Japanese speakers. Error rates matching the H condition would support structural filtering \u2014 the sounds collapse in lexical storage, not just perception.' },
+];
+
+const DesignCardsMobile = ({ slide, showFormal }) => {
+  const [expanded, setExpanded] = useState(null);
+  return (
+    <div className="slide slide-design-mobile" data-section="design">
+      <div className="design-mobile-header">
+        {showFormal && slide.showModelRecap && <ModelRecap />}
+        <div className="content-header">
+          <div className="content-header-top">
+            <span className="slide-label">{slide.label}</span>
+            {slide.repLevel && <RepLevelTag level={slide.repLevel} />}
+          </div>
+          <h2 className="content-title">{slide.title}</h2>
+        </div>
+      </div>
+
+      <div className="design-mobile-intro">
+        <p>Participants judge semantic relatedness of <strong>visually presented</strong> word pairs. On unrelated trials, responding &ldquo;related&rdquo; counts as a <strong>false positive</strong>. The task isolates <em>lexical</em> representations from auditory discrimination.</p>
+      </div>
+
+      <div className="design-contrast-cards">
+        {CONTRAST_CARDS.map((c, i) => (
+          <article key={c.code} className={`design-card ${c.highlight ? 'design-card-highlight' : ''} ${expanded === i ? 'design-card-expanded' : ''}`}>
+            <button className="design-card-header" onClick={() => setExpanded(expanded === i ? null : i)} aria-expanded={expanded === i}>
+              <div className="design-card-title">
+                <span className={`design-card-badge ${c.className}`}>{c.code}</span>
+                <span className="design-card-label">&middot; {c.label}</span>
+              </div>
+              <div className="design-card-preview">
+                <span className="design-card-pair">{c.pair}</span>
+                <span className="design-card-expected">Expected: {c.expected}</span>
+              </div>
+              <span className="design-card-chevron">{expanded === i ? '\u25B2' : '\u25BC'}</span>
+            </button>
+            {expanded === i && (
+              <div className="design-card-detail">
+                <dl className="design-detail-list">
+                  <dt>Phonological Relationship:</dt>
+                  <dd>{c.phonology}</dd>
+                  <dt>Expected Error Rate:</dt>
+                  <dd><strong>{c.expected}</strong></dd>
+                  <dt>Why This Matters:</dt>
+                  <dd>{c.why}</dd>
+                </dl>
+              </div>
+            )}
+          </article>
+        ))}
+      </div>
+
+      <div className="design-mobile-caption">N = 20 Japanese L1 users &middot; ~1,200 trials &middot; 258 unique word pairs</div>
+
+      {showFormal && (
+        <div className="design-mobile-formal">
+          <div className="formal-header">PHONOLOGICAL DISTINCTNESS SCALE</div>
+          <p>Accuracy coded as 1 = correct rejection, 0 = false positive.</p>
+          <div className="distinctness-scale">
+            <div className="scale-item"><span className="scale-label">Homophone</span><span className="scale-val">0.0</span></div>
+            <div className="scale-sep" />
+            <div className="scale-item"><span className="scale-label">L1-Absent</span><span className="scale-val">0.3</span></div>
+            <div className="scale-sep" />
+            <div className="scale-item"><span className="scale-label">L1-Present</span><span className="scale-val">0.8</span></div>
+            <div className="scale-sep" />
+            <div className="scale-item"><span className="scale-label">Control</span><span className="scale-val">1.0</span></div>
+            <div className="scale-gradient-edge" />
+          </div>
+        </div>
+      )}
+
+      {slide.footer && <ThreeLineFooter footer={slide.footer} />}
+    </div>
+  );
+};
+
+// ── Mobile Inline Flow (Phonological Chain — "From Sound to Meaning") ──
+const PhenomenonMobile = ({ slide, showFormal }) => (
+  <div className="slide slide-phenomenon-mobile" data-section="phonological">
+    <div className="phenom-header">
+      <div className="content-header">
+        <div className="content-header-top">
+          <span className="slide-label">{slide.label}</span>
+          {slide.repLevel && <RepLevelTag level={slide.repLevel} />}
+        </div>
+        <h2 className="content-title">{slide.title}</h2>
+      </div>
+    </div>
+
+    <div className="phenom-flow">
+      <p className="phenom-intro">
+        The /l/&ndash;/r/ distinction does not exist in Japanese phonology.
+        When Japanese speakers store English words:
+      </p>
+
+      {/* Step 1: Input words */}
+      <figure className="phenom-diagram-segment">
+        <div className="phenom-word-pair">
+          <div className="phenom-word-box">
+            <span className="phenom-word">ROCK</span>
+            <span className="phenom-phonetic">/&#x0279;&#x0251;k/</span>
+          </div>
+          <div className="phenom-word-box">
+            <span className="phenom-word">LOCK</span>
+            <span className="phenom-phonetic">/l&#x0251;k/</span>
+          </div>
+        </div>
+        <div className="phenom-arrow-down">&darr;</div>
+        <div className="phenom-constraint">No /l/&ndash;/r/ contrast in Japanese</div>
+      </figure>
+
+      <p className="phenom-explanation">
+        ROCK and LOCK map to the <strong>same phonological form</strong>,
+        creating representational indeterminacy.
+      </p>
+
+      {/* Step 2: Merged form + KEY */}
+      <figure className="phenom-diagram-segment phenom-merge-segment">
+        <div className="phenom-merged-form">
+          <span className="phenom-merged-label">Single representation</span>
+          <span className="phenom-merged-phoneme">/&#x0251;k/</span>
+        </div>
+        <div className="phenom-arrow-down">&darr;</div>
+        <div className="phenom-semantic-box">
+          <span className="phenom-word">KEY</span>
+          <span className="phenom-semantic-note">Semantic associate activated</span>
+        </div>
+      </figure>
+
+      {/* Consequence callout */}
+      <div className="phenom-insight">
+        <p>This creates <strong>false positives</strong>: Japanese speakers
+        incorrectly judge ROCK and KEY as related
+        (<strong>~21% error rate</strong>), matching true homophones.</p>
+      </div>
+
+      {/* Formal section */}
+      {showFormal && (
+        <div className="phenom-mechanism">
+          <div className="formal-header">STRUCTURAL FILTERING MECHANISM</div>
+          <p>If Japanese lacks /l/&ndash;/r/, then LOCK and ROCK both reduce to <span className="ipa-form">/&#x0251;k/</span> at the phonological level, producing a single lexical entry that activates KEY.</p>
+          <p>The experiment presents <strong>visually displayed</strong> word pairs (no audio). Participants judge semantic relatedness. A &ldquo;false positive&rdquo; means incorrectly accepting an unrelated pair as related &mdash; evidence that the phonological collapse activates the wrong lexical entry.</p>
+          <p className="formal-note">This is a claim about <em>storage</em> (lexical representation), not just <em>perception</em> (auditory discrimination). The visual task eliminates auditory confounds entirely.</p>
+        </div>
+      )}
+
+      <p className="phenom-try-it"><em>Want to experience this yourself?</em> Press <kbd>E</kbd> to try the experiment.</p>
+    </div>
+
+    {slide.footer && <ThreeLineFooter footer={slide.footer} />}
+  </div>
+);
+
 // ── Technical Appendix Modal ──
 const TechnicalAppendix = ({ onClose }) => (
   <div className="overview-backdrop" onClick={onClose}>
@@ -513,6 +1246,22 @@ const TechnicalAppendix = ({ onClose }) => (
         <button className="overview-close" onClick={onClose}>&times;</button>
       </div>
       <div className="overview-body technical-content">
+
+        <div className="appendix-section hotkey-section">
+          <h4>Keyboard Shortcuts</h4>
+          <div className="hotkey-grid">
+            <div className="hotkey-item"><kbd>D</kbd><span>Dark / Light mode</span></div>
+            <div className="hotkey-item"><kbd>M</kbd><span>Math notation on / off</span></div>
+            <div className="hotkey-item"><kbd>A</kbd><span>Technical Appendix</span></div>
+            <div className="hotkey-item"><kbd>E</kbd><span>Try the Experiment</span></div>
+            <div className="hotkey-item"><kbd>O</kbd><span>Slide Overview</span></div>
+            <div className="hotkey-item"><kbd>&larr;</kbd> <kbd>&rarr;</kbd><span>Navigate slides</span></div>
+            <div className="hotkey-item"><kbd>Space</kbd><span>Next slide</span></div>
+            <div className="hotkey-item"><kbd>Esc</kbd><span>Close modal</span></div>
+            <div className="hotkey-item"><kbd>&#8984;</kbd> <kbd>K</kbd><span>Spotlight search</span></div>
+          </div>
+          <p className="hotkey-note">Custom cursor and dyslexia font can be toggled from the bottom bar.</p>
+        </div>
 
         <div className="appendix-section">
           <h4>Notation Guide</h4>
@@ -567,6 +1316,24 @@ const TechnicalAppendix = ({ onClose }) => (
         </div>
 
         <div className="appendix-section">
+          <h4>MCMC Configuration</h4>
+          <table className="appendix-table">
+            <thead><tr><th>Parameter</th><th>Value</th></tr></thead>
+            <tbody>
+              <tr><td>Chains</td><td>4</td></tr>
+              <tr><td>Iterations per chain</td><td>2,000</td></tr>
+              <tr><td>Warmup</td><td>1,000</td></tr>
+              <tr><td>Post-warmup draws</td><td>4,000 total</td></tr>
+              <tr><td>Sampler</td><td>NUTS (No-U-Turn)</td></tr>
+              <tr><td><code>adapt_delta</code></td><td>0.95</td></tr>
+              <tr><td><code>max_treedepth</code></td><td>15</td></tr>
+              <tr><td>Seed</td><td>2025</td></tr>
+            </tbody>
+          </table>
+          <p className="appendix-note">Elevated <code>adapt_delta</code> (0.95 vs. default 0.80) reduces step size to better navigate the hierarchical posterior geometry. All models fit via <code>brms::brm()</code> with Stan backend.</p>
+        </div>
+
+        <div className="appendix-section">
           <h4>MCMC Diagnostics</h4>
           <table className="appendix-table">
             <thead><tr><th>Diagnostic</th><th>Criterion</th><th>Result</th></tr></thead>
@@ -580,6 +1347,34 @@ const TechnicalAppendix = ({ onClose }) => (
           </table>
           <p className="appendix-note">Following Vehtari et al. (2021), bulk ESS &gt; 400 is minimum for stable estimates; all parameters exceeded 1,000.</p>
           <p className="appendix-note">Overall, the MCMC chains have converged, effective sample sizes are well above recommended per-parameter minima, and there are no divergences or tree-depth issues, indicating a single well-explored posterior and small Monte Carlo error for all reported estimates.</p>
+        </div>
+
+        <div className="appendix-section">
+          <h4>Posterior Predictive Checks</h4>
+          <p>PPC compares observed data to data simulated from the fitted model. For each of the three models, 100 replicated datasets were drawn from the posterior predictive distribution and compared against the observed proportion of correct responses per contrast type.</p>
+          <table className="appendix-table">
+            <thead><tr><th>Check</th><th>Method</th><th>Result</th></tr></thead>
+            <tbody>
+              <tr><td>Overall accuracy</td><td>Observed vs. predicted mean</td><td className="pass">Within 95% PPC interval</td></tr>
+              <tr><td>By-contrast rates</td><td>Observed vs. predicted per group</td><td className="pass">All four groups captured</td></tr>
+              <tr><td>Distribution shape</td><td>Density overlay (100 reps)</td><td className="pass">No systematic misfit</td></tr>
+            </tbody>
+          </table>
+          <p className="appendix-note">PPC confirms that the Bernoulli GLMM adequately reproduces the observed pattern of false positives across all contrast types. No group shows systematic over- or under-prediction.</p>
+        </div>
+
+        <div className="appendix-section">
+          <h4>Contrast Definitions</h4>
+          <table className="appendix-table">
+            <thead><tr><th>Code</th><th>Full Name</th><th>Phonological Relationship</th><th>Distinctness</th><th>Example</th></tr></thead>
+            <tbody>
+              <tr><td><strong style={{ color: 'var(--color-lavender)' }}>F</strong></td><td>Fully distinct</td><td>No phonological overlap</td><td>1.0</td><td>BANK&ndash;RIVER</td></tr>
+              <tr><td><strong style={{ color: 'var(--color-purple)' }}>PB</strong></td><td>L1-Present</td><td>/p/&ndash;/b/ exists in Japanese</td><td>0.8</td><td>PIG&ndash;BIG</td></tr>
+              <tr><td><strong style={{ color: 'var(--color-hot-pink)' }}>H</strong></td><td>Homophone</td><td>Identical pronunciation</td><td>0.0</td><td>SUN&ndash;SON</td></tr>
+              <tr><td><strong style={{ color: 'var(--color-indigo)' }}>LR</strong></td><td>L1-Absent</td><td>/l/&ndash;/r/ absent from Japanese</td><td>0.3</td><td>LOCK&ndash;ROCK</td></tr>
+            </tbody>
+          </table>
+          <p className="appendix-note">The critical prediction is LR &asymp; H: if the L1-absent contrast collapses in storage, L1-absent pairs should behave like true homophones.</p>
         </div>
 
         <div className="appendix-section">
@@ -660,6 +1455,34 @@ const TechnicalAppendix = ({ onClose }) => (
             </ul>
           </div>
         </div>
+
+        <div className="appendix-section">
+          <h4>Experimental Word Pairs</h4>
+          <p className="appendix-note" style={{ marginBottom: '0.75rem' }}>Representative unrelated pairs from Ota et al. (2009), grouped by contrast type. In the experiment, participants judged whether each pair was semantically related; errors on these unrelated pairs are the dependent variable.</p>
+          <details className="word-pairs-details">
+            <summary className="word-pairs-summary">Show all word pairs ({EXP_LR.length + EXP_H.length + EXP_PB.length} pairs)</summary>
+            <div className="word-pairs-grid">
+              <div className="word-pairs-group">
+                <h5 className="word-pairs-heading" style={{ color: 'var(--color-indigo)' }}>LR &mdash; L1-Absent (/l/&ndash;/r/) <span className="word-pairs-count">{EXP_LR.length} pairs</span></h5>
+                <div className="word-pairs-list">
+                  {EXP_LR.map(([a, b], i) => <span key={i} className="word-pair-chip word-pair-lr">{a} &ndash; {b}</span>)}
+                </div>
+              </div>
+              <div className="word-pairs-group">
+                <h5 className="word-pairs-heading" style={{ color: 'var(--color-hot-pink)' }}>H &mdash; Homophone <span className="word-pairs-count">{EXP_H.length} pairs</span></h5>
+                <div className="word-pairs-list">
+                  {EXP_H.map(([a, b], i) => <span key={i} className="word-pair-chip word-pair-h">{a} &ndash; {b}</span>)}
+                </div>
+              </div>
+              <div className="word-pairs-group">
+                <h5 className="word-pairs-heading" style={{ color: 'var(--color-purple)' }}>PB &mdash; L1-Present (/p/&ndash;/b/) <span className="word-pairs-count">{EXP_PB.length} pairs</span></h5>
+                <div className="word-pairs-list">
+                  {EXP_PB.map(([a, b], i) => <span key={i} className="word-pair-chip word-pair-pb">{a} &ndash; {b}</span>)}
+                </div>
+              </div>
+            </div>
+          </details>
+        </div>
       </div>
     </div>
   </div>
@@ -704,7 +1527,7 @@ const slides = [
     id: 'title', type: 'hero',
     title: 'The Key to the Rock',
     subtitle: 'Why Japanese speakers see ROCK and think of KEY',
-    subtitleTechnical: 'A Bayesian re-analysis of representational indeterminacy in L2 visual word recognition',
+    subtitleTechnical: 'Bayesian hierarchical modeling of phonological mediation in L2 visual word recognition',
     credit: 'V. Manson & S. Tran',
   },
 
@@ -797,10 +1620,13 @@ const slides = [
         <p className="chain-caption">For Japanese L1 users, /l/ and /&#x0279;/ collapse to one phoneme. ROCK and LOCK share a single lexical entry, both triggering KEY.</p>
       </div>
     ),
-    text: (<>The /l/&ndash;/r/ distinction does not exist in Japanese phonology. When Japanese speakers store English words, ROCK and LOCK map to the <strong>same phonological form</strong>, creating representational indeterminacy. Our Bayesian re-analysis focuses on <strong>false positives</strong>: how often do participants incorrectly judge unrelated pairs as related? <em>Want to experience this yourself?</em> Press <kbd>E</kbd> to try the experiment.</>),
+    text: (<>This phonological collapse has a measurable consequence: <strong>false positives</strong>. Japanese speakers incorrectly judge unrelated pairs like ROCK&ndash;KEY as related, because ROCK activates the same lexical entry as LOCK. Our Bayesian re-analysis quantifies this error rate and tests whether it matches true homophones. <em>Want to experience this yourself?</em> Press <kbd>E</kbd> to try the experiment.</>),
     formal: (
       <div className="formal-block">
-        <div className="formal-header">STRUCTURAL FILTERING MECHANISM</div>
+        <div className="formal-header">DEFINITION: NEAR-HOMOPHONY</div>
+        <p className="formal-definition">Two L2 words are <strong>near-homophones</strong> when a phonological contrast that distinguishes them in L2 is <em>absent</em> from the speaker&rsquo;s L1, causing both words to map to a single phonological representation in the mental lexicon.</p>
+        <p style={{ fontSize: '0.85rem', margin: '0.5rem 0' }}>Formally: if L1 lacks contrast <em>c</em>, then L2 words <em>w</em><sub>1</sub> and <em>w</em><sub>2</sub> differing only by <em>c</em> satisfy <em>w</em><sub>1</sub> &asymp; <em>w</em><sub>2</sub> in lexical storage, i.e., they share a representation despite distinct orthography.</p>
+        <div className="formal-header" style={{ marginTop: '0.75rem' }}>STRUCTURAL FILTERING MECHANISM</div>
         <p>If Japanese lacks /l/&ndash;/r/, then LOCK and ROCK both reduce to <span className="ipa-form">/&#x0251;k/</span> at the phonological level, producing a single lexical entry that activates KEY.</p>
         <p>The experiment presents <strong>visually displayed</strong> word pairs (no audio). Participants judge semantic relatedness. A &ldquo;false positive&rdquo; means incorrectly accepting an unrelated pair as related &mdash; evidence that the phonological collapse activates the wrong lexical entry.</p>
         <p className="formal-note">This is a claim about <em>storage</em> (lexical representation), not just <em>perception</em> (auditory discrimination). The visual task eliminates auditory confounds entirely.</p>
@@ -853,6 +1679,7 @@ const slides = [
     label: '2. EXPERIMENTAL DESIGN',
     title: 'The Four Contrast Types',
     repLevel: 'LEX',
+    showModelRecap: true,
     showContrastLegend: true,
     visualContent: (
       <div className="contrast-table">
@@ -865,7 +1692,7 @@ const slides = [
             <tr className="row-lr"><td><strong>LR</strong></td><td>KEY – ROCK</td><td>/l/-/r/ (absent in Japanese)</td><td>High (L1-specific)</td></tr>
           </tbody>
         </table>
-        <div className="table-caption">N = 20 Japanese L1 users \u00B7 ~1,200 trials \u00B7 258 unique word pairs</div>
+        <div className="table-caption">N = 20 Japanese L1 users · ~1,200 trials · 258 unique word pairs</div>
       </div>
     ),
     text: (<>Participants judge semantic relatedness of <strong>visually presented</strong> word pairs. On unrelated trials, responding &ldquo;related&rdquo; counts as a <Tooltip term="FP">false positive</Tooltip>. The task isolates <em>lexical</em> representations from auditory discrimination.</>),
@@ -1018,8 +1845,8 @@ const slides = [
     visualSrc: './assets/22_mcmc_convergence_lr.gif',
     visualCaption: 'MCMC convergence (4 chains \u00D7 2,000 iterations)',
     figureLegend: 'Traceplot: each line is an MCMC chain; convergence = chains mixing over the same region.',
-    reproduceTag: 'Step 13c, line 1079',
-    text: (<>We use <code>brms</code> to fit a <Tooltip term="GLMM">GLMM</Tooltip> with Bernoulli likelihood, logit link, and <Tooltip term="Partial Pooling">partial pooling</Tooltip> for subjects and items. Three model variants test different theoretical parameterizations. <CodeLink label="Model" /></>),
+
+    text: (<>We use <code>brms</code> to fit a <Tooltip term="GLMM">GLMM</Tooltip> with Bernoulli likelihood, logit link, and <Tooltip term="Partial Pooling">partial pooling</Tooltip> for subjects and items. Three model variants test different theoretical parameterizations.</>),
     tiers: {
       plain: (<p className="tier-text">The model accounts for both <strong>individual differences</strong> (some people are better at the task) and <strong>contrast effects</strong> (some sound pairs are harder). It borrows strength across participants and items to make better estimates.</p>),
       technical: (
@@ -1061,7 +1888,7 @@ const slides = [
     visualSrc: './assets/34_prior_to_posterior_updating.gif',
     visualCaption: 'Prior (wide) \u2192 Posterior (tight) updating',
     figureLegend: 'Dashed = prior density; solid = posterior density. Posterior is much narrower, showing data overwhelms the prior.',
-    reproduceTag: 'Step 13c, line 1150',
+
     tiers: {
       plain: (<p className="tier-text">Weakly informative priors let the data speak &mdash; they rule out absurd parameter values without biasing results in any direction.</p>),
       technical: (
@@ -1082,7 +1909,7 @@ const slides = [
         </div>
       )
     },
-    text: (<><Tooltip term="Weakly Informative">Weakly informative priors</Tooltip> regularize against overfitting with N=20. The prior is agnostic about effect direction. <CodeLink label="Priors" /></>),
+    text: (<><Tooltip term="Weakly Informative">Weakly informative priors</Tooltip> regularize against overfitting with N=20. The prior is agnostic about effect direction.</>),
     footer: { question: 'How are priors specified?', summary: 'Prior-to-posterior updating shows data overwhelms priors.', takeHome: 'Normal(0, 1.5) is agnostic yet regularizing; results are data-driven.' }
   },
 
@@ -1097,7 +1924,7 @@ const slides = [
     visualSrc: './assets/29_contrast_effect_intervals.gif',
     visualCaption: 'Posterior intervals stabilizing by contrast',
     figureLegend: 'Point = posterior median; thick bar = 66% CrI; thin bar = 95% CrI. Pink dashed line = zero (no effect).',
-    reproduceTag: 'Step 7, line 438',
+
     theoryCallout: 'LR and H both shift substantially left of zero, supporting structural filtering: L1-absent contrasts impair accuracy at the same magnitude as true homophones.',
     text: (<>Negative log-odds = decreased probability of correct response. LR and H are shifted <strong>substantially left</strong>, with 95% <Tooltip term="Credible Interval">credible intervals</Tooltip> entirely excluding zero.</>),
     formal: (
@@ -1125,7 +1952,7 @@ const slides = [
     visualSrc: './assets/30_error_growth_by_contrast.gif',
     visualCaption: 'Predicted error rates vs. observed data',
     figureLegend: 'Bar = posterior mean error rate; whisker = 95% CrI. Points = observed subject-level rates.',
-    reproduceTag: 'Step 8, line 493',
+
     theoryCallout: 'LR and H clustering together supports structural filtering: L1-absent contrasts collapse in L2 storage, producing homophone-like error rates.',
     text: (<>Transforming log-odds to <strong>probabilities</strong>: LR produces ~21% errors, 10&times; higher than the F baseline (~2%). This is the <em>lexical-level</em> consequence of phonological indeterminacy.</>),
     formal: (
@@ -1153,7 +1980,7 @@ const slides = [
     visualSrc: './assets/32_posterior_interference_strength.gif',
     visualCaption: 'Posterior interference strength by category',
     figureLegend: 'Point = posterior median interference; interval = 95% CrI. Categories ordered by predicted severity.',
-    reproduceTag: 'Step 12, line 700',
+
     theoryCallout: 'The key dimension is L1 phonological status, not specific contrast identity \u2014 supporting Ota\u2019s phonological constraint hypothesis over Han et al.\u2019s orthographic account.',
     text: (<>When grouped by <strong>phonological status</strong> (Unrelated, L1-Present, L1-Absent, Homophone), L1-Absent clusters with Homophone. The grouping captures the theoretical distinction better than raw contrast labels.</>),
     tiers: {
@@ -1187,7 +2014,7 @@ const slides = [
     visualSrc: './assets/31_distinctness_predicts_errors.gif',
     visualCaption: 'Distinctness scores predicting error probabilities',
     figureLegend: 'Curve = posterior predictive mean; ribbon = 95% CrI. Points = observed error rates by distinctness level.',
-    reproduceTag: 'Step 12, line 760',
+
     theoryCallout: 'Gradient distinctness suggests that L1 phonology constrains the L2 lexicon in a graded way, refining the original binary indeterminacy hypothesis.',
     text: (<>Each increase in <strong>phonological distinctness</strong> (from H 0.0 &rarr; LR 0.3 &rarr; PB 0.8 &rarr; F 1.0, based on the L1 inventory) is associated with a lower probability of L2 errors. This pattern is better captured by a <strong>graded</strong> distinctness predictor than by a simple low&ndash;high split.</>),
     tiers: {
@@ -1225,7 +2052,7 @@ const slides = [
     visualSrc: './assets/27_posterior_densities_by_contrast.gif',
     visualCaption: 'Posterior densities evolving',
     figureLegend: 'Shading = posterior density; dark core = 66% CrI; full span = 95% CrI. Dashed line = zero.',
-    reproduceTag: 'Step 13a, line 837',
+
     text: (<>The <code>ggdist</code> <Tooltip term="Halfeye Plot">halfeye plots</Tooltip> reveal full distributional uncertainty. LR shows a <strong>narrow, dark core</strong> (high precision), while PB is diffuse near zero.</>),
     tiers: {
       plain: (
@@ -1264,7 +2091,7 @@ const slides = [
     visualSrc: './assets/12_item_level_robustness.png',
     visualCaption: 'Error rate for every word pair, grouped by contrast',
     figureLegend: 'Point = observed error rate per word pair; color = contrast type. Sorted within each panel.',
-    reproduceTag: 'Step 12, line 636',
+
     text: (<>LR items show <strong>systematically elevated</strong> error rates &mdash; not driven by a few &ldquo;weird&rdquo; pairs. Some LR pairs (LAG&ndash;CLOTH) reach 100% errors; others (WRONG&ndash;SHORT) near 0%. This is evidence at the <em>lexical item</em> level.</>),
     tiers: {
       plain: (
@@ -1298,7 +2125,7 @@ const slides = [
     visualSrc: './assets/24_subject_caterpillar.png',
     visualCaption: 'Subject random intercepts (caterpillar plot)',
     figureLegend: 'Point = posterior mean random intercept; bar = 95% CrI. Ordered by magnitude. Dashed line = population mean.',
-    reproduceTag: 'Step 13c, line 1250',
+
     text: (<>The <Tooltip term="Caterpillar Plot">caterpillar plot</Tooltip> reveals variation in baseline accuracy across subjects, but <Tooltip term="Partial Pooling">partial pooling</Tooltip> pulls extremes toward the mean. This is individual-level <em>decision</em> variation, not phonological variation.</>),
     tiers: {
       plain: (<p className="tier-text">Individuals vary in overall accuracy, but the <strong>LR effect is universal</strong> &mdash; every participant shows the same pattern. The model accounts for individual differences without letting them mask the contrast effect.</p>),
@@ -1329,7 +2156,7 @@ const slides = [
     visualSrc: './assets/37_evidence_accumulation.gif',
     visualCaption: 'Cumulative accuracy as subjects are added (1 \u2192 20)',
     figureLegend: 'Line = running mean accuracy per contrast; ribbon = running 95% CI. Subjects added one at a time.',
-    reproduceTag: 'Step 15, line 2050',
+
     text: (<>By Subject 10 (halfway), the LR disadvantage is <strong>clearly established and stable</strong> &mdash; not a fragile artifact of a few extreme participants.</>),
     formal: (
       <div className="formal-block">
@@ -1355,7 +2182,7 @@ const slides = [
     visualSrc: './assets/33_lr_indeterminacy_zoom.gif',
     visualCaption: 'LR \u2248 H equivalence (ROPE)',
     figureLegend: 'Distribution = posterior of LR\u2013H difference; gray band = ROPE (\u00B10.18 log-odds, OR \u2248 0.84\u20131.20). Overlap = practical equivalence.',
-    reproduceTag: 'Step 15, line 1560',
+
     tiers: {
       plain: (<p className="tier-text">LR and H produce <strong>nearly equivalent</strong> error rates &mdash; the difference between them is small enough to be consistent with equivalence. This is the key test: if L1-absent contrasts truly collapse, they should behave like homophones.</p>),
       technical: (
@@ -1385,7 +2212,7 @@ const slides = [
         </div>
       )
     },
-    text: (<>The <Tooltip term="ROPE">ROPE</Tooltip> test (&plusmn;0.18 log-odds, OR &asymp; 0.84&ndash;1.20) shows <strong>substantial mass near zero for LR&ndash;H</strong>, consistent with practical equivalence, while <strong>LR differs credibly from PB</strong>. <CodeLink label="ROPE" /></>),
+    text: (<>The <Tooltip term="ROPE">ROPE</Tooltip> test (&plusmn;0.18 log-odds, OR &asymp; 0.84&ndash;1.20) shows <strong>substantial mass near zero for LR&ndash;H</strong>, consistent with practical equivalence, while <strong>LR differs credibly from PB</strong>.</>),
     footer: { question: 'Are LR and H truly equivalent?', summary: 'LR\u2013H posterior places substantial mass inside the ROPE band.', takeHome: 'LR and H behave as nearly equivalent; LR and PB are credibly different.' }
   },
 
@@ -1399,7 +2226,7 @@ const slides = [
     visualSrc: './assets/35_mcmc_posterior_sampling.gif',
     visualCaption: 'MCMC sampling from the posterior',
     figureLegend: 'Animated MCMC traces: well-mixed chains explore the same region, indicating convergence.',
-    reproduceTag: 'Step 13c, line 1079',
+
     tiers: {
       plain: (
         <div>
@@ -1434,7 +2261,7 @@ const slides = [
         </div>
       )
     },
-    text: (<>Four validation layers: <Tooltip term="MCMC">MCMC</Tooltip> diagnostics, <Tooltip term="PPC">posterior predictive checks</Tooltip>, prior sensitivity, and <Tooltip term="LOO-CV">LOO cross-validation</Tooltip>. <CodeLink label="Diagnostics" /></>),
+    text: (<>Four validation layers: <Tooltip term="MCMC">MCMC</Tooltip> diagnostics, <Tooltip term="PPC">posterior predictive checks</Tooltip>, prior sensitivity, and <Tooltip term="LOO-CV">LOO cross-validation</Tooltip>.</>),
     footer: { question: 'Can we trust the model?', summary: 'MCMC diagnostics, PPC, sensitivity, and LOO-CV all pass.', takeHome: 'Good convergence, no divergences, robust to widening priors, competitive LOO-CV.' }
   },
 
@@ -1449,7 +2276,7 @@ const slides = [
     visualSrc: './assets/proto_A_ranked_dot_chart.png',
     visualCaption: 'All word pairs ranked by posterior error rate',
     figureLegend: 'Dot = posterior mean error rate per item; color = contrast type. Horizontal position = error magnitude.',
-    reproduceTag: 'Step 15b, line 2350',
+
     theoryCallout: 'LR items dominate the high-error region \u2014 L1-absent /l/-/r/ items behave like near-homophones at the item level, supporting lexical-level representational indeterminacy.',
     text: (<>Every word pair ranked by its <Tooltip term="Posterior">posterior</Tooltip> mean error rate. <strong>LR pairs cluster at the top</strong>, but within-category variability reveals item-level effects beyond contrast type.</>),
     tiers: {
@@ -1484,7 +2311,7 @@ const slides = [
     visualSrc: './assets/38_subject_contrast_heatmap.png',
     visualCaption: 'Subject \u00D7 Contrast heatmap',
     figureLegend: 'Color = observed error rate per cell; darker = more errors. Rows = subjects; columns = contrast types.',
-    reproduceTag: 'Step 15, line 1470',
+
     theoryCallout: 'Universal LR elevation across all 20 subjects confirms the effect is population-level \u2014 not driven by individual learning strategies or task approaches.',
     text: (<>The heatmap shows that <strong>LR difficulty is universal</strong> across all 20 subjects. No subgroup drives the effect &mdash; every participant shows elevated LR errors. This is task-level (<em>decision</em>) evidence corroborating the lexical-level findings.</>),
     tiers: {
@@ -1520,7 +2347,7 @@ const slides = [
     visualSrc: './assets/39_pairwise_contrast_rope.png',
     visualCaption: 'All 6 pairwise comparisons with ROPE',
     figureLegend: 'Distribution = posterior pairwise difference; gray band = ROPE (\u00B10.18 log-odds, OR \u2248 0.84\u20131.20). Panels = all 6 contrasts.',
-    reproduceTag: 'Step 15, line 1560',
+
     theoryCallout: 'LR \u2248 H equivalence is the critical test: if L1-absent = homophone in the lexicon, representational indeterminacy is confirmed.',
     text: (<>The hierarchy is confirmed: <strong><span style={{ color: 'var(--color-indigo)' }}>LR</span> and <span style={{ color: 'var(--color-hot-pink)' }}>H</span> are equivalent; both much worse than <span style={{ color: 'var(--color-purple)' }}>PB</span> and <span style={{ color: 'var(--color-lavender)' }}>F</span></strong>.</>),
     tiers: {
@@ -1533,7 +2360,7 @@ const slides = [
       technical: (
         <div>
           <p style={{ fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.15em', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 600 }}>Pairwise comparisons</p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem', marginBottom: '1rem' }}>
+          <div className="pairwise-grid">
             <div style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', padding: '0.8rem', textAlign: 'center' }}>
               <span style={{ fontSize: '0.7rem', color: 'var(--color-indigo)', fontWeight: 600, letterSpacing: '0.05em' }}>LR</span>
               <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', display: 'block', margin: '2px 0' }}>vs</span>
@@ -1687,17 +2514,26 @@ const slides = [
             <span className="synthesis-node-label">Phonology</span>
             <span className="synthesis-node-text">/l/&ndash;/r/ absent in L1</span>
           </div>
-          <span className="synthesis-arrow">&darr;</span>
+          <div className="synthesis-labeled-arrow">
+            <span className="synthesis-arrow-line">&darr;</span>
+            <span className="synthesis-arrow-label">contrast collapse</span>
+          </div>
           <div className="synthesis-node synthesis-node-lex">
             <span className="synthesis-node-label">Lexicon</span>
             <span className="synthesis-node-text">ROCK &asymp; LOCK in storage</span>
           </div>
-          <span className="synthesis-arrow">&darr;</span>
+          <div className="synthesis-labeled-arrow">
+            <span className="synthesis-arrow-line">&darr;</span>
+            <span className="synthesis-arrow-label">shared entry activates KEY</span>
+          </div>
           <div className="synthesis-node synthesis-node-dec">
             <span className="synthesis-node-label">Decision</span>
             <span className="synthesis-node-text">~21% false positives</span>
           </div>
-          <span className="synthesis-arrow">&darr;</span>
+          <div className="synthesis-labeled-arrow">
+            <span className="synthesis-arrow-line">&darr;</span>
+            <span className="synthesis-arrow-label">Bayesian GLMM quantifies</span>
+          </div>
           <div className="synthesis-node synthesis-node-stat">
             <span className="synthesis-node-label">Statistics</span>
             <span className="synthesis-node-text">LR &asymp; H &#x226B; PB &asymp; F</span>
@@ -1725,6 +2561,71 @@ const slides = [
 ];
 
 // ============================================================
+// CELESTIAL INTRO — "The Key to the Rock"
+// ============================================================
+function CelestialIntro({ onComplete }) {
+  const [phase, setPhase] = useState(0);
+  const [dissolving, setDissolving] = useState(false);
+  const doneRef = useRef(false);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
+
+  const finish = useCallback(() => {
+    if (doneRef.current) return;
+    doneRef.current = true;
+    setDissolving(true);
+    setTimeout(() => onCompleteRef.current(), 500);
+  }, []);
+
+  // Phase timeline — slow teaser reveal (~2s)
+  useEffect(() => {
+    const timers = [];
+    const advance = (p, delay) => timers.push(setTimeout(() => setPhase(p), delay));
+    advance(1, 150);       // key + crystal fade in together
+    advance(2, 350);       // crystal catches up
+    advance(3, 800);       // title appears
+    advance(4, 1200);      // subtitle appears
+    timers.push(setTimeout(() => finish(), 2000));
+    return () => timers.forEach(clearTimeout);
+  }, [finish]);
+
+  // Skip on click/key
+  useEffect(() => {
+    let attached = false;
+    const skip = (e) => {
+      if (e.type === 'keydown' && !['Enter', ' ', 'Escape'].includes(e.key)) return;
+      finish();
+    };
+    const timer = setTimeout(() => {
+      attached = true;
+      window.addEventListener('keydown', skip);
+      window.addEventListener('click', skip);
+    }, 100);
+    return () => {
+      clearTimeout(timer);
+      if (attached) {
+        window.removeEventListener('keydown', skip);
+        window.removeEventListener('click', skip);
+      }
+    };
+  }, [finish]);
+
+  return (
+    <div className={`celestial-intro phase-${phase}${dissolving ? ' dissolving' : ''}`}>
+      <div className="celestial-glow celestial-glow-a" />
+      <div className="celestial-glow celestial-glow-b" />
+      <img src="/assets/intro_key.png" alt="Key" className="celestial-key-img" draggable="false" />
+      <img src="/assets/intro_rock.png" alt="Rock" className="celestial-crystal-img" draggable="false" />
+      <div className="celestial-title-group">
+        <h1 className="celestial-title">The Key to the Rock</h1>
+        <p className="celestial-subtitle">A Bayesian Replication of Ota, Hartsuiker &amp; Haywood (2009)</p>
+      </div>
+      <div className="celestial-skip">click or press any key to skip</div>
+    </div>
+  );
+}
+
+// ============================================================
 // APP
 // ============================================================
 function App() {
@@ -1735,9 +2636,60 @@ function App() {
   const [showOverview, setShowOverview] = useState(false);
   const [showAppendix, setShowAppendix] = useState(false);
   const [showExperiment, setShowExperiment] = useState(false);
+  const [customCursor, setCustomCursor] = useState(true);
+  const [dyslexiaFont, setDyslexiaFont] = useState(false);
+  const [showSpotlight, setShowSpotlight] = useState(false);
+  const [showIntro, setShowIntro] = useState(() => !sessionStorage.getItem('ota-intro-seen'));
+  const [introKey, setIntroKey] = useState(0);
+  const dismissIntro = useCallback(() => {
+    setShowIntro(false);
+    sessionStorage.setItem('ota-intro-seen', 'true');
+    setIntroKey(k => k + 1);
+  }, []);
 
   const totalSlides = slides.length;
   const currentSlide = slides[currentIndex];
+
+  // Custom cursor init
+  useEffect(() => {
+    const saved = localStorage.getItem('ota-custom-cursor');
+    const enabled = saved !== 'false';
+    setCustomCursor(enabled);
+    document.documentElement.classList.toggle('cursor-custom', enabled);
+  }, []);
+
+  // Lock body scroll when any modal is open
+  useEffect(() => {
+    const anyModal = showOverview || showAppendix || showExperiment || showSpotlight || showIntro;
+    document.body.style.overflow = anyModal ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [showOverview, showAppendix, showExperiment, showSpotlight, showIntro]);
+
+  // Dyslexia font init
+  useEffect(() => {
+    const saved = localStorage.getItem('ota-dyslexia-font');
+    const enabled = saved === 'true';
+    setDyslexiaFont(enabled);
+    document.documentElement.classList.toggle('dyslexia-font', enabled);
+  }, []);
+
+  const toggleDyslexiaFont = useCallback(() => {
+    setDyslexiaFont(prev => {
+      const next = !prev;
+      localStorage.setItem('ota-dyslexia-font', String(next));
+      document.documentElement.classList.toggle('dyslexia-font', next);
+      return next;
+    });
+  }, []);
+
+  const toggleCursor = useCallback(() => {
+    setCustomCursor(prev => {
+      const next = !prev;
+      localStorage.setItem('ota-custom-cursor', String(next));
+      document.documentElement.classList.toggle('cursor-custom', next);
+      return next;
+    });
+  }, []);
 
   // Theme init
   useEffect(() => {
@@ -1773,6 +2725,16 @@ function App() {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
+      // Intro handles its own keys
+      if (showIntro) return;
+      // Cmd+K or Ctrl+K → spotlight
+      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setShowSpotlight(prev => !prev);
+        return;
+      }
+      // Spotlight handles its own keys when open
+      if (showSpotlight) return;
       if ((showOverview || showAppendix) && e.key === 'Escape') {
         setShowOverview(false);
         setShowAppendix(false);
@@ -1789,12 +2751,59 @@ function App() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [goNext, goPrev, showOverview, showAppendix, showExperiment, toggleTheme]);
+  }, [goNext, goPrev, showOverview, showAppendix, showExperiment, showSpotlight, showIntro, toggleTheme]);
+
+  // Priors minimap — sticky thumbnail when viz scrolls out of view on mobile
+  const priorsSentinelRef = useRef(null);
+  const [showPriorsMinimap, setShowPriorsMinimap] = useState(false);
+
+  useEffect(() => {
+    const sentinel = priorsSentinelRef.current;
+    if (!sentinel) { setShowPriorsMinimap(false); return; }
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowPriorsMinimap(!entry.isIntersecting),
+      { threshold: 0 }
+    );
+    observer.observe(sentinel);
+    return () => { observer.disconnect(); setShowPriorsMinimap(false); };
+  }, [currentIndex]);
+
+  // Swipe gesture navigation
+  const touchRef = useRef(null);
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
+
+  useEffect(() => {
+    const el = touchRef.current;
+    if (!el) return;
+    const onTouchStart = (e) => {
+      touchStartX.current = e.touches[0].clientX;
+      touchStartY.current = e.touches[0].clientY;
+    };
+    const onTouchEnd = (e) => {
+      if (showOverview || showAppendix || showExperiment) return;
+      const dx = e.changedTouches[0].clientX - touchStartX.current;
+      const dy = e.changedTouches[0].clientY - touchStartY.current;
+      const absDx = Math.abs(dx);
+      const absDy = Math.abs(dy);
+      if (absDx < 50 || absDx < absDy * 1.5) return;
+      if (dx < 0) goNext();
+      else goPrev();
+    };
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchend', onTouchEnd, { passive: true });
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [goNext, goPrev, showOverview, showAppendix, showExperiment]);
 
   return (
-    <div className="carousel-app">
+    <div className="carousel-app" ref={touchRef}>
+      {showIntro && <CelestialIntro onComplete={dismissIntro} />}
       <div className="app-background"></div>
       <div className="noise-overlay"></div>
+      <CursorAura enabled={customCursor} />
 
       <GlossarySidebar currentSlideId={currentSlide.id} />
 
@@ -1807,12 +2816,12 @@ function App() {
       )}
 
       {/* ── Stage ── */}
-      <main className={`stage ${isTransitioning ? 'fade-out' : 'fade-in'}`}>
+      <main key={introKey} className={`stage ${isTransitioning ? 'fade-out' : 'fade-in'}`}>
         {currentSlide.type === 'hero' && (
           <div className="slide slide-hero" data-section={currentSlide.id}>
             <div className="hero-content">
               {currentSlide.id === 'title' && (
-                <div className="hero-method-badge"><Tooltip term="Bayesian Statistics">Bayesian Statistics</Tooltip> &middot; <Tooltip term="brms">brms</Tooltip> + <Tooltip term="R Programming">R Programming</Tooltip></div>
+                <div className="hero-method-badge">Psycholinguistics &middot; Bayesian Statistics &middot; brms + R</div>
               )}
               <div className="hero-title-group">
                 <h1 className="hero-title">{currentSlide.title}</h1>
@@ -1866,50 +2875,78 @@ function App() {
         )}
 
         {currentSlide.type === 'split' && (
-          <div className="slide slide-split" data-section={currentSlide.id}>
-            <div className="split-left">
-              {/* Contrast Legend Strip (persistent reference) */}
-              {currentSlide.showContrastLegend && <ContrastLegendStrip />}
-
-              <div className="visual-frame">
-                {currentSlide.visualSrc ? (
-                  <div className="visual-img-pair">
-                    <img src={currentSlide.visualSrc} className="visual-img visual-img-light" alt="Evidence" />
-                    <img src={currentSlide.visualSrc.replace('./assets/', './assets/dark_mode/')} className="visual-img visual-img-dark" alt="Evidence" />
-                  </div>
-                ) : currentSlide.visualContent}
-                {currentSlide.visualCaption && <div className="visual-caption">{currentSlide.visualCaption}</div>}
-                {/* Figure legend: explains what visual elements mean */}
-                {currentSlide.figureLegend && <FigureLegend text={currentSlide.figureLegend} />}
-                {/* Reproduce tag: links to R script */}
-                {currentSlide.reproduceTag && <ReproduceTag scriptRef={currentSlide.reproduceTag} />}
-              </div>
-            </div>
-            <div className="split-right">
-              {/* Model Recap Box — compact header chip */}
-              {currentSlide.showModelRecap && showFormal && <ModelRecap />}
-              <div className="content-header">
-                <div className="content-header-top">
-                  <span className="slide-label">{currentSlide.label}</span>
-                  {currentSlide.repLevel && <RepLevelTag level={currentSlide.repLevel} />}
+          <>
+            <div className={`slide slide-split ${currentSlide.id === 'summary' ? 'summary-desktop' : ''} ${currentSlide.id === 'phonological' ? 'phonological-desktop' : ''} ${currentSlide.id === 'theory' ? 'theory-desktop' : ''} ${currentSlide.id === 'design' ? 'design-desktop' : ''} ${['logit_link', 'coin_flip', 'findings_summary', 'limitations', 'references', 'conclusion'].includes(currentSlide.id) ? 'text-first-mobile' : ''}`} data-section={currentSlide.id}>
+              <div className="split-left">
+                <div className="visual-frame">
+                  {currentSlide.visualSrc ? (
+                    <div className="visual-img-pair">
+                      <img src={currentSlide.visualSrc} className="visual-img visual-img-light" alt="Evidence" />
+                      <img src={currentSlide.visualSrc.replace('./assets/', './assets/dark_mode/')} className="visual-img visual-img-dark" alt="Evidence" />
+                    </div>
+                  ) : currentSlide.visualContent}
+                  {currentSlide.visualCaption && <div className="visual-caption">{currentSlide.visualCaption}</div>}
+                  {/* Figure legend: explains what visual elements mean */}
+                  {currentSlide.figureLegend && <FigureLegend text={currentSlide.figureLegend} showContrasts={currentSlide.showContrastLegend} />}
                 </div>
-                <h2 className="content-title">{currentSlide.title}</h2>
+                {currentSlide.id === 'priors' && <div className="priors-sentinel" ref={priorsSentinelRef} />}
               </div>
-              <div className="narrative-text">{currentSlide.text}</div>
+              <div className="split-right">
+                {/* Model Recap Box — compact header chip */}
+                {currentSlide.showModelRecap && showFormal && <ModelRecap />}
+                <div className="content-header">
+                  <div className="content-header-top">
+                    <span className="slide-label">{currentSlide.label}</span>
+                    {currentSlide.repLevel && <RepLevelTag level={currentSlide.repLevel} />}
+                  </div>
+                  <h2 className="content-title">{currentSlide.title}</h2>
+                </div>
+                <div className="narrative-text">{currentSlide.text}</div>
 
-              {/* Theory Callout */}
-              {currentSlide.theoryCallout && showFormal && (
-                <TheoryCallout text={currentSlide.theoryCallout} />
-              )}
+                {/* Theory Callout */}
+                {currentSlide.theoryCallout && showFormal && (
+                  <TheoryCallout text={currentSlide.theoryCallout} />
+                )}
 
-              {/* Progressive Disclosure OR standard formal block */}
-              {showFormal && currentSlide.tiers && <TieredContent tiers={currentSlide.tiers} />}
-              {showFormal && !currentSlide.tiers && currentSlide.formal}
+                {/* Progressive Disclosure OR standard formal block */}
+                {showFormal && currentSlide.tiers && <TieredContent tiers={currentSlide.tiers} />}
+                {showFormal && !currentSlide.tiers && currentSlide.formal}
+              </div>
+              {currentSlide.footer && <ThreeLineFooter footer={currentSlide.footer} />}
             </div>
-            {currentSlide.footer && <ThreeLineFooter footer={currentSlide.footer} />}
-          </div>
+            {showPriorsMinimap && currentSlide.id === 'priors' && currentSlide.visualSrc && (
+              <div className="priors-minimap">
+                <img src={currentSlide.visualSrc} className="visual-img visual-img-light" alt="Prior→Posterior mini" />
+                <img src={currentSlide.visualSrc.replace('./assets/', './assets/dark_mode/')} className="visual-img visual-img-dark" alt="Prior→Posterior mini" />
+              </div>
+            )}
+            {currentSlide.id === 'theory' && (
+              <TheoryCardMobile slide={currentSlide} showFormal={showFormal} />
+            )}
+            {currentSlide.id === 'design' && (
+              <DesignCardsMobile slide={currentSlide} showFormal={showFormal} />
+            )}
+            {currentSlide.id === 'summary' && (
+              <AccordionSummary slide={currentSlide} showFormal={showFormal} />
+            )}
+            {currentSlide.id === 'phonological' && (
+              <PhenomenonMobile slide={currentSlide} showFormal={showFormal} />
+            )}
+          </>
         )}
       </main>
+
+      {/* ── Key hints (desktop, slide 0 only) ── */}
+      {currentIndex === 0 && (
+        <div className="key-hints">
+          <span><kbd>&larr;</kbd> <kbd>&rarr;</kbd> navigate</span>
+          <span><kbd>D</kbd> theme</span>
+          <span><kbd>M</kbd> math</span>
+          <span><kbd>O</kbd> overview</span>
+          <span><kbd>A</kbd> appendix</span>
+          <span><kbd>&#8984;</kbd><kbd>K</kbd> search</span>
+        </div>
+      )}
 
       {/* ── Bottom bar ── */}
       <nav className="bottom-bar">
@@ -1934,6 +2971,17 @@ function App() {
           <button className="bar-icon-btn" onClick={toggleTheme} title="Toggle theme (D)">
             {theme === 'dark' ? '\u2600' : '\u263E'}
           </button>
+          <button className="bar-icon-btn" onClick={toggleCursor} title="Toggle custom cursor">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 1 L3 12 L6.5 8.5 L10 13 L12 11.5 L8.5 7 L13 6 Z" />
+              {!customCursor && <line x1="1" y1="15" x2="15" y2="1" strokeWidth="2" />}
+            </svg>
+          </button>
+          <button className={`bar-icon-btn${dyslexiaFont ? ' active' : ''}`} onClick={toggleDyslexiaFont} title="Dyslexia-friendly font">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <text x="1" y="13" fontSize="14" fontWeight="bold" fill="currentColor" stroke="none" fontFamily="serif">A</text>
+            </svg>
+          </button>
           <button className="bar-icon-btn" onClick={() => setShowFormal(!showFormal)} title="Toggle math (M)">
             {showFormal ? '\u2212M' : '+M'}
           </button>
@@ -1947,6 +2995,20 @@ function App() {
           <a className="bar-link" href="https://doi.org/10.1016/j.cognition.2008.12.007" target="_blank" rel="noopener noreferrer">Ota 2009</a>
         </div>
       </nav>
+
+      {/* ── Mobile bottom sheet navigation ── */}
+      <MobileNav
+        currentIndex={currentIndex}
+        totalSlides={totalSlides}
+        goToSlide={goToSlide}
+        theme={theme}
+        toggleTheme={toggleTheme}
+        showFormal={showFormal}
+        setShowFormal={setShowFormal}
+        setShowOverview={setShowOverview}
+        setShowAppendix={setShowAppendix}
+        setShowExperiment={setShowExperiment}
+      />
 
       {/* ── Overview modal ── */}
       {showOverview && (
@@ -1966,6 +3028,14 @@ function App() {
       {/* ── Experiment modal ── */}
       {showExperiment && (
         <ExperimentModal onClose={() => setShowExperiment(false)} />
+      )}
+
+      {/* ── Spotlight search ── */}
+      {showSpotlight && (
+        <SpotlightSearch
+          onClose={() => setShowSpotlight(false)}
+          onNavigate={(idx) => { goToSlide(idx); setShowSpotlight(false); }}
+        />
       )}
     </div>
   );

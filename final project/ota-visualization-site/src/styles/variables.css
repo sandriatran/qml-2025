@@ -28,7 +28,7 @@
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
 
   /* Glass materials */
-  --glass-bg: rgba(255, 255, 255, 0.4);
+  --glass-bg: rgba(255, 255, 255, 0.82);
   --glass-border: rgba(167, 160, 230, 0.25);
   --glass-blur: 20px;
 
@@ -38,12 +38,17 @@
   --color-purple: var(--palette-purple);
   --color-lavender: var(--palette-lavender);
 
-  /* Aurora background */
-  --aurora-a: #ffffff;
-  --aurora-b: #d8e6ff;
-  --aurora-c: #a7a0e6;
-  --aurora-d: #ffd6ff;
-  --aurora-e: #fdfcf5;
+  /* Aurora background — lavender / pink / periwinkle / blue */
+  --aurora-a: #F1EAF4;
+  --aurora-b: #F2DBEF;
+  --aurora-c: #EFC4EC;
+  --aurora-d: #FAE2E2;
+  --aurora-e: #CCD2F4;
+  --aurora-f: #d4e2f1;
+  --aurora-g: #bdbcef;
+  --aurora-h: #c6d1ff;
+  --aurora-i: #6dafff;
+  --aurora-j: #deafde;
 
   /* ── Typography ── */
   --font-stack: 'Inter', system-ui, -apple-system, sans-serif;
@@ -58,6 +63,13 @@
   --radius-md: 8px;
   --radius-lg: 16px;
   --radius-pill: 100px;
+
+  /* ── Fluid responsive tokens ── */
+  --space-xs: clamp(0.25rem, 0.5vw, 0.5rem);
+  --space-sm: clamp(0.5rem, 1vw, 0.75rem);
+  --space-md: clamp(0.75rem, 2vw, 1rem);
+  --space-lg: clamp(1rem, 3vw, 1.5rem);
+  --touch-target: 44px;
 }
 
 /* ── Dark Theme ── */
@@ -84,14 +96,34 @@
   --color-purple: #d18aff;
   --color-lavender: #b8b2f0;
 
-  --aurora-a: #0a0b14;
-  --aurora-b: #0d0e1e;
+  --aurora-a: #0e0b14;
+  --aurora-b: #100c18;
   --aurora-c: #13102a;
-  --aurora-d: #160e22;
-  --aurora-e: #0a0b14;
+  --aurora-d: #140e1e;
+  --aurora-e: #0e0f1c;
+  --aurora-f: #0d1018;
+  --aurora-g: #0f0e1e;
+  --aurora-h: #0e1020;
+  --aurora-i: #0b1028;
+  --aurora-j: #120e18;
 }
 
 /* ── Base reset ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+
+/* ── Dyslexia-friendly font override ── */
+.dyslexia-font {
+  --font-stack: 'OpenDyslexic', system-ui, sans-serif;
+  --font-mono: 'OpenDyslexicMono', 'Consolas', monospace;
+}
+
 body {
   margin: 0;
   font-family: var(--font-stack);
@@ -100,6 +132,7 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
+  overflow-x: hidden;
 }
 
 h1, h2, h3 {
