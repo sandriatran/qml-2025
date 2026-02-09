@@ -115,3 +115,10 @@
     display: none;
   }
 }
+
+/* Hide on landscape phones */
+@media (max-height: 500px) and (orientation: landscape) {
+  .glossary-sidebar {
+    display: none;
+  }
+}

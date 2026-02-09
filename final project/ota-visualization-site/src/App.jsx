@@ -1488,6 +1488,193 @@ const TechnicalAppendix = ({ onClose }) => (
   </div>
 );
 
+// ── Design Philosophy Modal ──
+const DesignPhilosophyModal = ({ onClose }) => (
+  <div className="overview-backdrop" onClick={onClose}>
+    <div className="overview-modal design-philosophy-modal" onClick={e => e.stopPropagation()}>
+      <div className="overview-header">
+        <h3>Design Philosophy</h3>
+        <button className="overview-close" onClick={onClose}>&times;</button>
+      </div>
+      <div className="overview-body design-philosophy-body">
+
+        <p className="dp-lead">An interactive 26-slide Bayesian reanalysis of Ota, Hartsuiker &amp; Haywood (2009), examining how L1 phonology warps LX word recognition&mdash;engineered in React/Vite with a glassmorphic UI, powered by an R/brms Bayesian pipeline, and designed for universal accessibility.</p>
+
+        {/* ── Structure ── */}
+        <div className="dp-section">
+          <h4 className="dp-section-title">Structure</h4>
+          <p className="dp-desc">26 slides organized across 6 thematic sections&mdash;Intro, Model, Results, Evidence, Deep Dive, Synthesis&mdash;with full keyboard navigation (<kbd>&larr;</kbd> <kbd>&rarr;</kbd> <kbd>Space</kbd>), slide overview (<kbd>O</kbd>), and a command-palette search (<kbd>&#8984;</kbd><kbd>K</kbd>).</p>
+          <div className="dp-stats-row">
+            <div className="dp-stat"><span className="dp-stat-num">26</span><span className="dp-stat-label">Slides</span></div>
+            <div className="dp-stat"><span className="dp-stat-num">6</span><span className="dp-stat-label">Sections</span></div>
+            <div className="dp-stat"><span className="dp-stat-num">9</span><span className="dp-stat-label">Hotkeys</span></div>
+            <div className="dp-stat"><span className="dp-stat-num">3</span><span className="dp-stat-label">brms Models</span></div>
+          </div>
+          <img className="dp-gif" src="./assets/showcase/key-rock-intro.gif" alt="The Key to the Rock — light mode intro" loading="lazy" />
+        </div>
+
+        {/* ── The Research ── */}
+        <div className="dp-section">
+          <h4 className="dp-section-title">The Research</h4>
+          <p className="dp-desc">A short online experiment where participants quickly judge whether English word pairs like <strong>KEY / ROCK</strong> are related in meaning. The Bayesian reanalysis reveals that LX words built on L1-absent phonological contrasts (sound distinctions not present in one&rsquo;s first language) form indeterminate lexical entries&mdash;unclear mental dictionary entries that blur together&mdash;with error rates (~21%) comparable to true homophones like <em>flour</em> and <em>flower</em>.</p>
+          <div className="dp-gif-pair">
+            <div className="dp-gif-frame">
+              <img className="dp-gif" src="./assets/showcase/key-rock-experiment.gif" alt="Key-Rock experiment interaction" loading="lazy" />
+              <span className="dp-gif-caption">Key-Rock Experiment</span>
+            </div>
+            <div className="dp-gif-frame">
+              <img className="dp-gif" src="./assets/showcase/experimental-design.gif" alt="Experimental design walkthrough" loading="lazy" />
+              <span className="dp-gif-caption">Experimental Design</span>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Features ── */}
+        <div className="dp-section">
+          <h4 className="dp-section-title">Features</h4>
+          <div className="dp-features-grid">
+            <div className="dp-feature-card">
+              <div className="dp-feature-icon"><kbd>&#8984;</kbd><kbd>K</kbd></div>
+              <div className="dp-feature-label">Spotlight Search</div>
+              <div className="dp-feature-desc">Key terms glossary with instant search across all 26 slides via a command-palette interface</div>
+            </div>
+            <div className="dp-feature-card">
+              <div className="dp-feature-icon"><kbd>D</kbd></div>
+              <div className="dp-feature-label">Dual Themes</div>
+              <div className="dp-feature-desc">Light and dark modes with matched R plot variants&mdash;softer aurora, glass panels, and optimized text contrast</div>
+            </div>
+            <div className="dp-feature-card">
+              <div className="dp-feature-icon"><kbd>A</kbd></div>
+              <div className="dp-feature-label">Technical Appendix</div>
+              <div className="dp-feature-desc">Full model specs, MCMC diagnostics, LOO-CV comparison, notation guide, and downloadable R scripts</div>
+            </div>
+            <div className="dp-feature-card">
+              <div className="dp-feature-icon"><kbd>E</kbd></div>
+              <div className="dp-feature-label">Try the Experiment</div>
+              <div className="dp-feature-desc">Interactive demo of the semantic-relatedness judgment task used in the original study</div>
+            </div>
+            <div className="dp-feature-card">
+              <div className="dp-feature-icon">Aa</div>
+              <div className="dp-feature-label">Dyslexia Typeface</div>
+              <div className="dp-feature-desc">OpenDyslexic font toggle for improved readability across all slides and modals</div>
+            </div>
+            <div className="dp-feature-card">
+              <div className="dp-feature-icon"><kbd>M</kbd></div>
+              <div className="dp-feature-label">Inline KaTeX Math</div>
+              <div className="dp-feature-desc">Fast, lightweight LaTeX rendering for Bayesian notation&mdash;toggleable between formal and intuitive tiers</div>
+            </div>
+          </div>
+          <div className="dp-gif-pair">
+            <div className="dp-gif-frame">
+              <img className="dp-gif" src="./assets/showcase/key-terms-spotlight.gif" alt="Key Terms + Spotlight Search" loading="lazy" />
+              <span className="dp-gif-caption">Key Terms + Spotlight Search</span>
+            </div>
+            <div className="dp-gif-frame">
+              <img className="dp-gif" src="./assets/showcase/dyslexia-typeface.gif" alt="Dyslexia typeface support" loading="lazy" />
+              <span className="dp-gif-caption">Dyslexia Typeface Support</span>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Bayesian Math ── */}
+        <div className="dp-section">
+          <h4 className="dp-section-title">Bayesian Notation &amp; Theory</h4>
+          <p className="dp-desc">Inline KaTeX renders Bayesian notation at native speed. The logit link function, Bernoulli likelihood, and theoretical foundations are presented with color-coded brms equations and progressive disclosure tiers.</p>
+          <div className="dp-gif-trio">
+            <div className="dp-gif-frame">
+              <img className="dp-gif" src="./assets/showcase/bernoulli.gif" alt="Bernoulli model slide" loading="lazy" />
+              <span className="dp-gif-caption">Bernoulli Model</span>
+            </div>
+            <div className="dp-gif-frame">
+              <img className="dp-gif" src="./assets/showcase/link-function.gif" alt="Link function slide" loading="lazy" />
+              <span className="dp-gif-caption">Logit Link Function</span>
+            </div>
+            <div className="dp-gif-frame">
+              <img className="dp-gif" src="./assets/showcase/theoretical-foundation.gif" alt="Theoretical foundation" loading="lazy" />
+              <span className="dp-gif-caption">Theoretical Foundation</span>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Interactive Visualizations ── */}
+        <div className="dp-section">
+          <h4 className="dp-section-title">Interactive Visualizations</h4>
+          <p className="dp-desc">Every statistical plot is generated in R with a custom <code>theme_ota()</code> palette and dual-saved for light/dark modes. Animated GIFs reveal posteriors, credible intervals, and MCMC convergence progressively. Color-coded contrast schemes (F, PB, H, LR) maintain consistency across forest plots, error-rate bar charts, half-eye densities, caterpillar plots, heatmaps, and raincloud distributions.</p>
+          <img className="dp-gif" src="./assets/showcase/color-design.gif" alt="Color design and visualization palette" loading="lazy" />
+          <span className="dp-gif-caption dp-gif-caption-solo">Data Visualization &amp; Color Schemes</span>
+        </div>
+
+        {/* ── Progressive Disclosure ── */}
+        <div className="dp-section">
+          <h4 className="dp-section-title">Progressive Disclosure</h4>
+          <p className="dp-desc">Complex slides offer three-tier toggles&mdash;Intuitive, Technical, and Full Detail&mdash;so readers at every level, from curious learners to Bayesian statisticians, can engage at their preferred depth. Color-coded brms equations, model recap boxes, contrast legend strips, and representation-level tags (PHON, LEX, DEC, STAT) guide comprehension without overwhelming.</p>
+        </div>
+
+        {/* ── Dark Mode & Appendix ── */}
+        <div className="dp-section">
+          <h4 className="dp-section-title">Dark Mode &amp; Technical Appendix</h4>
+          <p className="dp-desc">The full dark theme extends from the glassmorphic UI into every R-generated plot via <code>theme_ota_dark()</code>. The Technical Appendix (<kbd>A</kbd>) provides model specifications, MCMC diagnostics, LOO-CV, notation guide, and downloadable R scripts&mdash;all responsive across desktop and mobile viewports.</p>
+          <div className="dp-gif-pair">
+            <div className="dp-gif-frame">
+              <img className="dp-gif" src="./assets/showcase/dark-mode-desktop.gif" alt="Dark mode desktop view" loading="lazy" />
+              <span className="dp-gif-caption">Dark Mode | Desktop</span>
+            </div>
+            <div className="dp-gif-frame">
+              <img className="dp-gif" src="./assets/showcase/appendix-dark-mode.gif" alt="Technical Appendix in dark mode" loading="lazy" />
+              <span className="dp-gif-caption">Technical Appendix | Dark Mode</span>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Architecture ── */}
+        <div className="dp-section">
+          <h4 className="dp-section-title">Architecture</h4>
+          <div className="dp-arch-row">
+            <div className="dp-arch-card">
+              <div className="dp-arch-label">Frontend</div>
+              <div className="dp-arch-detail">React 19 + Vite</div>
+              <div className="dp-arch-sub">Glassmorphic UI, CSS custom properties, responsive grid</div>
+            </div>
+            <div className="dp-arch-card">
+              <div className="dp-arch-label">Analysis</div>
+              <div className="dp-arch-detail">R / brms</div>
+              <div className="dp-arch-sub">Bayesian GLMMs, MCMC sampling, posterior visualization pipeline</div>
+            </div>
+            <div className="dp-arch-card">
+              <div className="dp-arch-label">Rendering</div>
+              <div className="dp-arch-detail">KaTeX + GIF</div>
+              <div className="dp-arch-sub">LaTeX math, animated statistical reveals, dual-theme plot export</div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Mobile & Responsive ── */}
+        <div className="dp-section">
+          <h4 className="dp-section-title">Mobile &amp; Responsive</h4>
+          <p className="dp-desc">Every slide scales from wide desktop down to mobile with a bottom-sheet navigation drawer, touch-friendly controls, and readable typography. Statistical plots resize gracefully, and the glassmorphic panels adapt to viewport constraints.</p>
+          <div className="dp-gif-pair">
+            <div className="dp-gif-frame">
+              <img className="dp-gif" src="./assets/showcase/mobile-key-rock.gif" alt="Mobile view of the Key to the Rock" loading="lazy" />
+              <span className="dp-gif-caption">Mobile | The Key to the Rock</span>
+            </div>
+            <div className="dp-gif-frame">
+              <img className="dp-gif" src="./assets/showcase/appendix-mobile.gif" alt="Technical Appendix on mobile" loading="lazy" />
+              <span className="dp-gif-caption">Mobile | Technical Appendix</span>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Accessibility ── */}
+        <div className="dp-section dp-section-last">
+          <h4 className="dp-section-title">Accessibility First</h4>
+          <p className="dp-desc">Designed for the full range of readers, learners, and academic backgrounds. Dual themes reduce eye strain. Dyslexia-friendly typeface support improves readability. Keyboard navigation ensures screen-reader compatibility. Custom cursor toggle, responsive layout, and progressive disclosure tiers make the content approachable regardless of statistical background or device.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+);
+
 // ── Overview Modal ──
 const OverviewModal = ({ slides, currentIndex, onSelect, onClose }) => (
   <div className="overview-backdrop" onClick={onClose}>
@@ -2636,6 +2823,7 @@ function App() {
   const [showOverview, setShowOverview] = useState(false);
   const [showAppendix, setShowAppendix] = useState(false);
   const [showExperiment, setShowExperiment] = useState(false);
+  const [showDesignPhilosophy, setShowDesignPhilosophy] = useState(false);
   const [customCursor, setCustomCursor] = useState(true);
   const [dyslexiaFont, setDyslexiaFont] = useState(false);
   const [showSpotlight, setShowSpotlight] = useState(false);
@@ -2660,10 +2848,10 @@ function App() {
 
   // Lock body scroll when any modal is open
   useEffect(() => {
-    const anyModal = showOverview || showAppendix || showExperiment || showSpotlight || showIntro;
+    const anyModal = showOverview || showAppendix || showExperiment || showDesignPhilosophy || showSpotlight || showIntro;
     document.body.style.overflow = anyModal ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
-  }, [showOverview, showAppendix, showExperiment, showSpotlight, showIntro]);
+  }, [showOverview, showAppendix, showExperiment, showDesignPhilosophy, showSpotlight, showIntro]);
 
   // Dyslexia font init
   useEffect(() => {
@@ -2693,9 +2881,8 @@ function App() {
 
   // Theme init
   useEffect(() => {
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const saved = localStorage.getItem('ota-theme');
-    const initial = saved || (prefersDark ? 'dark' : 'light');
+    const initial = saved || 'light';
     setTheme(initial);
     document.documentElement.setAttribute('data-theme', initial);
   }, []);
@@ -2735,9 +2922,10 @@ function App() {
       }
       // Spotlight handles its own keys when open
       if (showSpotlight) return;
-      if ((showOverview || showAppendix) && e.key === 'Escape') {
+      if ((showOverview || showAppendix || showDesignPhilosophy) && e.key === 'Escape') {
         setShowOverview(false);
         setShowAppendix(false);
+        setShowDesignPhilosophy(false);
         return;
       }
       if (showExperiment) return; // Experiment modal handles its own keys
@@ -2751,7 +2939,7 @@ function App() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [goNext, goPrev, showOverview, showAppendix, showExperiment, showSpotlight, showIntro, toggleTheme]);
+  }, [goNext, goPrev, showOverview, showAppendix, showExperiment, showDesignPhilosophy, showSpotlight, showIntro, toggleTheme]);
 
   // Priors minimap — sticky thumbnail when viz scrolls out of view on mobile
   const priorsSentinelRef = useRef(null);
@@ -2993,6 +3181,7 @@ function App() {
           <a className="bar-link" href="https://github.com/sandriatran/qml-2025" target="_blank" rel="noopener noreferrer">GitHub</a>
           <a className="bar-link" href="https://github.com/sandriatran/qml-2025/blob/main/final%20project/Re-Analyzing-Ota%2C-Hartsuiker-and-Haywood--2009----A-Bayesian-Approach-to-Representational-Indeterminacy.pdf" target="_blank" rel="noopener noreferrer">Final Report</a>
           <a className="bar-link" href="https://doi.org/10.1016/j.cognition.2008.12.007" target="_blank" rel="noopener noreferrer">Ota 2009</a>
+          <button className="bar-link design-philosophy-btn" onClick={() => setShowDesignPhilosophy(true)}>Design Philosophy</button>
         </div>
       </nav>
 
@@ -3028,6 +3217,11 @@ function App() {
       {/* ── Experiment modal ── */}
       {showExperiment && (
         <ExperimentModal onClose={() => setShowExperiment(false)} />
+      )}
+
+      {/* ── Design Philosophy modal ── */}
+      {showDesignPhilosophy && (
+        <DesignPhilosophyModal onClose={() => setShowDesignPhilosophy(false)} />
       )}
 
       {/* ── Spotlight search ── */}
