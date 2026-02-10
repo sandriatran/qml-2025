@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
 import GlossarySidebar from './components/GlossarySidebar';
+import KineticGrid from './components/KineticGrid';
 import './index.css';
 
 // ============================================================
@@ -1563,6 +1564,11 @@ const DesignPhilosophyModal = ({ onClose }) => (
               <div className="dp-feature-label">Inline KaTeX Math</div>
               <div className="dp-feature-desc">Fast, lightweight LaTeX rendering for Bayesian notation&mdash;toggleable between formal and intuitive tiers</div>
             </div>
+            <div className="dp-feature-card">
+              <div className="dp-feature-icon"><kbd>M</kbd></div>
+              <div className="dp-feature-label">Dyscalculia-Friendly</div>
+              <div className="dp-feature-desc">Math toggle hides all formal notation on demand, reducing cognitive load for the ~6% affected by dyscalculia</div>
+            </div>
           </div>
           <div className="dp-gif-pair">
             <div className="dp-gif-frame">
@@ -1668,6 +1674,9 @@ const DesignPhilosophyModal = ({ onClose }) => (
         <div className="dp-section dp-section-last">
           <h4 className="dp-section-title">Accessibility First</h4>
           <p className="dp-desc">Designed for the full range of readers, learners, and academic backgrounds. Dual themes reduce eye strain. Dyslexia-friendly typeface support improves readability. Keyboard navigation ensures screen-reader compatibility. Custom cursor toggle, responsive layout, and progressive disclosure tiers make the content approachable regardless of statistical background or device.</p>
+          <div className="dp-callout">
+            <strong>Dyscalculia support.</strong> Dyscalculia is a learning difficulty affecting approximately 6% of people, making it hard to read, understand, and use numbers. The <kbd>M</kbd> toggle hides all formal mathematical notation site-wide&mdash;equations, Greek symbols, subscripts&mdash;leaving only plain-language explanations. This reduces cognitive load around numbers, avoids overwhelming pages with statistics, and provides context through sentences rather than formulas alone. Combined with the three-tier progressive disclosure (Intuitive &rarr; Technical &rarr; Full Detail), users can engage with the research without encountering any notation they find distressing. Because dyscalculia often co-occurs with dyslexia, the OpenDyslexic toggle pairs naturally with the math toggle for comprehensive neurodivergent support.
+          </div>
         </div>
 
       </div>
@@ -2991,6 +3000,7 @@ function App() {
       {showIntro && <CelestialIntro onComplete={dismissIntro} />}
       <div className="app-background"></div>
       <div className="noise-overlay"></div>
+      <KineticGrid theme={theme} />
       <CursorAura enabled={customCursor} />
 
       <GlossarySidebar currentSlideId={currentSlide.id} />
